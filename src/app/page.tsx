@@ -1,103 +1,174 @@
+"use client";
+
 import Image from "next/image";
+import { motion, type Variants, useMotionValue, useTransform, useSpring } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import PixelTransition from "@/components/PixelTransition";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const headingText = "Modern web experiences with a refined, understated aesthetic.";
+  const headingWords = headingText.split(" ");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+  const gridContainer: Variants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const leftSection: Variants = {
+    hidden: { opacity: 0, y: 12 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: [0.16, 1, 0.3, 1],
+        when: "beforeChildren",
+        staggerChildren: 0.2,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const childItem: Variants = {
+    hidden: { opacity: 0, y: 12 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
+  };
+
+  const rightSection: Variants = {
+    hidden: { opacity: 0, scale: 0.98, y: 10 },
+    show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
+  };
+
+  const headingContainer: Variants = {
+    hidden: {},
+    show: {
+      transition: { staggerChildren: 0.06, delayChildren: 0.02 },
+    },
+  };
+
+  const headingWord: Variants = {
+    hidden: { y: 24, opacity: 0, filter: "blur(8px)" },
+    show: {
+      y: 0,
+      opacity: 1,
+      filter: "blur(0px)",
+      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+    },
+  };
+
+  // Mouse-driven parallax for right visual block
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const springCfg = { stiffness: 120, damping: 16, mass: 0.3 } as const;
+  const rotateX = useSpring(useTransform(mouseY, [-1, 1], [8, -8]), springCfg);
+  const rotateY = useSpring(useTransform(mouseX, [-1, 1], [-10, 10]), springCfg);
+  const shiftX = useSpring(useTransform(mouseX, [-1, 1], [-8, 8]), springCfg);
+  const shiftY = useSpring(useTransform(mouseY, [-1, 1], [-4, 4]), springCfg);
+
+  function handleParallaxMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width; // 0..1
+    const py = (e.clientY - rect.top) / rect.height; // 0..1
+    mouseX.set(px * 2 - 1); // -1..1
+    mouseY.set(py * 2 - 1); // -1..1
+  }
+
+  function resetParallax() {
+    mouseX.set(0);
+    mouseY.set(0);
+  }
+  return (
+    <main className="relative min-h-[70vh] sm:min-h-[80vh] flex items-center justify-center p-8 sm:p-16">
+      <motion.div
+        className="relative grid w-full max-w-6xl grid-cols-1 gap-10 lg:grid-cols-2 items-center"
+        variants={gridContainer}
+        initial="hidden"
+        animate="show"
+      >
+        <motion.div variants={leftSection}>
+          <motion.p variants={childItem} className="text-sm tracking-widest text-muted mb-3">PORTFOLIO</motion.p>
+          <motion.h1 variants={childItem} className="font-display text-5xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight text-foreground drop-shadow-md mb-4">
+            <motion.span variants={headingContainer} className="inline-block">
+              {headingWords.map((word, i) => (
+                <motion.span
+                  key={`${word}-${i}`}
+                  variants={headingWord}
+                  className="inline-block will-change-transform"
+                  style={{ display: "inline-block" }}
+                >
+                  {word}
+                  {i < headingWords.length - 1 ? "\u00A0" : ""}
+                </motion.span>
+              ))}
+            </motion.span>
+          </motion.h1>
+          <motion.p variants={childItem} className="text-lg sm:text-xl text-foreground/80 font-medium mb-8 max-w-prose">
+            I design and build performant, accessible interfaces with Next.js and a
+            thoughtful component system.
+          </motion.p>
+          <motion.div variants={childItem} className="flex flex-wrap gap-3">
+            <motion.a
+              className="inline-flex items-center gap-2 rounded-md px-5 py-3 bg-foreground text-background hover:opacity-90 transition-colors"
+              href="#work"
+              whileHover={{ y: -2, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              View Work <ArrowRight size={18} />
+            </motion.a>
+            <motion.a
+              className="inline-flex items-center gap-2 rounded-md px-5 py-3 border border-muted/40 text-foreground hover:bg-accent/10 transition-colors"
+              href="#contact"
+              whileHover={{ y: -2, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Contact
+            </motion.a>
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          className="relative"
+          variants={rightSection}
+          style={{ rotateX, rotateY, x: shiftX, y: shiftY, transformPerspective: 800 }}
+          onMouseMove={handleParallaxMove}
+          onMouseLeave={resetParallax}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+          <div className="absolute -inset-6 -z-10 rounded-[28px] bg-accent/20 blur-2xl" />
+          <div className="absolute -inset-x-12 -bottom-10 -z-10 h-36 bg-green-blob rounded-full blur-3xl opacity-70" aria-hidden />
+          <PixelTransition
+            gridSize={24}
+            pixelColor="#1C1303"
+            animationStepDuration={0.75}
+            startActive
+            aspectRatio="100%"
+            autoplayReveal
+            autoplayDelayMs={150}
+            firstContent={
+              <Image
+                src="/kino crop.png"
+                alt="Kino"
+                priority
+                className="w-full h-auto object-contain shadow-2xl"
+                width={0}
+                height={0}
+                sizes="100vw"
+              />
+            }
+            secondContent={<div className="w-full h-full bg-[#1C1303]" />}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
+          <motion.div
             aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+            className="pointer-events-none absolute inset-0"
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        </motion.div>
+      </motion.div>
+    </main>
   );
 }
