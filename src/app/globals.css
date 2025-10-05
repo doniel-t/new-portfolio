@@ -9,7 +9,7 @@
   --accent: oklch(0.97 0 0);  /* accent */
   --mid: #A69F8D;     /* mid tones */
   --dark: #1C1303;    /* dark */
-  --green: #6C673B;   /* green accent */
+  --green: #6c673b;   /* green accent */
   /* Translucent tints for blob gradients */
   --accent-blob: rgba(143, 138, 122, 0.28);
   --mid-blob: rgba(166, 159, 141, 0.22);

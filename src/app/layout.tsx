@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Staatliches } from "next/font/google";
 import "./globals.css";
-import Noise from "@/components/Noise";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,7 +34,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${staatliches.variable} antialiased`}
       >
-        <Noise patternSize={100000} patternRefreshInterval={3} patternAlpha={100} patternScaleX={8} />
+        {/* Noise overlay removed in favor of hero-only Dither effect */}
         {children}
       </body>
     </html>

@@ -8,6 +8,7 @@ import DecodingWord from "@/components/DecodingWord";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PixelDivider from "@/components/PixelDivider";
+import Dither from "@/components/Dither";
 
 export default function Home() {
   const headingText = "Modern web experiences with a refined, understated aesthetic.";
@@ -73,7 +74,20 @@ export default function Home() {
   }
   return (
     <>
-    <main className="relative min-h-[70vh] sm:min-h-[80vh] flex items-center justify-center p-8 sm:p-16">
+    <main className="relative min-h-[100vh] sm:min-h-[100vh] flex items-center justify-center p-8 sm:p-16">
+      {/* Dither effect background for hero section */}
+      <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
+        <Dither
+          waveColor={[165/100, 158/100, 141/100]}
+          disableAnimation={false}
+          enableMouseInteraction={false}
+          mouseRadius={0.5}
+          colorNum={2}
+          waveAmplitude={0.002}
+          waveFrequency={2.2}
+          waveSpeed={0.09}
+        />
+      </div>
       <motion.div
         className="relative grid w-full max-w-6xl grid-cols-1 gap-10 lg:grid-cols-2 items-center"
         variants={gridContainer}
@@ -159,9 +173,11 @@ export default function Home() {
         </motion.div>
       </motion.div>
     </main>
-    {/* Pixelated divider between sections: large squares rising and fading */}
-    <div className="relative w-full" style={{ height: "180px" }}>
-      <PixelDivider color={"#1C1303"} pixelSize={24} durationSec={5.2} rise="-200%" streamsPerCol={6} />
+    {/* Pixelated divider overlay (no extra layout height) */}
+    <div className="relative w-full h-0" aria-hidden>
+      <div className="absolute inset-x-0" style={{ top: "-180px", height: "180px", zIndex: 5 }}>
+        <PixelDivider color={"#1C1303"} pixelSize={20} durationSec={8} rise="-200%" streamsPerCol={6} />
+      </div>
     </div>
 
     {/* Projects Section */}
