@@ -34,11 +34,16 @@ const Noise = ({
       const imageData = ctx.createImageData(canvasSize, canvasSize);
       const data = imageData.data;
 
+      // Base color for the grain: #A69F8D (R:166, G:159, B:141)
+      const baseR = 0xA6;
+      const baseG = 0x9F;
+      const baseB = 0x8D;
+
       for (let i = 0; i < data.length; i += 4) {
-        const value = Math.random() * 255;
-        data[i] = value;
-        data[i + 1] = value;
-        data[i + 2] = value;
+        const intensity = Math.random(); // 0..1 brightness per pixel
+        data[i] = Math.round(baseR * intensity);
+        data[i + 1] = Math.round(baseG * intensity);
+        data[i + 2] = Math.round(baseB * intensity);
         data[i + 3] = patternAlpha;
       }
 

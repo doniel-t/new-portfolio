@@ -4,6 +4,10 @@ import Image from "next/image";
 import { motion, type Variants, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import PixelTransition from "@/components/PixelTransition";
+import DecodingWord from "@/components/DecodingWord";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import PixelDivider from "@/components/PixelDivider";
 
 export default function Home() {
   const headingText = "Modern web experiences with a refined, understated aesthetic.";
@@ -44,22 +48,7 @@ export default function Home() {
     show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
   };
 
-  const headingContainer: Variants = {
-    hidden: {},
-    show: {
-      transition: { staggerChildren: 0.06, delayChildren: 0.02 },
-    },
-  };
-
-  const headingWord: Variants = {
-    hidden: { y: 24, opacity: 0, filter: "blur(8px)" },
-    show: {
-      y: 0,
-      opacity: 1,
-      filter: "blur(0px)",
-      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-    },
-  };
+  // DecodingWord is imported as a reusable component.
 
   // Mouse-driven parallax for right visual block
   const mouseX = useMotionValue(0);
@@ -83,6 +72,7 @@ export default function Home() {
     mouseY.set(0);
   }
   return (
+    <>
     <main className="relative min-h-[70vh] sm:min-h-[80vh] flex items-center justify-center p-8 sm:p-16">
       <motion.div
         className="relative grid w-full max-w-6xl grid-cols-1 gap-10 lg:grid-cols-2 items-center"
@@ -91,21 +81,20 @@ export default function Home() {
         animate="show"
       >
         <motion.div variants={leftSection}>
-          <motion.p variants={childItem} className="text-sm tracking-widest text-muted mb-3">PORTFOLIO</motion.p>
+          <motion.p variants={childItem} className="text-sm tracking-widest text-muted font-bold mb-3">PORTFOLIO</motion.p>
           <motion.h1 variants={childItem} className="font-display text-5xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight text-foreground drop-shadow-md mb-4">
-            <motion.span variants={headingContainer} className="inline-block">
+            <span className="inline-block">
               {headingWords.map((word, i) => (
-                <motion.span
+                <span
                   key={`${word}-${i}`}
-                  variants={headingWord}
-                  className="inline-block will-change-transform"
+                  className="inline-block"
                   style={{ display: "inline-block" }}
                 >
-                  {word}
+                  <DecodingWord word={word} startDelayMs={i * 250} />
                   {i < headingWords.length - 1 ? "\u00A0" : ""}
-                </motion.span>
+                </span>
               ))}
-            </motion.span>
+            </span>
           </motion.h1>
           <motion.p variants={childItem} className="text-lg sm:text-xl text-foreground/80 font-medium mb-8 max-w-prose">
             I design and build performant, accessible interfaces with Next.js and a
@@ -170,5 +159,58 @@ export default function Home() {
         </motion.div>
       </motion.div>
     </main>
+    {/* Pixelated divider between sections: large squares rising and fading */}
+    <div className="relative w-full" style={{ height: "180px" }}>
+      <PixelDivider color={"#1C1303"} pixelSize={24} durationSec={5.2} rise="-200%" streamsPerCol={6} />
+    </div>
+
+    {/* Projects Section */}
+    <section id="work" className="relative min-h-screen w-full py-20 sm:py-28">
+      <div className="absolute inset-0 -z-10" style={{ backgroundColor: "var(--dark)" }} />
+      {/* Blueprint rim lines using mid accent color */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            // 12px inset
+            "linear-gradient(to right, rgba(166,159,141,0.18), rgba(166,159,141,0.18)) 12px 0 / 1px 100% no-repeat, " +
+            "linear-gradient(to right, rgba(166,159,141,0.18), rgba(166,159,141,0.18)) calc(100% - 12px) 0 / 1px 100% no-repeat, " +
+            "linear-gradient(to bottom, rgba(166,159,141,0.18), rgba(166,159,141,0.18)) 0 12px / 100% 1px no-repeat, " +
+            "linear-gradient(to bottom, rgba(166,159,141,0.18), rgba(166,159,141,0.18)) 0 calc(100% - 12px) / 100% 1px no-repeat, " +
+            // 36px inset
+            "linear-gradient(to right, rgba(166,159,141,0.12), rgba(166,159,141,0.12)) 36px 0 / 1px 100% no-repeat, " +
+            "linear-gradient(to right, rgba(166,159,141,0.12), rgba(166,159,141,0.12)) calc(100% - 36px) 0 / 1px 100% no-repeat, " +
+            "linear-gradient(to bottom, rgba(166,159,141,0.12), rgba(166,159,141,0.12)) 0 36px / 100% 1px no-repeat, " +
+            "linear-gradient(to bottom, rgba(166,159,141,0.12), rgba(166,159,141,0.12)) 0 calc(100% - 36px) / 100% 1px no-repeat",
+        }}
+      />
+      <div className="relative mx-auto w-full max-w-6xl px-8">
+        <div className="mb-10 sm:mb-12">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight text-foreground">Selected Work</h2>
+          <p className="mt-2 text-foreground/80">Placeholder projects showcasing layout.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <Card key={idx} className="bg-primary/95 hover:bg-primary transition-colors">
+              <CardHeader>
+                <CardTitle>Project {idx + 1}</CardTitle>
+                <CardDescription>Short one-line description.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="aspect-video w-full overflow-hidden rounded-md border border-muted/30 bg-background/40">
+                  <div className="flex h-full items-center justify-center text-muted">Preview</div>
+                </div>
+                <div className="mt-4 flex items-center gap-3">
+                  <Button size="sm">View</Button>
+                  <Button variant="outline" size="sm">Details</Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+    </>
   );
 }

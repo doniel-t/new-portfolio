@@ -147,6 +147,21 @@ body {
   }
 }
 
+/* Pixel divider animation (bottom -> top, fade out near top) */
+@keyframes pixel-divider-rise {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(var(--pixel-rise, -120%));
+    opacity: 0;
+  }
+}
+
 /* Site-wide noise overlay */
 .noise-overlay {
   position: fixed;
