@@ -34,7 +34,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${staatliches.variable} antialiased`}
       >
-        {/* Noise overlay removed in favor of hero-only Dither effect */}
         {children}
       </body>
     </html>

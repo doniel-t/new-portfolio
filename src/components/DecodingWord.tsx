@@ -6,18 +6,22 @@ type DecodingWordProps = {
   word: string;
   startDelayMs?: number;
   className?: string;
+  active?: boolean; // when false, animation waits until true
 };
 
 const RANDOM_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*+-?";
 
-export default function DecodingWord({ word, startDelayMs = 0, className }: DecodingWordProps) {
+export default function DecodingWord({ word, startDelayMs = 0, className, active = true }: DecodingWordProps) {
   const [revealCount, setRevealCount] = useState(0);
   const [scrambleTick, setScrambleTick] = useState(0);
   const revealIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const scrambleIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasStartedRef = useRef(false);
 
   useEffect(() => {
+    if (!active || hasStartedRef.current) return;
+    hasStartedRef.current = true;
     startTimeoutRef.current = setTimeout(() => {
       scrambleIntervalRef.current = setInterval(() => {
         setScrambleTick((t) => t + 1);
@@ -40,7 +44,7 @@ export default function DecodingWord({ word, startDelayMs = 0, className }: Deco
       if (revealIntervalRef.current) clearInterval(revealIntervalRef.current);
       if (scrambleIntervalRef.current) clearInterval(scrambleIntervalRef.current);
     };
-  }, [startDelayMs, word.length]);
+  }, [active, startDelayMs, word.length]);
 
   const displayed = useMemo(() => {
     const characters = word.split("");
