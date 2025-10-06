@@ -9,6 +9,7 @@ import DecodingWord from "@/components/DecodingWord";
 import PixelDivider from "@/components/PixelDivider";
 import BackgroundLineArt from "@/components/BackgroundLineArt";
 import Dither from "@/components/Dither";
+import DotGrid from "@/components/DotGrid";
 
 export default function Home() {
   const headingText = "Modern web experiences with a refined, understated aesthetic.";
@@ -176,13 +177,17 @@ export default function Home() {
       {/* Pixelated divider overlay (no extra layout height) */}
       <div className="relative w-full h-0" aria-hidden>
         <div className="absolute inset-x-0" style={{ top: "-180px", height: "180px", zIndex: 5 }}>
-          <PixelDivider color={"#1C1303"} pixelSize={24} durationSec={8} rise="-200%" streamsPerCol={4} />
+          <PixelDivider color={"#130e05"} pixelSize={24} durationSec={8} rise="-200%" streamsPerCol={4} />
         </div>
       </div>
 
       {/* Projects Section */}
       <section id="work" className="relative min-h-screen w-full py-20 sm:py-28">
         <div className="absolute inset-0 -z-10" style={{ backgroundColor: "var(--dark)" }} />
+        {/* DotGrid background for About me section */}
+        <div className="absolute inset-0 -z-10 opacity-60" aria-hidden>
+          <DotGrid baseColor="#6c673b" activeColor="#A69F8D" dotSize={1.5} gap={32} proximity={75} className="w-full h-full" />
+        </div>
         {/* Geometric line art background */}
         <BackgroundLineArt className="-z-0" />
         {/* Blueprint rim lines using mid accent color */}

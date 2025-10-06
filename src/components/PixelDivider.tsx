@@ -13,7 +13,7 @@ type PixelDividerProps = {
 };
 
 export default function PixelDivider({
-  color = "#1C1303",
+  color = "#130e05",
   pixelSize = 28,
   durationSec = 4.5,
   rise = "-180%",
