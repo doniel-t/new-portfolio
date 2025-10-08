@@ -86,8 +86,24 @@ export default function Home() {
   }
   return (
     <>
+
+      
+      <main className="relative min-h-[100vh] sm:min-h-[100vh] flex items-center justify-center p-8 sm:p-16">
+        {/* Dither effect background for hero section */}
+        <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
+          <Dither
+            waveColor={[165 / 100, 158 / 100, 141 / 100]}
+            disableAnimation={false}
+            enableMouseInteraction={false}
+            mouseRadius={0.5}
+            colorNum={2}
+            waveAmplitude={0.002}
+            waveFrequency={2.2}
+            waveSpeed={0.09}
+          />
+        </div>
       {/* Pixelated backdrop filter at top - only visible when scrolled */}
-      <div 
+      {/* <div 
         className="fixed top-0 left-0 right-0 h-32 z-50 pointer-events-none transition-opacity duration-300"
         style={{
           opacity: isScrolled ? 1 : 0,
@@ -106,22 +122,7 @@ export default function Home() {
           maskComposite: 'intersect',
           WebkitMaskComposite: 'source-in',
         }}
-      />
-      
-      <main className="relative min-h-[100vh] sm:min-h-[100vh] flex items-center justify-center p-8 sm:p-16">
-        {/* Dither effect background for hero section */}
-        <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
-          <Dither
-            waveColor={[165 / 100, 158 / 100, 141 / 100]}
-            disableAnimation={false}
-            enableMouseInteraction={false}
-            mouseRadius={0.5}
-            colorNum={2}
-            waveAmplitude={0.002}
-            waveFrequency={2.2}
-            waveSpeed={0.09}
-          />
-        </div>
+      /> */}
         <motion.div
           className="relative grid w-full max-w-6xl grid-cols-1 gap-10 lg:grid-cols-2 items-center"
           variants={gridContainer}
