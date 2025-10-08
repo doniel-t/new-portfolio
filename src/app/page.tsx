@@ -12,6 +12,17 @@ import Dither from "@/components/Dither";
 import DotGrid from "@/components/DotGrid";
 
 export default function Home() {
+  const [isScrolled, setIsScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const headingText = "Modern web experiences with a refined, understated aesthetic.";
   const headingWords = headingText.split(" ");
 
@@ -75,6 +86,28 @@ export default function Home() {
   }
   return (
     <>
+      {/* Pixelated backdrop filter at top - only visible when scrolled */}
+      <div 
+        className="fixed top-0 left-0 right-0 h-32 z-50 pointer-events-none transition-opacity duration-300"
+        style={{
+          opacity: isScrolled ? 1 : 0,
+          backdropFilter: 'blur(12px) contrast(1.15) saturate(0.9)',
+          WebkitBackdropFilter: 'blur(12px) contrast(1.15) saturate(0.9)',
+          maskImage: `
+            repeating-linear-gradient(0deg, black, black 4px, transparent 4px, transparent 5px),
+            repeating-linear-gradient(90deg, black, black 4px, transparent 4px, transparent 5px),
+            linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)
+          `,
+          WebkitMaskImage: `
+            repeating-linear-gradient(0deg, black, black 4px, transparent 4px, transparent 5px),
+            repeating-linear-gradient(90deg, black, black 4px, transparent 4px, transparent 5px),
+            linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)
+          `,
+          maskComposite: 'intersect',
+          WebkitMaskComposite: 'source-in',
+        }}
+      />
+      
       <main className="relative min-h-[100vh] sm:min-h-[100vh] flex items-center justify-center p-8 sm:p-16">
         {/* Dither effect background for hero section */}
         <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>

@@ -9,7 +9,7 @@ type BackgroundLineArtProps = {
 
 const loopLinear = (duration: number) => ({
   duration,
-  ease: "linear" as const,
+  ease: [0.37, 0, 0.63, 1] as const,
   repeat: Infinity,
   repeatType: "reverse" as const,
 });
