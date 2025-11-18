@@ -7,9 +7,12 @@ import { ArrowRight } from "lucide-react";
 import PixelTransition from "@/components/PixelTransition";
 import DecodingWord from "@/components/DecodingWord";
 import PixelDivider from "@/components/PixelDivider";
+import AboutChat from "@/components/AboutChat";
 import BackgroundLineArt from "@/components/BackgroundLineArt";
 import Dither from "@/components/Dither";
+import DitherImage from "@/components/DitherImage";
 import DotGrid from "@/components/DotGrid";
+import TechStack from "@/components/TechStack";
 
 export default function Home() {
   const [isScrolled, setIsScrolled] = React.useState(false);
@@ -216,7 +219,7 @@ export default function Home() {
       </div>
 
       {/* Projects Section */}
-      <section id="work" className="relative min-h-screen w-full py-20 sm:py-28">
+      <section id="work" className="relative w-full py-20 sm:py-28">
         <div className="absolute inset-0 -z-10" style={{ backgroundColor: "var(--dark)" }} />
         {/* DotGrid background for About me section */}
         <div className="absolute inset-0 -z-10 opacity-60" aria-hidden>
@@ -248,6 +251,8 @@ export default function Home() {
 
         </div>
       </section>
+
+      <TechStack />
     </>
   );
 }
@@ -255,60 +260,83 @@ export default function Home() {
 function InViewAboutBlock() {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const isInViewOnce = useInView(containerRef, { once: true, margin: "-10% 0px -10% 0px" });
+  
   return (
-    <motion.div
-      ref={containerRef}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
-            variants={{
-              hidden: {},
-              show: {
-                transition: { staggerChildren: 0.15, delayChildren: 0.05 },
-              },
-            }}
-            className="mb-10 sm:mb-12"
-          >
-            <motion.h2
-              variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } } }}
-              className="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight text-muted"
-            >
-              {/* Unscramble heading when in view */}
-              {"About me".split(" ").map((word, i) => (
-                <span key={`${word}-${i}`} className="inline-block" style={{ display: "inline-block" }}>
-                  <DecodingWord word={word} startDelayMs={i * 180} active={isInViewOnce} />{i < 1 ? "\u00A0" : ""}
-                </span>
-              ))}
-            </motion.h2>
-            <motion.p
-              variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.1 } } }}
-              className="mt-2 text-muted/80"
-            >
-              {/* Unscramble paragraph in chunks for readability */}
-              {[
-                "I",
-                "am",
-                "a",
-                "software",
-                "engineer",
-                "with",
-                "a",
-                "passion",
-                "for",
-                "building",
-                "products",
-                "that",
-                "help",
-                "people",
-                "live",
-                "better",
-                "lives.",
-              ].map((word, i, arr) => (
-                <span key={`about-word-${i}`} className="inline-block" style={{ display: "inline-block" }}>
-                  <DecodingWord word={word} startDelayMs={i * 5} active={isInViewOnce} />{i < arr.length - 1 ? "\u00A0" : ""}
-                </span>
-              ))}
-            </motion.p>
-    </motion.div>
+    <div ref={containerRef} className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-10 sm:mb-12">
+      <motion.div
+        initial="hidden"
+        animate={isInViewOnce ? "show" : "hidden"}
+        variants={{
+          hidden: {},
+          show: {
+            transition: { staggerChildren: 0.15, delayChildren: 0.05 },
+          },
+        }}
+      >
+        <motion.h2
+          variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } } }}
+          className="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight text-muted"
+        >
+          {/* Unscramble heading when in view */}
+          {"About me".split(" ").map((word, i) => (
+            <span key={`${word}-${i}`} className="inline-block" style={{ display: "inline-block" }}>
+              <DecodingWord word={word} startDelayMs={i * 180} active={isInViewOnce} />{i < 1 ? "\u00A0" : ""}
+            </span>
+          ))}
+        </motion.h2>
+        <motion.p
+          variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.1 } } }}
+          className="mt-4 text-muted/80 text-lg leading-relaxed"
+        >
+          {/* Unscramble paragraph in chunks for readability */}
+          {[
+            "I",
+            "am",
+            "a",
+            "software",
+            "engineer",
+            "with",
+            "a",
+            "passion",
+            "for",
+            "building",
+            "products",
+            "that",
+            "help",
+            "people",
+            "live",
+            "better",
+            "lives.",
+          ].map((word, i, arr) => (
+            <span key={`about-word-${i}`} className="inline-block" style={{ display: "inline-block" }}>
+              <DecodingWord word={word} startDelayMs={i * 5} active={isInViewOnce} />{i < arr.length - 1 ? "\u00A0" : ""}
+            </span>
+          ))}
+        </motion.p>
+        <div className="mt-8">
+          <AboutChat active={isInViewOnce} />
+        </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, filter: "grayscale(100%)" }}
+        animate={isInViewOnce ? { opacity: 1, scale: 1, filter: "grayscale(0%)" } : { opacity: 0, scale: 0.95, filter: "grayscale(100%)" }}
+        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+        className="relative w-full aspect-[4/5] lg:aspect-square max-w-md mx-auto lg:max-w-none rounded-2xl overflow-hidden border border-muted/10 bg-black/40 shadow-2xl"
+      >
+        <div className="absolute inset-0 z-0">
+          <DitherImage src="/asa noodles crop.png" active={isInViewOnce} className="w-full h-full" />
+        </div>
+        
+        {/* Overlay details */}
+        <div className="absolute inset-0 pointer-events-none z-10 ring-1 ring-inset ring-white/10 rounded-2xl" />
+        
+        {/* Corner brackets decoration */}
+        <div className="absolute top-4 left-4 w-2 h-2 border-t border-l border-white/40" />
+        <div className="absolute top-4 right-4 w-2 h-2 border-t border-r border-white/40" />
+        <div className="absolute bottom-4 left-4 w-2 h-2 border-b border-l border-white/40" />
+        <div className="absolute bottom-4 right-4 w-2 h-2 border-b border-r border-white/40" />
+      </motion.div>
+    </div>
   );
 }
