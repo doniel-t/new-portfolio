@@ -1,44 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { motion, type Variants } from "framer-motion";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 type AboutChatProps = {
   active?: boolean;
 };
 
-const container: Variants = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.12, delayChildren: 0.05 },
-  },
-};
-
-const item: Variants = {
-  hidden: {
-    opacity: 0,
-    y: 14,
-    scale: 0.985,
-    skewY: 2,
-    filter: "blur(2px)",
-    clipPath: "inset(0 100% 0 0 round 6px)", // hidden with 0% width, reveals L→R
-  },
-  show: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    skewY: 0,
-    filter: "blur(0)",
-    clipPath: "inset(0 0% 0 0 round 6px)",
-    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-  },
-};
-
 // Small helpers for reference-inspired tiles
 function Tile({ title, children, active }: { title: string; children: React.ReactNode; active: boolean }) {
+  const isMobile = useIsMobile();
   return (
     <div className="relative inline-block w-full sm:w-auto rounded-[6px] border border-muted/60 bg-muted px-5 py-3.5 sm:px-6 sm:py-4 shadow-sm tile-grid overflow-hidden">
-      {active && (
+      {active && !isMobile && (
         <motion.span
           aria-hidden
           className="pointer-events-none absolute inset-y-0 left-0 w-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
@@ -91,6 +66,35 @@ function Matrix({ cols = 10, rows = 4, fill = 0.45 }: { cols?: number; rows?: nu
  * Left-aligned, Nier Automata-inspired chat feed used in the About section.
  */
 export default function AboutChat({ active = false }: AboutChatProps) {
+  const isMobile = useIsMobile();
+
+  const container: Variants = useMemo(() => ({
+    hidden: {},
+    show: {
+      transition: { staggerChildren: isMobile ? 0 : 0.12, delayChildren: isMobile ? 0 : 0.05 },
+    },
+  }), [isMobile]);
+
+  const item: Variants = useMemo(() => ({
+    hidden: {
+      opacity: 0,
+      y: isMobile ? 0 : 14,
+      scale: isMobile ? 1 : 0.985,
+      skewY: isMobile ? 0 : 2,
+      filter: isMobile ? "blur(0)" : "blur(2px)",
+      clipPath: isMobile ? "inset(0 0 0 0 round 6px)" : "inset(0 100% 0 0 round 6px)", // hidden with 0% width, reveals L→R
+    },
+    show: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      skewY: 0,
+      filter: "blur(0)",
+      clipPath: "inset(0 0% 0 0 round 6px)",
+      transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1] },
+    },
+  }), [isMobile]);
+
   return (
     <motion.ol
       aria-label="About chat"

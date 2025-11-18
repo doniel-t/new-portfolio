@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, useInView } from "framer-motion";
 import { SiNextdotjs, SiReact, SiTypescript, SiTailwindcss, SiGo, SiPython, SiPostgresql, SiStrapi, SiPayloadcms, SiDocker, SiPodman, SiNginx, SiGit, SiGithubactions, SiGitlab, SiFigma } from "react-icons/si";
 import DecodingWord from "./DecodingWord";
 import TargetCursor from "./TargetCursor";
 import PixelBlast from "./PixelBlast";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 type TechItem = {
   name: string;
@@ -37,6 +38,7 @@ const TECH_STACK: TechItem[] = [
 export default function TechStack() {
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: "-10% 0px" });
+  const isMobile = useIsMobile();
   
   return (
     <section className="relative w-full py-20 overflow-hidden" ref={containerRef}>
@@ -56,13 +58,15 @@ export default function TechStack() {
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#A69F8D]/30 to-transparent z-10" />
       <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-[var(--dark)] to-transparent z-0 pointer-events-none" />
 
-      <div className="absolute inset-0 -z-15 opacity-20" style={{ maskImage: "linear-gradient(to bottom, transparent 0%, black 150px)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 150px)" }}>
-          <PixelBlast
-            pixelSize={24}
-            color="#A69F8D"
-            variant="square"
-          />
-      </div>
+      {!isMobile && (
+        <div className="absolute inset-0 -z-15 opacity-20" style={{ maskImage: "linear-gradient(to bottom, transparent 0%, black 150px)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 150px)" }}>
+            <PixelBlast
+              pixelSize={24}
+              color="#A69F8D"
+              variant="square"
+            />
+        </div>
+      )}
       <div className="absolute inset-0 scanlines -z-10 opacity-30 pointer-events-none" style={{ maskImage: "linear-gradient(to bottom, transparent 0%, black 150px)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 150px)" }} />
 
       {/* Header */}
@@ -96,24 +100,25 @@ export default function TechStack() {
 
 function Chip({ tech, index, active }: { tech: TechItem; index: number; active: boolean }) {
   const [isHovered, setIsHovered] = useState(false);
+  const isMobile = useIsMobile();
 
   // Animation variants for spawn
-  const variants = {
+  const variants = useMemo(() => ({
     hidden: { 
       opacity: 0, 
-      scaleX: 0, 
-      filter: "blur(4px)"
+      scaleX: isMobile ? 1 : 0, 
+      filter: isMobile ? "blur(0px)" : "blur(4px)"
     },
     visible: { 
       opacity: 1, 
       scaleX: 1,
       filter: "blur(0px)",
       transition: { 
-        duration: 0.4, 
-        delay: index * 0.05
+        duration: isMobile ? 0.2 : 0.4, 
+        delay: isMobile ? 0 : index * 0.05
       }  
     }
-  };
+  }), [isMobile, index]);
 
   return (
     <motion.div
@@ -127,8 +132,8 @@ function Chip({ tech, index, active }: { tech: TechItem; index: number; active: 
         ${isHovered ? 'bg-[#A69F8D] border-[#A69F8D] text-[#130e05]' : 'bg-[#130e05]/40 border-[#A69F8D]/30 text-[#A69F8D] hover:border-[#A69F8D]/80'}
       `}
     >
-      {/* Particle Canvas Layer */}
-      <ParticleCanvas isHovered={isHovered} color={isHovered ? "#130e05" : "#A69F8D"} />
+      {/* Particle Canvas Layer - Disabled on mobile for performance */}
+      {!isMobile && <ParticleCanvas isHovered={isHovered} color={isHovered ? "#130e05" : "#A69F8D"} />}
 
       {/* Corner decorative markers */}
       <div className={`absolute top-0 left-0 w-1 h-1 transition-colors ${isHovered ? 'bg-[#130e05]' : 'bg-[#A69F8D]'}`} />

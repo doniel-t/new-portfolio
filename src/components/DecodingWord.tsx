@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 type DecodingWordProps = {
   word: string;
@@ -18,9 +19,18 @@ export default function DecodingWord({ word, startDelayMs = 0, className, active
   const scrambleIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasStartedRef = useRef(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!active || hasStartedRef.current) return;
+    
+    if (isMobile) {
+      // On mobile, skip animation and reveal immediately
+      setRevealCount(word.length);
+      hasStartedRef.current = true;
+      return;
+    }
+
     hasStartedRef.current = true;
     startTimeoutRef.current = setTimeout(() => {
       scrambleIntervalRef.current = setInterval(() => {
@@ -44,9 +54,12 @@ export default function DecodingWord({ word, startDelayMs = 0, className, active
       if (revealIntervalRef.current) clearInterval(revealIntervalRef.current);
       if (scrambleIntervalRef.current) clearInterval(scrambleIntervalRef.current);
     };
-  }, [active, startDelayMs, word.length]);
+  }, [active, startDelayMs, word.length, isMobile]);
 
   const displayed = useMemo(() => {
+    // If animation finished or mobile, show word
+    if (revealCount >= word.length || isMobile) return word;
+    
     const characters = word.split("");
     const out = characters.map((ch, idx) => {
       if (idx < revealCount) return ch;
@@ -54,7 +67,7 @@ export default function DecodingWord({ word, startDelayMs = 0, className, active
       return RANDOM_CHARACTERS[randomIndex];
     });
     return out.join("");
-  }, [word, revealCount, scrambleTick]);
+  }, [word, revealCount, scrambleTick, isMobile]);
 
   return (
     <span aria-label={word} className={className} style={{ position: "relative", display: "inline-block" }}>
@@ -63,5 +76,3 @@ export default function DecodingWord({ word, startDelayMs = 0, className, active
     </span>
   );
 }
-
-

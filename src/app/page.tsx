@@ -13,18 +13,10 @@ import Dither from "@/components/Dither";
 import DitherImage from "@/components/DitherImage";
 import DotGrid from "@/components/DotGrid";
 import TechStack from "@/components/TechStack";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function Home() {
-  const [isScrolled, setIsScrolled] = React.useState(false);
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const isMobile = useIsMobile();
 
   const headingText = "Modern web experiences with a refined, understated aesthetic.";
   const headingWords = headingText.split(" ");
@@ -33,35 +25,35 @@ export default function Home() {
     hidden: {},
     show: {
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
+        staggerChildren: isMobile ? 0 : 0.2,
+        delayChildren: isMobile ? 0 : 0.1,
       },
     },
   };
 
   const leftSection: Variants = {
-    hidden: { opacity: 0, y: 12 },
+    hidden: { opacity: 0, y: isMobile ? 0 : 12 },
     show: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6,
+        duration: isMobile ? 0.3 : 0.6,
         ease: [0.16, 1, 0.3, 1],
         when: "beforeChildren",
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
+        staggerChildren: isMobile ? 0 : 0.2,
+        delayChildren: isMobile ? 0 : 0.1,
       },
     },
   };
 
   const childItem: Variants = {
-    hidden: { opacity: 0, y: 12 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
+    hidden: { opacity: 0, y: isMobile ? 0 : 12 },
+    show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.5, ease: [0.16, 1, 0.3, 1] } },
   };
 
   const rightSection: Variants = {
-    hidden: { opacity: 0, scale: 0.98, y: 10 },
-    show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
+    hidden: { opacity: 0, scale: isMobile ? 1 : 0.98, y: isMobile ? 0 : 10 },
+    show: { opacity: 1, scale: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.7, ease: [0.16, 1, 0.3, 1] } },
   };
 
   // DecodingWord is imported as a reusable component.
@@ -76,6 +68,7 @@ export default function Home() {
   const shiftY = useSpring(useTransform(mouseY, [-1, 1], [-4, 4]), springCfg);
 
   function handleParallaxMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (isMobile) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const px = (e.clientX - rect.left) / rect.width; // 0..1
     const py = (e.clientY - rect.top) / rect.height; // 0..1
@@ -96,8 +89,8 @@ export default function Home() {
         <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
           <Dither
             waveColor={[165 / 100, 158 / 100, 141 / 100]}
-            disableAnimation={false}
-            enableMouseInteraction={false}
+            disableAnimation={isMobile}
+            enableMouseInteraction={!isMobile}
             mouseRadius={0.5}
             colorNum={2}
             waveAmplitude={0.002}
@@ -121,7 +114,7 @@ export default function Home() {
                     className="inline-block"
                     style={{ display: "inline-block" }}
                   >
-                    <DecodingWord word={word} startDelayMs={i * 250} />
+                    <DecodingWord word={word} startDelayMs={isMobile ? 0 : i * 250} />
                     {i < headingWords.length - 1 ? "\u00A0" : ""}
                   </span>
                 ))}
@@ -135,16 +128,16 @@ export default function Home() {
               <motion.a
                 className="inline-flex items-center gap-2 rounded-md px-5 py-3 bg-foreground text-background hover:opacity-90 transition-colors"
                 href="#work"
-                whileHover={{ y: -2, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={isMobile ? {} : { y: -2, scale: 1.02 }}
+                whileTap={isMobile ? {} : { scale: 0.98 }}
               >
                 View Work <ArrowRight size={18} />
               </motion.a>
               <motion.a
                 className="inline-flex items-center gap-2 rounded-md px-5 py-3 border border-muted/40 text-foreground hover:bg-accent/10 transition-colors"
                 href="#contact"
-                whileHover={{ y: -2, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={isMobile ? {} : { y: -2, scale: 1.02 }}
+                whileTap={isMobile ? {} : { scale: 0.98 }}
               >
                 Contact
               </motion.a>
@@ -154,20 +147,20 @@ export default function Home() {
           <motion.div
             className="relative"
             variants={rightSection}
-            style={{ rotateX, rotateY, x: shiftX, y: shiftY, transformPerspective: 800 }}
+            style={isMobile ? {} : { rotateX, rotateY, x: shiftX, y: shiftY, transformPerspective: 800 }}
             onMouseMove={handleParallaxMove}
             onMouseLeave={resetParallax}
           >
             <div className="absolute -inset-6 -z-10 rounded-[28px] bg-accent/20 blur-2xl" />
             <div className="absolute -inset-x-12 -bottom-10 -z-10 h-36 bg-green-blob rounded-full blur-3xl opacity-70" aria-hidden />
             <PixelTransition
-              gridSize={24}
+              gridSize={isMobile ? 12 : 24}
               pixelColor="#1C1303"
-              animationStepDuration={0.75}
+              animationStepDuration={isMobile ? 0.5 : 0.75}
               startActive
               aspectRatio="100%"
               autoplayReveal
-              autoplayDelayMs={150}
+              autoplayDelayMs={isMobile ? 0 : 150}
               firstContent={
                 <Image
                   src="/kino crop.png"
@@ -184,7 +177,7 @@ export default function Home() {
             <motion.div
               aria-hidden
               className="pointer-events-none absolute inset-0"
-              animate={{ y: [0, -8, 0] }}
+              animate={isMobile ? {} : { y: [0, -8, 0] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             />
           </motion.div>
@@ -193,7 +186,7 @@ export default function Home() {
       {/* Pixelated divider overlay (no extra layout height) */}
       <div className="relative w-full h-0" aria-hidden>
         <div className="absolute inset-x-0" style={{ top: "-180px", height: "180px", zIndex: 5 }}>
-          <PixelDivider color={"#130e05"} pixelSize={24} durationSec={8} rise="-200%" streamsPerCol={4} />
+          <PixelDivider color={"#130e05"} pixelSize={isMobile ? 12 : 24} durationSec={8} rise="-200%" streamsPerCol={4} />
         </div>
       </div>
 
@@ -239,6 +232,7 @@ export default function Home() {
 function InViewAboutBlock() {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const isInViewOnce = useInView(containerRef, { once: true, margin: "-10% 0px -10% 0px" });
+  const isMobile = useIsMobile();
   
   return (
     <div ref={containerRef} className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-10 sm:mb-12">
@@ -248,23 +242,23 @@ function InViewAboutBlock() {
         variants={{
           hidden: {},
           show: {
-            transition: { staggerChildren: 0.15, delayChildren: 0.05 },
+            transition: { staggerChildren: isMobile ? 0 : 0.15, delayChildren: isMobile ? 0 : 0.05 },
           },
         }}
       >
         <motion.h2
-          variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } } }}
+          variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1] } } }}
           className="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight text-muted"
         >
           {/* Unscramble heading when in view */}
           {"About me".split(" ").map((word, i) => (
             <span key={`${word}-${i}`} className="inline-block" style={{ display: "inline-block" }}>
-              <DecodingWord word={word} startDelayMs={i * 180} active={isInViewOnce} />{i < 1 ? "\u00A0" : ""}
+              <DecodingWord word={word} startDelayMs={isMobile ? 0 : i * 180} active={isInViewOnce} />{i < 1 ? "\u00A0" : ""}
             </span>
           ))}
         </motion.h2>
         <motion.p
-          variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.1 } } }}
+          variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1], delay: isMobile ? 0 : 0.1 } } }}
           className="mt-4 text-muted/80 text-lg leading-relaxed"
         >
           {/* Unscramble paragraph in chunks for readability */}
@@ -288,7 +282,7 @@ function InViewAboutBlock() {
             "lives.",
           ].map((word, i, arr) => (
             <span key={`about-word-${i}`} className="inline-block" style={{ display: "inline-block" }}>
-              <DecodingWord word={word} startDelayMs={i * 5} active={isInViewOnce} />{i < arr.length - 1 ? "\u00A0" : ""}
+              <DecodingWord word={word} startDelayMs={isMobile ? 0 : i * 5} active={isInViewOnce} />{i < arr.length - 1 ? "\u00A0" : ""}
             </span>
           ))}
         </motion.p>
@@ -298,9 +292,9 @@ function InViewAboutBlock() {
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, filter: "grayscale(100%)" }}
-        animate={isInViewOnce ? { opacity: 1, scale: 1, filter: "grayscale(0%)" } : { opacity: 0, scale: 0.95, filter: "grayscale(100%)" }}
-        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+        initial={{ opacity: 0, scale: isMobile ? 1 : 0.95, filter: "grayscale(100%)" }}
+        animate={isInViewOnce ? { opacity: 1, scale: 1, filter: "grayscale(0%)" } : { opacity: 0, scale: isMobile ? 1 : 0.95, filter: "grayscale(100%)" }}
+        transition={{ duration: isMobile ? 0.5 : 1, ease: [0.16, 1, 0.3, 1], delay: isMobile ? 0 : 0.2 }}
         className="relative w-full aspect-[4/5] lg:aspect-square max-w-md mx-auto lg:max-w-none rounded-2xl overflow-hidden border border-muted/10 bg-black/40 shadow-2xl"
       >
         <div className="absolute inset-0 z-0">
