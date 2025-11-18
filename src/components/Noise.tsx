@@ -35,8 +35,8 @@ export default function Noise({
       if (!el) return;
       el.width = canvasSize;
       el.height = canvasSize;
-      el.style.width = "100vw";
-      el.style.height = "100vh";
+      el.style.width = "100%";
+      el.style.height = "100%";
     };
 
     const drawGrain = () => {
