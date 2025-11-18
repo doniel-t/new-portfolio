@@ -105,27 +105,6 @@ export default function Home() {
             waveSpeed={0.09}
           />
         </div>
-      {/* Pixelated backdrop filter at top - only visible when scrolled */}
-      {/* <div 
-        className="fixed top-0 left-0 right-0 h-32 z-50 pointer-events-none transition-opacity duration-300"
-        style={{
-          opacity: isScrolled ? 1 : 0,
-          backdropFilter: 'blur(12px) contrast(1.15) saturate(0.9)',
-          WebkitBackdropFilter: 'blur(12px) contrast(1.15) saturate(0.9)',
-          maskImage: `
-            repeating-linear-gradient(0deg, black, black 4px, transparent 4px, transparent 5px),
-            repeating-linear-gradient(90deg, black, black 4px, transparent 4px, transparent 5px),
-            linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)
-          `,
-          WebkitMaskImage: `
-            repeating-linear-gradient(0deg, black, black 4px, transparent 4px, transparent 5px),
-            repeating-linear-gradient(90deg, black, black 4px, transparent 4px, transparent 5px),
-            linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)
-          `,
-          maskComposite: 'intersect',
-          WebkitMaskComposite: 'source-in',
-        }}
-      /> */}
         <motion.div
           className="relative grid w-full max-w-6xl grid-cols-1 gap-10 lg:grid-cols-2 items-center"
           variants={gridContainer}

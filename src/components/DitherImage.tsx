@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, forwardRef } from 'react';
+import React, { useEffect, forwardRef, useRef } from 'react';
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
 import { EffectComposer } from '@react-three/postprocessing';
 import { Effect } from 'postprocessing';
@@ -91,27 +91,31 @@ RetroSepiaEffect.displayName = 'RetroSepiaEffect';
 
 function ImagePlane({ src }: { src: string }) {
   const texture = useLoader(THREE.TextureLoader, src);
-  const { viewport } = useThree();
+  const viewport = useThree((state) => state.viewport);
   
-  // Calculate scale to cover viewport (like object-fit: cover)
-  const imageAspect = texture.image.width / texture.image.height;
-  const viewportAspect = viewport.width / viewport.height;
-  
-  let scaleX, scaleY;
-  if (viewportAspect > imageAspect) {
-    scaleX = viewport.width;
-    scaleY = viewport.width / imageAspect;
-  } else {
-    scaleY = viewport.height;
-    scaleX = viewport.height * imageAspect;
-  }
+  const scale = React.useMemo(() => {
+    // Calculate scale to cover viewport (like object-fit: cover)
+    const imageAspect = texture.image.width / texture.image.height;
+    const viewportAspect = viewport.width / viewport.height;
+    
+    let scaleX, scaleY;
+    if (viewportAspect > imageAspect) {
+      scaleX = viewport.width;
+      scaleY = viewport.width / imageAspect;
+    } else {
+      scaleY = viewport.height;
+      scaleX = viewport.height * imageAspect;
+    }
 
-  // Add a small buffer to prevent edge snapping artifacts
-  scaleX *= 1.01;
-  scaleY *= 1.01;
+    // Add a small buffer to prevent edge snapping artifacts
+    scaleX *= 1.01;
+    scaleY *= 1.01;
+
+    return [scaleX, scaleY, 1] as [number, number, number];
+  }, [texture, viewport.width, viewport.height]);
 
   return (
-    <mesh scale={[scaleX, scaleY, 1]}>
+    <mesh scale={scale}>
       <planeGeometry args={[1, 1]} />
       <meshBasicMaterial map={texture} toneMapped={false} />
     </mesh>
@@ -119,20 +123,24 @@ function ImagePlane({ src }: { src: string }) {
 }
 
 function DitherScene({ src, active }: { src: string; active: boolean }) {
-  const [pixelSize, setPixelSize] = useState(128); // Start bigger
-  const targetPixelSize = 1.0; // End finer
-  const duration = 1.25; // Animation duration in seconds
-  const [elapsed, setElapsed] = useState(0);
+  const effectRef = useRef<RetroSepiaEffectImpl>(null);
+  const elapsedRef = useRef(0);
+  const targetPixelSize = 2.5;
+  const duration = 0.8; // Animation duration in seconds
   
   useFrame((state, delta) => {
-    if (active && pixelSize > targetPixelSize) {
-      setElapsed(prev => prev + delta);
-      const progress = Math.min(elapsed / duration, 1);
+    if (active && effectRef.current) {
+      const currentVal = effectRef.current.uniforms.get('pixelSize')?.value;
+      if (currentVal <= targetPixelSize && elapsedRef.current > duration) return;
+
+      elapsedRef.current += delta;
+      const progress = Math.min(elapsedRef.current / duration, 1);
       
       // Non-linear interpolation for better effect (starts fast, slows down)
       const current = 128 - (128 - targetPixelSize) * Math.pow(progress, 0.5);
       
-      setPixelSize(Math.max(current, targetPixelSize));
+      const newPixelSize = Math.max(current, targetPixelSize);
+      effectRef.current.uniforms.get('pixelSize')!.value = newPixelSize;
     }
   });
 
@@ -140,7 +148,7 @@ function DitherScene({ src, active }: { src: string; active: boolean }) {
     <>
       <ImagePlane src={src} />
       <EffectComposer>
-        <RetroSepiaEffect colorNum={4} pixelSize={pixelSize} />
+        <RetroSepiaEffect ref={effectRef} colorNum={5} pixelSize={1024} />
       </EffectComposer>
     </>
   );
