@@ -1,6 +1,10 @@
 "use client";
 
+<<<<<<< HEAD
 import React, { useState, useRef, useEffect, useMemo, useCallback, memo } from "react";
+=======
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+>>>>>>> ccb3b66 (fix: old header and fix performance issues)
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { SiNextdotjs, SiReact, SiTypescript, SiTailwindcss, SiGo, SiPython, SiPostgresql, SiStrapi, SiPayloadcms, SiDocker, SiPodman, SiNginx, SiGit, SiGithubactions, SiGitlab, SiFigma } from "react-icons/si";
 import DecodingWord from "./DecodingWord";
@@ -30,6 +34,7 @@ type Particle = {
   speedY: number;
   driftX: number;
   decay: number;
+<<<<<<< HEAD
   active: boolean;
 };
 
@@ -51,6 +56,8 @@ const ICONS = {
   github: <SiGithubactions size={24} />,
   gitlab: <SiGitlab size={24} />,
   figma: <SiFigma size={24} />,
+=======
+>>>>>>> ccb3b66 (fix: old header and fix performance issues)
 };
 
 const TECH_STACK: TechItem[] = [
@@ -141,6 +148,7 @@ export default function TechStack() {
       window.removeEventListener("scroll", handlePositionChange, true);
     };
   }, [enableHoverParticles, hoveredIndex, updateActiveRect]);
+<<<<<<< HEAD
 
   // Memoize hover handlers to prevent recreation on each render
   const hoverHandlers = useMemo(() => 
@@ -155,6 +163,8 @@ export default function TechStack() {
       })
     })), 
   []);
+=======
+>>>>>>> ccb3b66 (fix: old header and fix performance issues)
   
   return (
     <section className="relative w-full py-20 overflow-hidden" ref={containerRef}>
@@ -176,6 +186,7 @@ export default function TechStack() {
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#A69F8D]/30 to-transparent z-10" />
       <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-[var(--dark)] to-transparent z-0 pointer-events-none" />
 
+<<<<<<< HEAD
       {/* Replaced heavy PixelBlast with lightweight CSS pattern */}
       {!isMobile && !prefersReducedMotion && (
         <div 
@@ -189,6 +200,16 @@ export default function TechStack() {
             backgroundSize: '24px 24px'
           }}
         />
+=======
+      {!isMobile && !prefersReducedMotion && (
+        <div className="absolute inset-0 -z-15 opacity-20" style={{ maskImage: "linear-gradient(to bottom, transparent 0%, black 150px)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 150px)" }}>
+            <PixelBlast
+              pixelSize={24}
+              color="#A69F8D"
+              variant="square"
+            />
+        </div>
+>>>>>>> ccb3b66 (fix: old header and fix performance issues)
       )}
       <div className="absolute inset-0 scanlines -z-10 opacity-30 pointer-events-none" style={{ maskImage: "linear-gradient(to bottom, transparent 0%, black 150px)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 150px)" }} />
 
@@ -227,11 +248,25 @@ export default function TechStack() {
                   index={index} 
                   active={isInView}
                   isHovered={hoveredIndex === index}
+<<<<<<< HEAD
                   isMobile={isMobile}
                   prefersReducedMotion={prefersReducedMotion ?? false}
                   registerRef={(element) => registerCardRef(element, index)}
                   onHoverStart={hoverHandlers[index].onHoverStart}
                   onHoverEnd={hoverHandlers[index].onHoverEnd}
+=======
+                  registerRef={(element) => registerCardRef(element, index)}
+                  onHoverStart={() => setHoveredIndex(index)}
+                  onHoverEnd={() =>
+                    setHoveredIndex((current) => {
+                      if (current === index) {
+                        setActiveRect(null);
+                        return null;
+                      }
+                      return current;
+                    })
+                  }
+>>>>>>> ccb3b66 (fix: old header and fix performance issues)
                 />
               ))}
             </div>
@@ -241,6 +276,7 @@ export default function TechStack() {
   );
 }
 
+<<<<<<< HEAD
 // Pre-compute animation variants outside component to avoid recreation
 const REDUCED_MOTION_VARIANTS = {
   hidden: { opacity: 0 },
@@ -312,6 +348,58 @@ const Chip = memo(function Chip({
       : DESKTOP_VARIANTS[index];
 
   const filledBars = COST_BARS[index];
+=======
+function Chip({
+  tech,
+  index,
+  active,
+  isHovered,
+  registerRef,
+  onHoverStart,
+  onHoverEnd,
+}: {
+  tech: TechItem;
+  index: number;
+  active: boolean;
+  isHovered: boolean;
+  registerRef: (element: HTMLDivElement | null) => void;
+  onHoverStart: () => void;
+  onHoverEnd: () => void;
+}) {
+  const isMobile = useIsMobile();
+  const prefersReducedMotion = useReducedMotion();
+
+  // Animation variants for spawn
+  const variants = useMemo(() => {
+    if (prefersReducedMotion) {
+      return {
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: { duration: 0.2 },
+        },
+      };
+    }
+
+    return {
+      hidden: { 
+        opacity: 0, 
+        scaleX: isMobile ? 1 : 0, 
+        filter: isMobile ? "blur(0px)" : "blur(4px)"
+      },
+      visible: { 
+        opacity: 1, 
+        scaleX: 1,
+        filter: "blur(0px)",
+        transition: { 
+          duration: isMobile ? 0.2 : 0.4, 
+          delay: isMobile ? 0 : index * 0.05,
+          ease: [0.16, 1, 0.3, 1] as const,
+        }  
+      }
+    };
+  }, [isMobile, index, prefersReducedMotion]);
+>>>>>>> ccb3b66 (fix: old header and fix performance issues)
 
   return (
     <motion.div
@@ -368,6 +456,7 @@ const Chip = memo(function Chip({
   );
 });
 
+<<<<<<< HEAD
 // Memoized cost bars component to avoid re-rendering
 const CostBars = memo(function CostBars({ filled }: { filled: number }) {
   return (
@@ -384,6 +473,8 @@ const CostBars = memo(function CostBars({ filled }: { filled: number }) {
 // Particle pool size - reduced from 90 for better performance
 const MAX_PARTICLES = 40;
 
+=======
+>>>>>>> ccb3b66 (fix: old header and fix performance issues)
 function SharedParticleLayer({
   containerRef,
   activeRect,
@@ -396,6 +487,7 @@ function SharedParticleLayer({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const activeRectRef = useRef<ActiveRect | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+<<<<<<< HEAD
   const startLoopRef = useRef<(() => void) | null>(null);
   const colorRef = useRef(color);
   const lastFrameTimeRef = useRef(0);
@@ -408,6 +500,11 @@ function SharedParticleLayer({
     }
     return pool;
   });
+=======
+  const particlesRef = useRef<Particle[]>([]);
+  const startLoopRef = useRef<(() => void) | null>(null);
+  const colorRef = useRef(color);
+>>>>>>> ccb3b66 (fix: old header and fix performance issues)
 
   useEffect(() => {
     colorRef.current = color;
@@ -424,6 +521,7 @@ function SharedParticleLayer({
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
+<<<<<<< HEAD
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
     
@@ -444,6 +542,16 @@ function SharedParticleLayer({
       ctx.scale(dpr, dpr);
     };
 
+=======
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const resize = () => {
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+    };
+
+>>>>>>> ccb3b66 (fix: old header and fix performance issues)
     resize();
 
     let resizeObserver: ResizeObserver | null = null;
@@ -455,6 +563,7 @@ function SharedParticleLayer({
       window.addEventListener("resize", resize);
     }
 
+<<<<<<< HEAD
     // Find inactive particle in pool
     const getInactiveParticle = (): Particle | null => {
       const pool = particlePoolRef.current as Particle[];
@@ -519,11 +628,47 @@ function SharedParticleLayer({
         hasActiveParticles = true;
         ctx.globalAlpha = p.alpha;
         ctx.fillRect(p.x, p.y, p.size, p.size);
+=======
+    const tick = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const rect = activeRectRef.current;
+
+      if (rect && particlesRef.current.length < 90 && Math.random() < 0.6) {
+        particlesRef.current.push({
+          x: rect.x + Math.random() * rect.width,
+          y: rect.y + Math.random() * rect.height,
+          size: Math.random() * 2 + 1,
+          alpha: 0.85,
+          speedY: Math.random() * 0.3 + 0.2,
+          driftX: (Math.random() - 0.5) * 0.4,
+          decay: Math.random() * 0.02 + 0.01,
+        });
+      }
+
+      for (let i = particlesRef.current.length - 1; i >= 0; i--) {
+        const particle = particlesRef.current[i];
+        particle.x += particle.driftX;
+        particle.y -= particle.speedY;
+        particle.alpha -= particle.decay;
+
+        if (particle.alpha <= 0) {
+          particlesRef.current.splice(i, 1);
+          continue;
+        }
+
+        ctx.globalAlpha = particle.alpha;
+        ctx.fillStyle = colorRef.current;
+        ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
+>>>>>>> ccb3b66 (fix: old header and fix performance issues)
       }
 
       ctx.globalAlpha = 1;
 
+<<<<<<< HEAD
       if (activeRectRef.current || hasActiveParticles) {
+=======
+      if (activeRectRef.current || particlesRef.current.length > 0) {
+>>>>>>> ccb3b66 (fix: old header and fix performance issues)
         animationFrameRef.current = requestAnimationFrame(tick);
       } else {
         animationFrameRef.current = null;
@@ -532,7 +677,10 @@ function SharedParticleLayer({
 
     const startLoop = () => {
       if (animationFrameRef.current === null) {
+<<<<<<< HEAD
         lastFrameTimeRef.current = performance.now();
+=======
+>>>>>>> ccb3b66 (fix: old header and fix performance issues)
         animationFrameRef.current = requestAnimationFrame(tick);
       }
     };
@@ -544,11 +692,15 @@ function SharedParticleLayer({
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
+<<<<<<< HEAD
       // Reset pool instead of creating new array
       const pool = particlePoolRef.current as Particle[];
       for (let i = 0; i < pool.length; i++) {
         pool[i].active = false;
       }
+=======
+      particlesRef.current = [];
+>>>>>>> ccb3b66 (fix: old header and fix performance issues)
       startLoopRef.current = null;
       if (resizeObserver) {
         resizeObserver.disconnect();
