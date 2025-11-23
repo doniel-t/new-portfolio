@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useMemo } from "react";
-import { motion, useInView } from "framer-motion";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { SiNextdotjs, SiReact, SiTypescript, SiTailwindcss, SiGo, SiPython, SiPostgresql, SiStrapi, SiPayloadcms, SiDocker, SiPodman, SiNginx, SiGit, SiGithubactions, SiGitlab, SiFigma } from "react-icons/si";
 import DecodingWord from "./DecodingWord";
 import TargetCursor from "./TargetCursor";
@@ -14,6 +14,23 @@ type TechItem = {
   cost: number;
   icon: React.ReactNode;
   description: string;
+};
+
+type ActiveRect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+type Particle = {
+  x: number;
+  y: number;
+  size: number;
+  alpha: number;
+  speedY: number;
+  driftX: number;
+  decay: number;
 };
 
 const TECH_STACK: TechItem[] = [
@@ -37,19 +54,83 @@ const TECH_STACK: TechItem[] = [
 
 export default function TechStack() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const gridContainerRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const isInView = useInView(containerRef, { once: true, margin: "-10% 0px" });
   const isMobile = useIsMobile();
+  const prefersReducedMotion = useReducedMotion();
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [activeRect, setActiveRect] = useState<ActiveRect | null>(null);
+
+  const enableHoverParticles = !isMobile && !prefersReducedMotion;
+  const enableCursor = !prefersReducedMotion;
+  const particleColor = hoveredIndex !== null ? "#130e05" : "#A69F8D";
+
+  const updateActiveRect = useCallback(() => {
+    if (hoveredIndex === null || !gridContainerRef.current) {
+      setActiveRect(null);
+      return;
+    }
+
+    const hoveredCard = cardRefs.current[hoveredIndex];
+    if (!hoveredCard) {
+      setActiveRect(null);
+      return;
+    }
+
+    const cardBounds = hoveredCard.getBoundingClientRect();
+    const containerBounds = gridContainerRef.current.getBoundingClientRect();
+
+    setActiveRect({
+      x: cardBounds.left - containerBounds.left,
+      y: cardBounds.top - containerBounds.top,
+      width: cardBounds.width,
+      height: cardBounds.height,
+    });
+  }, [hoveredIndex]);
+
+  const registerCardRef = useCallback(
+    (element: HTMLDivElement | null, index: number) => {
+      cardRefs.current[index] = element;
+      if (hoveredIndex === index) {
+        updateActiveRect();
+      }
+    },
+    [hoveredIndex, updateActiveRect]
+  );
+
+  useEffect(() => {
+    if (!enableHoverParticles) {
+      setActiveRect(null);
+      return;
+    }
+    updateActiveRect();
+  }, [enableHoverParticles, updateActiveRect]);
+
+  useEffect(() => {
+    if (!enableHoverParticles || hoveredIndex === null) return;
+    const handlePositionChange = () => updateActiveRect();
+    handlePositionChange();
+    window.addEventListener("resize", handlePositionChange);
+    window.addEventListener("scroll", handlePositionChange, true);
+    return () => {
+      window.removeEventListener("resize", handlePositionChange);
+      window.removeEventListener("scroll", handlePositionChange, true);
+    };
+  }, [enableHoverParticles, hoveredIndex, updateActiveRect]);
   
   return (
     <section className="relative w-full py-20 overflow-hidden" ref={containerRef}>
       {/* Target Cursor for Tech Cards */}
-      <TargetCursor 
-        targetSelector=".tech-card" 
-        spinDuration={4} 
-        hideDefaultCursor={false} 
-        hoverDuration={0.15}
-        parallaxOn={false}
-      />
+      {enableCursor && (
+        <TargetCursor 
+          targetSelector=".tech-card" 
+          spinDuration={4} 
+          hideDefaultCursor={false} 
+          hoverDuration={0.15}
+          parallaxOn={false}
+        />
+      )}
 
       {/* Background decorations */}
       <div className="absolute inset-0 bg-[#130e05]/95 -z-20" style={{ backgroundColor: "var(--dark)" }} />
@@ -58,7 +139,7 @@ export default function TechStack() {
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#A69F8D]/30 to-transparent z-10" />
       <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-[var(--dark)] to-transparent z-0 pointer-events-none" />
 
-      {!isMobile && (
+      {!isMobile && !prefersReducedMotion && (
         <div className="absolute inset-0 -z-15 opacity-20" style={{ maskImage: "linear-gradient(to bottom, transparent 0%, black 150px)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 150px)" }}>
             <PixelBlast
               pixelSize={24}
@@ -72,9 +153,9 @@ export default function TechStack() {
       {/* Header */}
       <div className="max-w-7xl mx-auto px-8 mb-16">
          <motion.div 
-           initial={{ opacity: 0, x: -20 }}
-           animate={isInView ? { opacity: 1, x: 0 } : {}}
-           transition={{ duration: 0.8, ease: "easeOut" }}
+           initial={prefersReducedMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+           animate={prefersReducedMotion ? { opacity: 1, x: 0 } : isInView ? { opacity: 1, x: 0 } : {}}
+           transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }}
            className="flex items-center gap-4 border-b border-[#A69F8D]/30 pb-4 mb-8"
          >
             <div className="w-2 h-2 bg-[#A69F8D] rotate-45" />
@@ -88,53 +169,109 @@ export default function TechStack() {
          </motion.div>
 
          {/* Grid of Chips */}
-         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6">
-            {TECH_STACK.map((tech, index) => (
-              <Chip key={tech.name} tech={tech} index={index} active={isInView} />
-            ))}
+         <div ref={gridContainerRef} className="relative">
+            {enableHoverParticles && (
+              <SharedParticleLayer 
+                containerRef={gridContainerRef} 
+                activeRect={activeRect} 
+                color={particleColor} 
+              />
+            )}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 relative z-10">
+              {TECH_STACK.map((tech, index) => (
+                <Chip 
+                  key={tech.name} 
+                  tech={tech} 
+                  index={index} 
+                  active={isInView}
+                  isHovered={hoveredIndex === index}
+                  registerRef={(element) => registerCardRef(element, index)}
+                  onHoverStart={() => setHoveredIndex(index)}
+                  onHoverEnd={() =>
+                    setHoveredIndex((current) => {
+                      if (current === index) {
+                        setActiveRect(null);
+                        return null;
+                      }
+                      return current;
+                    })
+                  }
+                />
+              ))}
+            </div>
          </div>
       </div>
     </section>
   );
 }
 
-function Chip({ tech, index, active }: { tech: TechItem; index: number; active: boolean }) {
-  const [isHovered, setIsHovered] = useState(false);
+function Chip({
+  tech,
+  index,
+  active,
+  isHovered,
+  registerRef,
+  onHoverStart,
+  onHoverEnd,
+}: {
+  tech: TechItem;
+  index: number;
+  active: boolean;
+  isHovered: boolean;
+  registerRef: (element: HTMLDivElement | null) => void;
+  onHoverStart: () => void;
+  onHoverEnd: () => void;
+}) {
   const isMobile = useIsMobile();
+  const prefersReducedMotion = useReducedMotion();
 
   // Animation variants for spawn
-  const variants = useMemo(() => ({
-    hidden: { 
-      opacity: 0, 
-      scaleX: isMobile ? 1 : 0, 
-      filter: isMobile ? "blur(0px)" : "blur(4px)"
-    },
-    visible: { 
-      opacity: 1, 
-      scaleX: 1,
-      filter: "blur(0px)",
-      transition: { 
-        duration: isMobile ? 0.2 : 0.4, 
-        delay: isMobile ? 0 : index * 0.05
-      }  
+  const variants = useMemo(() => {
+    if (prefersReducedMotion) {
+      return {
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: { duration: 0.2 },
+        },
+      };
     }
-  }), [isMobile, index]);
+
+    return {
+      hidden: { 
+        opacity: 0, 
+        scaleX: isMobile ? 1 : 0, 
+        filter: isMobile ? "blur(0px)" : "blur(4px)"
+      },
+      visible: { 
+        opacity: 1, 
+        scaleX: 1,
+        filter: "blur(0px)",
+        transition: { 
+          duration: isMobile ? 0.2 : 0.4, 
+          delay: isMobile ? 0 : index * 0.05,
+          ease: [0.16, 1, 0.3, 1] as const,
+        }  
+      }
+    };
+  }, [isMobile, index, prefersReducedMotion]);
 
   return (
     <motion.div
+      ref={registerRef}
       initial="hidden"
       animate={active ? "visible" : "hidden"}
       variants={variants}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={onHoverStart}
+      onMouseLeave={onHoverEnd}
+      onFocus={onHoverStart}
+      onBlur={onHoverEnd}
+      tabIndex={0}
       className={`
         relative min-h-[140px] h-auto p-4 border transition-colors duration-200 cursor-default group overflow-hidden tech-card
         ${isHovered ? 'bg-[#A69F8D] border-[#A69F8D] text-[#130e05]' : 'bg-[#130e05]/40 border-[#A69F8D]/30 text-[#A69F8D] hover:border-[#A69F8D]/80'}
       `}
     >
-      {/* Particle Canvas Layer - Disabled on mobile for performance */}
-      {!isMobile && <ParticleCanvas isHovered={isHovered} color={isHovered ? "#130e05" : "#A69F8D"} />}
-
       {/* Corner decorative markers */}
       <div className={`absolute top-0 left-0 w-1 h-1 transition-colors ${isHovered ? 'bg-[#130e05]' : 'bg-[#A69F8D]'}`} />
       <div className={`absolute top-0 right-0 w-1 h-1 transition-colors ${isHovered ? 'bg-[#130e05]' : 'bg-[#A69F8D]'}`} />
@@ -181,70 +318,120 @@ function Chip({ tech, index, active }: { tech: TechItem; index: number; active: 
   );
 }
 
-function ParticleCanvas({ isHovered, color }: { isHovered: boolean; color: string }) {
+function SharedParticleLayer({
+  containerRef,
+  activeRect,
+  color,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  activeRect: ActiveRect | null;
+  color: string;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const particlesRef = useRef<{ x: number; y: number; size: number; speedY: number; life: number; maxLife: number }[]>([]);
+  const activeRectRef = useRef<ActiveRect | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const particlesRef = useRef<Particle[]>([]);
+  const startLoopRef = useRef<(() => void) | null>(null);
+  const colorRef = useRef(color);
+
+  useEffect(() => {
+    colorRef.current = color;
+  }, [color]);
+
+  useEffect(() => {
+    activeRectRef.current = activeRect;
+    if (activeRect && startLoopRef.current) {
+      startLoopRef.current();
+    }
+  }, [activeRect]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationFrameId: number;
-    
-    // Resize canvas to match parent
     const resize = () => {
-      if (canvas.parentElement) {
-        canvas.width = canvas.parentElement.clientWidth;
-        canvas.height = canvas.parentElement.clientHeight;
-      }
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
     };
-    resize();
-    window.addEventListener("resize", resize);
 
-    const update = () => {
+    resize();
+
+    let resizeObserver: ResizeObserver | null = null;
+    const canObserve = typeof ResizeObserver !== "undefined";
+    if (canObserve) {
+      resizeObserver = new ResizeObserver(() => resize());
+      resizeObserver.observe(container);
+    } else {
+      window.addEventListener("resize", resize);
+    }
+
+    const tick = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = color;
-      
-      // Spawn logic
-      const spawnRate = isHovered ? 0.4 : 0.05;
-      if (Math.random() < spawnRate) {
+      const rect = activeRectRef.current;
+
+      if (rect && particlesRef.current.length < 90 && Math.random() < 0.6) {
         particlesRef.current.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height, // Spawn anywhere
-          size: Math.random() * 2 + 1,      // Small squares
-          speedY: Math.random() * 0.5 + 0.2,
-          life: 1,
-          maxLife: 1,
+          x: rect.x + Math.random() * rect.width,
+          y: rect.y + Math.random() * rect.height,
+          size: Math.random() * 2 + 1,
+          alpha: 0.85,
+          speedY: Math.random() * 0.3 + 0.2,
+          driftX: (Math.random() - 0.5) * 0.4,
+          decay: Math.random() * 0.02 + 0.01,
         });
       }
 
-      // Update and draw particles
       for (let i = particlesRef.current.length - 1; i >= 0; i--) {
-        const p = particlesRef.current[i];
-        p.y -= p.speedY; // Float up
-        p.life -= 0.01; // Fade out
-        
-        if (p.life <= 0) {
+        const particle = particlesRef.current[i];
+        particle.x += particle.driftX;
+        particle.y -= particle.speedY;
+        particle.alpha -= particle.decay;
+
+        if (particle.alpha <= 0) {
           particlesRef.current.splice(i, 1);
-        } else {
-          ctx.globalAlpha = p.life * 0.6; 
-          ctx.fillRect(p.x, p.y, p.size, p.size);
+          continue;
         }
+
+        ctx.globalAlpha = particle.alpha;
+        ctx.fillStyle = colorRef.current;
+        ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
       }
-      
+
       ctx.globalAlpha = 1;
-      animationFrameId = requestAnimationFrame(update);
+
+      if (activeRectRef.current || particlesRef.current.length > 0) {
+        animationFrameRef.current = requestAnimationFrame(tick);
+      } else {
+        animationFrameRef.current = null;
+      }
     };
 
-    update();
+    const startLoop = () => {
+      if (animationFrameRef.current === null) {
+        animationFrameRef.current = requestAnimationFrame(tick);
+      }
+    };
+
+    startLoopRef.current = startLoop;
 
     return () => {
-      window.removeEventListener("resize", resize);
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      particlesRef.current = [];
+      startLoopRef.current = null;
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      } else {
+        window.removeEventListener("resize", resize);
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
-  }, [isHovered, color]); // Dependencies dictate when the loop restarts, but particlesRef persists
+  }, [containerRef]);
 
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none z-0" />;
+  return <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 z-0" />;
 }

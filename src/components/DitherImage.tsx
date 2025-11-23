@@ -126,7 +126,7 @@ function DitherScene({ src, active }: { src: string; active: boolean }) {
   const effectRef = useRef<RetroSepiaEffectImpl>(null);
   const elapsedRef = useRef(0);
   const targetPixelSize = 2.5;
-  const duration = 0.8; // Animation duration in seconds
+  const duration = 1; // Animation duration in seconds
   
   useFrame((state, delta) => {
     if (active && effectRef.current) {

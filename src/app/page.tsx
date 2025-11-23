@@ -83,14 +83,14 @@ export default function Home() {
   return (
     <>
 
-      
+
       <main className="relative min-h-[100vh] sm:min-h-[100vh] flex items-center justify-center p-8 sm:p-16">
         {/* Dither effect background for hero section */}
         <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
           <Dither
             waveColor={[165 / 100, 158 / 100, 141 / 100]}
-            disableAnimation={isMobile}
-            enableMouseInteraction={!isMobile}
+            disableAnimation={false}
+            enableMouseInteraction={false}
             mouseRadius={0.5}
             colorNum={2}
             waveAmplitude={0.002}
@@ -233,7 +233,7 @@ function InViewAboutBlock() {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const isInViewOnce = useInView(containerRef, { once: true, margin: "-10% 0px -10% 0px" });
   const isMobile = useIsMobile();
-  
+
   return (
     <div ref={containerRef} className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-10 sm:mb-12">
       <motion.div
@@ -300,10 +300,10 @@ function InViewAboutBlock() {
         <div className="absolute inset-0 z-0">
           <DitherImage src="/asa noodles crop.png" active={isInViewOnce} className="w-full h-full" />
         </div>
-        
+
         {/* Overlay details */}
         <div className="absolute inset-0 pointer-events-none z-10 ring-1 ring-inset ring-white/10 rounded-2xl" />
-        
+
         {/* Corner brackets decoration */}
         <div className="absolute top-4 left-4 w-2 h-2 border-t border-l border-white/40" />
         <div className="absolute top-4 right-4 w-2 h-2 border-t border-r border-white/40" />
