@@ -242,18 +242,22 @@ export default function TechStack() {
 
 // Pre-compute animation variants outside component to avoid recreation
 const REDUCED_MOTION_VARIANTS = {
-  hidden: { opacity: 0 },
+  hidden: { opacity: 0, scaleX: 1, filter: "blur(0px)" },
   visible: {
     opacity: 1,
+    scaleX: 1,
+    filter: "blur(0px)",
     transition: { duration: 0.2 },
   },
 };
 
 const MOBILE_VARIANTS = {
-  hidden: { opacity: 0 },
+  hidden: { opacity: 0, scaleX: 1, filter: "blur(0px)" },
   visible: { 
     opacity: 1, 
-    transition: { duration: 0.2 }  
+    scaleX: 1,
+    filter: "blur(0px)",
+    transition: { duration: 0.3 }  
   }
 };
 
