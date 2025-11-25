@@ -90,7 +90,7 @@ export default function Home() {
           <Dither
             waveColor={[165 / 100, 158 / 100, 141 / 100]}
             disableAnimation={false}
-            enableMouseInteraction={false}
+            enableMouseInteraction={true}
             mouseRadius={0.5}
             colorNum={2}
             waveAmplitude={0.002}

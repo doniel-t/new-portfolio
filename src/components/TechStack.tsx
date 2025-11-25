@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback, memo } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { SiNextdotjs, SiReact, SiTypescript, SiTailwindcss, SiGo, SiPython, SiPostgresql, SiStrapi, SiPayloadcms, SiDocker, SiPodman, SiNginx, SiGit, SiGithubactions, SiGitlab, SiFigma } from "react-icons/si";
 import DecodingWord from "./DecodingWord";
 import TargetCursor from "./TargetCursor";
-import PixelBlast from "./PixelBlast";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 type TechItem = {
@@ -31,26 +30,50 @@ type Particle = {
   speedY: number;
   driftX: number;
   decay: number;
+  active: boolean;
+};
+
+// Pre-create icons once to avoid re-renders
+const ICONS = {
+  nextjs: <SiNextdotjs size={24} />,
+  react: <SiReact size={24} />,
+  typescript: <SiTypescript size={24} />,
+  tailwind: <SiTailwindcss size={24} />,
+  go: <SiGo size={24} />,
+  python: <SiPython size={24} />,
+  postgres: <SiPostgresql size={24} />,
+  strapi: <SiStrapi size={24} />,
+  payload: <SiPayloadcms size={24} />,
+  docker: <SiDocker size={24} />,
+  podman: <SiPodman size={24} />,
+  nginx: <SiNginx size={24} />,
+  git: <SiGit size={24} />,
+  github: <SiGithubactions size={24} />,
+  gitlab: <SiGitlab size={24} />,
+  figma: <SiFigma size={24} />,
 };
 
 const TECH_STACK: TechItem[] = [
-  { name: "Next.js", category: "Framework", cost: 12, icon: <SiNextdotjs size={24} />, description: "Server-side Rendering" },
-  { name: "React", category: "Library", cost: 10, icon: <SiReact size={24} />, description: "UI Components" },
-  { name: "TypeScript", category: "Language", cost: 8, icon: <SiTypescript size={24} />, description: "Type Safety" },
-  { name: "Tailwind", category: "CSS", cost: 6, icon: <SiTailwindcss size={24} />, description: "Utility-first" },
-  { name: "Go", category: "Language", cost: 14, icon: <SiGo size={24} />, description: "High Performance" },
-  { name: "Python", category: "Language", cost: 10, icon: <SiPython size={24} />, description: "Automation & AI" },
-  { name: "Postgres", category: "Database", cost: 11, icon: <SiPostgresql size={24} />, description: "Relational DB" },
-  { name: "Strapi", category: "CMS", cost: 9, icon: <SiStrapi size={24} />, description: "Headless CMS" },
-  { name: "Payload", category: "CMS", cost: 9, icon: <SiPayloadcms size={24} />, description: "Code-first CMS" },
-  { name: "Docker", category: "Container", cost: 15, icon: <SiDocker size={24} />, description: "Containerization" },
-  { name: "Podman", category: "Container", cost: 12, icon: <SiPodman size={24} />, description: "Daemonless" },
-  { name: "Nginx", category: "Server", cost: 8, icon: <SiNginx size={24} />, description: "Reverse Proxy" },
-  { name: "Git", category: "VCS", cost: 4, icon: <SiGit size={24} />, description: "Version Control" },
-  { name: "GitHub Actions", category: "CI/CD", cost: 13, icon: <SiGithubactions size={24} />, description: "Automation Workflows" },
-  { name: "GitLab CI", category: "CI/CD", cost: 13, icon: <SiGitlab size={24} />, description: "DevOps Pipelines" },
-  { name: "Figma", category: "Design", cost: 7, icon: <SiFigma size={24} />, description: "UI/UX Design" },
+  { name: "Next.js", category: "Framework", cost: 12, icon: ICONS.nextjs, description: "Server-side Rendering" },
+  { name: "React", category: "Library", cost: 10, icon: ICONS.react, description: "UI Components" },
+  { name: "TypeScript", category: "Language", cost: 8, icon: ICONS.typescript, description: "Type Safety" },
+  { name: "Tailwind", category: "CSS", cost: 6, icon: ICONS.tailwind, description: "Utility-first" },
+  { name: "Go", category: "Language", cost: 14, icon: ICONS.go, description: "High Performance" },
+  { name: "Python", category: "Language", cost: 10, icon: ICONS.python, description: "Automation & AI" },
+  { name: "Postgres", category: "Database", cost: 11, icon: ICONS.postgres, description: "Relational DB" },
+  { name: "Strapi", category: "CMS", cost: 9, icon: ICONS.strapi, description: "Headless CMS" },
+  { name: "Payload", category: "CMS", cost: 9, icon: ICONS.payload, description: "Code-first CMS" },
+  { name: "Docker", category: "Container", cost: 15, icon: ICONS.docker, description: "Containerization" },
+  { name: "Podman", category: "Container", cost: 12, icon: ICONS.podman, description: "Daemonless" },
+  { name: "Nginx", category: "Server", cost: 8, icon: ICONS.nginx, description: "Reverse Proxy" },
+  { name: "Git", category: "VCS", cost: 4, icon: ICONS.git, description: "Version Control" },
+  { name: "GitHub Actions", category: "CI/CD", cost: 13, icon: ICONS.github, description: "Automation Workflows" },
+  { name: "GitLab CI", category: "CI/CD", cost: 13, icon: ICONS.gitlab, description: "DevOps Pipelines" },
+  { name: "Figma", category: "Design", cost: 7, icon: ICONS.figma, description: "UI/UX Design" },
 ];
+
+// Pre-compute total memory cost
+const TOTAL_MEMORY = TECH_STACK.reduce((acc, item) => acc + item.cost, 0);
 
 export default function TechStack() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -118,6 +141,20 @@ export default function TechStack() {
       window.removeEventListener("scroll", handlePositionChange, true);
     };
   }, [enableHoverParticles, hoveredIndex, updateActiveRect]);
+
+  // Memoize hover handlers to prevent recreation on each render
+  const hoverHandlers = useMemo(() => 
+    TECH_STACK.map((_, index) => ({
+      onHoverStart: () => setHoveredIndex(index),
+      onHoverEnd: () => setHoveredIndex((current) => {
+        if (current === index) {
+          setActiveRect(null);
+          return null;
+        }
+        return current;
+      })
+    })), 
+  []);
   
   return (
     <section className="relative w-full py-20 overflow-hidden" ref={containerRef}>
@@ -139,14 +176,19 @@ export default function TechStack() {
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#A69F8D]/30 to-transparent z-10" />
       <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-[var(--dark)] to-transparent z-0 pointer-events-none" />
 
+      {/* Replaced heavy PixelBlast with lightweight CSS pattern */}
       {!isMobile && !prefersReducedMotion && (
-        <div className="absolute inset-0 -z-15 opacity-20" style={{ maskImage: "linear-gradient(to bottom, transparent 0%, black 150px)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 150px)" }}>
-            <PixelBlast
-              pixelSize={24}
-              color="#A69F8D"
-              variant="square"
-            />
-        </div>
+        <div 
+          className="absolute inset-0 -z-15 opacity-10 pointer-events-none" 
+          style={{ 
+            maskImage: "linear-gradient(to bottom, transparent 0%, black 150px)", 
+            WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 150px)",
+            backgroundImage: `
+              radial-gradient(circle at 1px 1px, #A69F8D 1px, transparent 1px)
+            `,
+            backgroundSize: '24px 24px'
+          }}
+        />
       )}
       <div className="absolute inset-0 scanlines -z-10 opacity-30 pointer-events-none" style={{ maskImage: "linear-gradient(to bottom, transparent 0%, black 150px)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 150px)" }} />
 
@@ -164,7 +206,7 @@ export default function TechStack() {
             </h2>
             <div className="flex-1" />
             <div className="text-xs font-mono text-[#A69F8D]/60 tracking-widest">
-              MEMORY: {TECH_STACK.reduce((acc, item) => acc + item.cost, 0)} / 256
+              MEMORY: {TOTAL_MEMORY} / 256
             </div>
          </motion.div>
 
@@ -185,17 +227,11 @@ export default function TechStack() {
                   index={index} 
                   active={isInView}
                   isHovered={hoveredIndex === index}
+                  isMobile={isMobile}
+                  prefersReducedMotion={prefersReducedMotion ?? false}
                   registerRef={(element) => registerCardRef(element, index)}
-                  onHoverStart={() => setHoveredIndex(index)}
-                  onHoverEnd={() =>
-                    setHoveredIndex((current) => {
-                      if (current === index) {
-                        setActiveRect(null);
-                        return null;
-                      }
-                      return current;
-                    })
-                  }
+                  onHoverStart={hoverHandlers[index].onHoverStart}
+                  onHoverEnd={hoverHandlers[index].onHoverEnd}
                 />
               ))}
             </div>
@@ -205,11 +241,55 @@ export default function TechStack() {
   );
 }
 
-function Chip({
+// Pre-compute animation variants outside component to avoid recreation
+const REDUCED_MOTION_VARIANTS = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { duration: 0.2 },
+  },
+};
+
+const MOBILE_VARIANTS = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1, 
+    transition: { duration: 0.2 }  
+  }
+};
+
+// Create desktop variants for each index (staggered delay)
+const createDesktopVariants = (index: number) => ({
+  hidden: { 
+    opacity: 0, 
+    scaleX: 0, 
+    filter: "blur(4px)"
+  },
+  visible: { 
+    opacity: 1, 
+    scaleX: 1,
+    filter: "blur(0px)",
+    transition: { 
+      duration: 0.4, 
+      delay: index * 0.05,
+      ease: [0.16, 1, 0.3, 1] as const,
+    }  
+  }
+});
+
+// Pre-compute variants for all 16 tech items
+const DESKTOP_VARIANTS = TECH_STACK.map((_, i) => createDesktopVariants(i));
+
+// Pre-compute cost bars to avoid recreation
+const COST_BARS = TECH_STACK.map(tech => Math.ceil(tech.cost / 3));
+
+const Chip = memo(function Chip({
   tech,
   index,
   active,
   isHovered,
+  isMobile,
+  prefersReducedMotion,
   registerRef,
   onHoverStart,
   onHoverEnd,
@@ -218,43 +298,20 @@ function Chip({
   index: number;
   active: boolean;
   isHovered: boolean;
+  isMobile: boolean;
+  prefersReducedMotion: boolean;
   registerRef: (element: HTMLDivElement | null) => void;
   onHoverStart: () => void;
   onHoverEnd: () => void;
 }) {
-  const isMobile = useIsMobile();
-  const prefersReducedMotion = useReducedMotion();
+  // Use pre-computed variants instead of creating new objects
+  const variants = prefersReducedMotion 
+    ? REDUCED_MOTION_VARIANTS 
+    : isMobile 
+      ? MOBILE_VARIANTS 
+      : DESKTOP_VARIANTS[index];
 
-  // Animation variants for spawn
-  const variants = useMemo(() => {
-    if (prefersReducedMotion) {
-      return {
-        hidden: { opacity: 0 },
-        visible: {
-          opacity: 1,
-          transition: { duration: 0.2 },
-        },
-      };
-    }
-
-    return {
-      hidden: { 
-        opacity: 0, 
-        scaleX: isMobile ? 1 : 0, 
-        filter: isMobile ? "blur(0px)" : "blur(4px)"
-      },
-      visible: { 
-        opacity: 1, 
-        scaleX: 1,
-        filter: "blur(0px)",
-        transition: { 
-          duration: isMobile ? 0.2 : 0.4, 
-          delay: isMobile ? 0 : index * 0.05,
-          ease: [0.16, 1, 0.3, 1] as const,
-        }  
-      }
-    };
-  }, [isMobile, index, prefersReducedMotion]);
+  const filledBars = COST_BARS[index];
 
   return (
     <motion.div
@@ -304,19 +361,28 @@ function Chip({
           </span>
           
           {/* Hover reveal description or static decorative bar */}
-          <div className="flex gap-0.5 shrink-0">
-               {Array.from({ length: 5 }).map((_, i) => (
-                   <div 
-                      key={i} 
-                      className={`w-1 h-2 ${i < Math.ceil(tech.cost / 3) ? 'opacity-100' : 'opacity-20'} bg-current`}
-                   />
-               ))}
-          </div>
+          <CostBars filled={filledBars} />
         </div>
       </div>
     </motion.div>
   );
-}
+});
+
+// Memoized cost bars component to avoid re-rendering
+const CostBars = memo(function CostBars({ filled }: { filled: number }) {
+  return (
+    <div className="flex gap-0.5 shrink-0">
+      <div className={`w-1 h-2 ${filled >= 1 ? 'opacity-100' : 'opacity-20'} bg-current`} />
+      <div className={`w-1 h-2 ${filled >= 2 ? 'opacity-100' : 'opacity-20'} bg-current`} />
+      <div className={`w-1 h-2 ${filled >= 3 ? 'opacity-100' : 'opacity-20'} bg-current`} />
+      <div className={`w-1 h-2 ${filled >= 4 ? 'opacity-100' : 'opacity-20'} bg-current`} />
+      <div className={`w-1 h-2 ${filled >= 5 ? 'opacity-100' : 'opacity-20'} bg-current`} />
+    </div>
+  );
+});
+
+// Particle pool size - reduced from 90 for better performance
+const MAX_PARTICLES = 40;
 
 function SharedParticleLayer({
   containerRef,
@@ -330,9 +396,18 @@ function SharedParticleLayer({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const activeRectRef = useRef<ActiveRect | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-  const particlesRef = useRef<Particle[]>([]);
   const startLoopRef = useRef<(() => void) | null>(null);
   const colorRef = useRef(color);
+  const lastFrameTimeRef = useRef(0);
+  
+  // Object pool for particles - pre-allocate to avoid GC
+  const particlePoolRef = useRef<Particle[]>(() => {
+    const pool: Particle[] = [];
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+      pool.push({ x: 0, y: 0, size: 0, alpha: 0, speedY: 0, driftX: 0, decay: 0, active: false });
+    }
+    return pool;
+  });
 
   useEffect(() => {
     colorRef.current = color;
@@ -349,12 +424,24 @@ function SharedParticleLayer({
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
+    
+    // Initialize particle pool
+    const particles = particlePoolRef.current;
+    if (typeof particles === 'function') {
+      particlePoolRef.current = particles();
+    }
 
     const resize = () => {
-      canvas.width = container.clientWidth;
-      canvas.height = container.clientHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.scale(dpr, dpr);
     };
 
     resize();
@@ -368,41 +455,75 @@ function SharedParticleLayer({
       window.addEventListener("resize", resize);
     }
 
-    const tick = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const rect = activeRectRef.current;
+    // Find inactive particle in pool
+    const getInactiveParticle = (): Particle | null => {
+      const pool = particlePoolRef.current as Particle[];
+      for (let i = 0; i < pool.length; i++) {
+        if (!pool[i].active) return pool[i];
+      }
+      return null;
+    };
 
-      if (rect && particlesRef.current.length < 90 && Math.random() < 0.6) {
-        particlesRef.current.push({
-          x: rect.x + Math.random() * rect.width,
-          y: rect.y + Math.random() * rect.height,
-          size: Math.random() * 2 + 1,
-          alpha: 0.85,
-          speedY: Math.random() * 0.3 + 0.2,
-          driftX: (Math.random() - 0.5) * 0.4,
-          decay: Math.random() * 0.02 + 0.01,
-        });
+    // Throttled frame rate (~30fps instead of 60fps for particles)
+    const FRAME_INTERVAL = 33; // ~30fps
+    
+    const tick = (timestamp: number) => {
+      const elapsed = timestamp - lastFrameTimeRef.current;
+      
+      if (elapsed < FRAME_INTERVAL) {
+        animationFrameRef.current = requestAnimationFrame(tick);
+        return;
+      }
+      
+      lastFrameTimeRef.current = timestamp;
+      
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      ctx.clearRect(0, 0, w, h);
+      
+      const rect = activeRectRef.current;
+      const pool = particlePoolRef.current as Particle[];
+
+      // Spawn new particles (reduced rate)
+      if (rect && Math.random() < 0.4) {
+        const p = getInactiveParticle();
+        if (p) {
+          p.x = rect.x + Math.random() * rect.width;
+          p.y = rect.y + Math.random() * rect.height;
+          p.size = Math.random() * 2 + 1;
+          p.alpha = 0.85;
+          p.speedY = Math.random() * 0.4 + 0.3;
+          p.driftX = (Math.random() - 0.5) * 0.5;
+          p.decay = Math.random() * 0.025 + 0.015;
+          p.active = true;
+        }
       }
 
-      for (let i = particlesRef.current.length - 1; i >= 0; i--) {
-        const particle = particlesRef.current[i];
-        particle.x += particle.driftX;
-        particle.y -= particle.speedY;
-        particle.alpha -= particle.decay;
+      // Update and draw particles
+      let hasActiveParticles = false;
+      ctx.fillStyle = colorRef.current;
+      
+      for (let i = 0; i < pool.length; i++) {
+        const p = pool[i];
+        if (!p.active) continue;
+        
+        p.x += p.driftX;
+        p.y -= p.speedY;
+        p.alpha -= p.decay;
 
-        if (particle.alpha <= 0) {
-          particlesRef.current.splice(i, 1);
+        if (p.alpha <= 0) {
+          p.active = false;
           continue;
         }
 
-        ctx.globalAlpha = particle.alpha;
-        ctx.fillStyle = colorRef.current;
-        ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
+        hasActiveParticles = true;
+        ctx.globalAlpha = p.alpha;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
       }
 
       ctx.globalAlpha = 1;
 
-      if (activeRectRef.current || particlesRef.current.length > 0) {
+      if (activeRectRef.current || hasActiveParticles) {
         animationFrameRef.current = requestAnimationFrame(tick);
       } else {
         animationFrameRef.current = null;
@@ -411,6 +532,7 @@ function SharedParticleLayer({
 
     const startLoop = () => {
       if (animationFrameRef.current === null) {
+        lastFrameTimeRef.current = performance.now();
         animationFrameRef.current = requestAnimationFrame(tick);
       }
     };
@@ -422,7 +544,11 @@ function SharedParticleLayer({
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
-      particlesRef.current = [];
+      // Reset pool instead of creating new array
+      const pool = particlePoolRef.current as Particle[];
+      for (let i = 0; i < pool.length; i++) {
+        pool[i].active = false;
+      }
       startLoopRef.current = null;
       if (resizeObserver) {
         resizeObserver.disconnect();
