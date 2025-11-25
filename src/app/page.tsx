@@ -90,11 +90,7 @@ export default function Home() {
           <Dither
             waveColor={[165 / 100, 158 / 100, 141 / 100]}
             disableAnimation={false}
-<<<<<<< HEAD
             enableMouseInteraction={true}
-=======
-            enableMouseInteraction={false}
->>>>>>> ccb3b66 (fix: old header and fix performance issues)
             mouseRadius={0.5}
             colorNum={2}
             waveAmplitude={0.002}
