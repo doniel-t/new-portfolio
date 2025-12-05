@@ -367,3 +367,13 @@ body::after {
   animation: line-art-dash 10s ease-in-out infinite;
   will-change: stroke-dashoffset;
 }
+
+/* Fade in animation for modals */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

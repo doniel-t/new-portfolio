@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { motion, AnimatePresence, type Variants, useMotionValue, useTransform, useSpring, useInView } from "framer-motion";
+import { motion, type Variants, useMotionValue, useTransform, useSpring, useInView } from "framer-motion";
 import { ArrowRight, X } from "lucide-react";
 import PixelTransition from "@/components/PixelTransition";
 import DecodingWord from "@/components/DecodingWord";
@@ -404,6 +404,18 @@ const HOBBIES: HobbyCard[] = [
       { label: "Style", value: "Anime Painting" },
     ],
   },
+  { 
+    title: "Dungeons & Dragons", 
+    items: ["Roleplay", "Character building"], 
+    image: "/dnd-bg.png",
+    description: "There's nothing quite like collaborative storytelling around a table. As a forever DM, I craft worlds, weave narratives, and watch players make choices I never anticipated. It's improv theater meets tactical combat meets collective imagination.",
+    stats: [
+      { label: "Years Playing", value: "5+" },
+      { label: "Preferred Role", value: "DM" },
+      { label: "Favorite Class", value: "Wizard" },
+    ],
+    quote: "\"Roll for initiative.\"",
+  },
 ];
 
 function InViewHobbyBlock() {
@@ -455,7 +467,7 @@ function InViewHobbyBlock() {
       >
         <motion.p
           variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.5, ease: [0.16, 1, 0.3, 1] } } }}
-          className="text-sm tracking-widest text-muted font-bold mb-3"
+          className="text-sm tracking-widest text-muted font-bold mb-3 mt-24"
         >
           BEYOND THE CODE
         </motion.p>
@@ -532,19 +544,19 @@ function InViewHobbyBlock() {
                   <div className="absolute bottom-0 left-0 right-0 h-4 bg-[#130e05] z-[15]" />
 
                   {/* Pixel divider animation at bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 h-28 z-10 overflow-hidden pointer-events-none">
+                  <div className="absolute bottom-0 left-0 right-0 h-96 z-10 overflow-hidden pointer-events-none">
                     <PixelDivider 
                       color="#130e05" 
-                      pixelSize={isMobile ? 10 : 16} 
-                      durationSec={7} 
-                      rise="-220%" 
-                      streamsPerCol={3}
+                      pixelSize={isMobile ? 10 : 48} 
+                      durationSec={10} 
+                      rise="-250%" 
+                      streamsPerCol={9}
                       direction="up"
                     />
                   </div>
 
                   {/* Card Content */}
-                  <div className="relative z-10 h-full flex flex-col justify-end p-8">
+                  <div className="relative z-20 h-full flex flex-col justify-end p-8">
                     {/* Index tag */}
                     <div className="absolute top-6 right-6 font-mono text-xs tracking-widest text-foreground/40 group-hover:text-white/50 uppercase transition-colors duration-300">
                       [{String(cardIndex + 1).padStart(2, "0")}]
@@ -555,7 +567,7 @@ function InViewHobbyBlock() {
                       Click to expand
                     </div>
 
-                    <h3 className="font-display text-4xl sm:text-5xl lg:text-6xl tracking-tight text-foreground group-hover:text-white mb-4 transition-colors duration-300 drop-shadow-sm group-hover:drop-shadow-lg">
+                    <h3 className="font-display text-4xl sm:text-5xl lg:text-6xl tracking-tight text-foreground group-hover:text-white mb-4 transition-colors duration-300" >
                       {card.title}
                     </h3>
                     
@@ -564,7 +576,7 @@ function InViewHobbyBlock() {
                       {card.items.map((item, itemIndex) => (
                         <span
                           key={item}
-                          className="inline-block text-sm font-mono text-foreground/60 group-hover:text-white/70 bg-foreground/5 group-hover:bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded border border-foreground/10 group-hover:border-white/10 transition-colors duration-300"
+                          className="inline-block text-sm font-mono text-foreground group-hover:text-white bg-background/90 group-hover:bg-[#130e05]/90 px-3 py-1.5 rounded border border-foreground/20 group-hover:border-white/20 transition-colors  duration-300 shadow-lg backdrop-blur-3xl"
                         >
                           <DecodingWord 
                             word={item} 
@@ -626,48 +638,42 @@ function InViewHobbyBlock() {
       </motion.div>
 
       {/* Expanded Card Modal */}
-      <AnimatePresence>
-        {expandedCard !== null && (
-          <>
-            {/* Backdrop with blurred card image */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={() => setExpandedCard(null)}
-              className="fixed inset-0 z-50 overflow-hidden"
-            >
-              {/* Blurred background image */}
-              <Image
-                src={HOBBIES[expandedCard].image}
-                alt=""
-                fill
-                className="object-cover scale-110 blur-3xl"
-                sizes="100vw"
+      {expandedCard !== null && (
+        <>
+          {/* Backdrop with blurred card image */}
+          <div
+            onClick={() => setExpandedCard(null)}
+            className="fixed inset-0 z-50 overflow-hidden animate-[fadeIn_0.3s_ease-out]"
+          >
+            {/* Blurred background image */}
+            <Image
+              src={HOBBIES[expandedCard].image}
+              alt=""
+              fill
+              className="object-cover scale-110 blur-3xl"
+              sizes="100vw"
+            />
+            {/* Dark overlay */}
+            <div className="absolute inset-0 bg-[#130e05]/70" />
+            {/* Dither wave overlay */}
+            <div className="absolute inset-0 opacity-[0.08] pointer-events-none">
+              <Dither
+                waveColor={[165 / 100, 158 / 100, 141 / 100]}
+                disableAnimation={false}
+                enableMouseInteraction={false}
+                colorNum={2}
+                waveAmplitude={0.002}
+                waveFrequency={1.5}
+                waveSpeed={0.05}
               />
-              {/* Dark overlay */}
-              <div className="absolute inset-0 bg-[#130e05]/70" />
-              {/* Dither wave overlay */}
-              <div className="absolute inset-0 opacity-[0.08] pointer-events-none">
-                <Dither
-                  waveColor={[165 / 100, 158 / 100, 141 / 100]}
-                  disableAnimation={false}
-                  enableMouseInteraction={false}
-                  colorNum={2}
-                  waveAmplitude={0.002}
-                  waveFrequency={1.5}
-                  waveSpeed={0.05}
-                />
-              </div>
-            </motion.div>
+            </div>
+          </div>
 
-            {/* Expanded Content */}
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 pointer-events-none">
-              <motion.div
-                layoutId={`hobby-card-${expandedCard}`}
-                className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/20 bg-[#130e05] pointer-events-auto"
-              >
+          {/* Expanded Content */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 pointer-events-none">
+            <div
+              className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/20 bg-[#130e05] pointer-events-auto animate-[fadeIn_0.3s_ease-out]"
+            >
                 {/* Close button */}
                 <button
                   onClick={() => setExpandedCard(null)}
@@ -698,11 +704,11 @@ function InViewHobbyBlock() {
                 {/* Pixel animation at bottom */}
                 <div className="absolute bottom-0 left-0 right-0 h-32 z-10 overflow-hidden pointer-events-none opacity-40">
                   <PixelDivider 
-                    color="#fff" 
-                    pixelSize={isMobile ? 12 : 20} 
-                    durationSec={8} 
-                    rise="-200%" 
-                    streamsPerCol={4}
+                    color="#444" 
+                    pixelSize={isMobile ? 12 : 48} 
+                    durationSec={7} 
+                    rise="-160%" 
+                    streamsPerCol={3}
                     direction="up"
                   />
                 </div>
@@ -772,11 +778,11 @@ function InViewHobbyBlock() {
                     <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent" />
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </>
         )}
-      </AnimatePresence>
+      
     </div>
   );
 }
