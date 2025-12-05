@@ -423,6 +423,13 @@ function InViewHobbyBlock() {
   const isInViewOnce = useInView(containerRef, { once: true, margin: "-10% 0px -10% 0px" });
   const isMobile = useIsMobile();
   const [expandedCard, setExpandedCard] = React.useState<number | null>(null);
+  const [shouldPreload, setShouldPreload] = React.useState(false);
+
+  // Defer image preloading until after first render
+  React.useEffect(() => {
+    const timer = setTimeout(() => setShouldPreload(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Close on escape key
   React.useEffect(() => {
@@ -441,19 +448,22 @@ function InViewHobbyBlock() {
 
   return (
     <div ref={containerRef}>
-      {/* Preload all hobby images for smooth modal transitions */}
-      <div className="hidden">
-        {HOBBIES.map((hobby) => (
-          <Image
-            key={`preload-${hobby.title}`}
-            src={hobby.image}
-            alt=""
-            width={1}
-            height={1}
-            priority
-          />
-        ))}
-      </div>
+      {/* Preload all hobby images in background after first render */}
+      {shouldPreload && (
+        <div className="fixed -left-[9999px] w-px h-px overflow-hidden" aria-hidden="true">
+          {HOBBIES.map((hobby) => (
+            <Image
+              key={`preload-${hobby.title}`}
+              src={hobby.image}
+              alt=""
+              width={1}
+              height={1}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
+              loading="eager"
+            />
+          ))}
+        </div>
+      )}
 
       <motion.div
         initial="hidden"
@@ -511,22 +521,37 @@ function InViewHobbyBlock() {
                 style={!isEven ? { direction: "rtl" } : undefined}
               >
                 {/* Card */}
-                <motion.div 
-                  layoutId={`hobby-card-${cardIndex}`}
-                  onClick={() => setExpandedCard(cardIndex)}
-                  className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_10px_rgba(0,0,0,0.1)] cursor-pointer h-[400px] lg:h-[480px]" 
-                  style={{ direction: "ltr" }}
-                  whileHover={isMobile ? {} : { scale: 1.02 }}
-                  whileTap={isMobile ? {} : { scale: 0.98 }}
-                >
-                  {/* Background Image - hidden by default, shown on hover */}
-                  <div className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="group relative" style={{ direction: "ltr" }}>
+                  {/* Image-sensitive shadow - scaled, blurred duplicate */}
+                  <div className="absolute inset-x-4 inset-y-1 z-0 opacity-0 group-hover:opacity-25 group-hover:saturate-200 transition-opacity duration-500 scale-x-[1.15] scale-y-[1.10] pointer-events-none blur-md">
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={card.image}
+                        alt=""
+                        fill
+                        className="object-cover rounded-lg"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 560px"
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+                  
+                  <motion.div 
+                    layoutId={`hobby-card-${cardIndex}`}
+                    onClick={() => setExpandedCard(cardIndex)}
+                    className="relative overflow-hidden rounded-xl border border-white/10 bg-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_10px_rgba(0,0,0,0.1)] cursor-pointer h-[400px] lg:h-[480px]" 
+                    whileHover={isMobile ? {} : { scale: 1.02 }}
+                    whileTap={isMobile ? {} : { scale: 0.98 }}
+                  >
+                    {/* Background Image - hidden by default, shown on hover */}
+                    <div className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     <Image
                       src={card.image}
                       alt={card.title}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 560px"
+                      loading="lazy"
                     />
                     {/* Dark gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#130e05] via-[#130e05]/60 to-[#130e05]/30" />
@@ -595,9 +620,10 @@ function InViewHobbyBlock() {
                     </div>
                   </div>
 
-                  {/* Bottom decorative line */}
-                  <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/20 group-hover:via-white/30 to-transparent transition-colors duration-300 z-20" />
-                </motion.div>
+                    {/* Bottom decorative line */}
+                    <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/20 group-hover:via-white/30 to-transparent transition-colors duration-300 z-20" />
+                  </motion.div>
+                </div>
 
                 {/* Text Content Side */}
                 <div className="flex flex-col justify-center space-y-6" style={{ direction: "ltr" }}>
@@ -652,13 +678,14 @@ function InViewHobbyBlock() {
             onClick={() => setExpandedCard(null)}
             className="fixed inset-0 z-50 overflow-hidden animate-[fadeIn_0.3s_ease-out]"
           >
-            {/* Blurred background image */}
+            {/* Blurred background image - small size since heavily blurred */}
             <Image
               src={HOBBIES[expandedCard].image}
               alt=""
               fill
               className="object-cover scale-110 blur-3xl"
-              sizes="100vw"
+              sizes="384px"
+              quality={25}
             />
             {/* Dark overlay */}
             <div className="absolute inset-0 bg-[#130e05]/70" />
@@ -696,7 +723,8 @@ function InViewHobbyBlock() {
                     alt={HOBBIES[expandedCard].title}
                     fill
                     className="object-cover"
-                    sizes="100vw"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
+                    priority
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#130e05] via-[#130e05]/80 to-[#130e05]/50" />
                   <div className="absolute inset-0 scanlines opacity-15 pointer-events-none" />
