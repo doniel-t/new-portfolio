@@ -1,31 +1,54 @@
 "use client";
 
-import { motion } from "framer-motion";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type BackgroundLineArtProps = {
   className?: string;
 };
 
-const loopLinear = (duration: number) => ({
-  duration,
-  ease: [0.37, 0, 0.63, 1] as const,
-  repeat: Infinity,
-  repeatType: "reverse" as const,
-});
+// Hook to detect if element is visible in viewport
+function useIsVisible(ref: React.RefObject<HTMLElement | null>) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: '50px' }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return isVisible;
+}
 
 export default function BackgroundLineArt({ className }: BackgroundLineArtProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isVisible = useIsVisible(containerRef);
+  
   return (
-    <div className={"pointer-events-none absolute inset-0 z-0 " + (className ?? "")}
+    <div 
+      ref={containerRef}
+      className={"pointer-events-none absolute inset-0 z-0 " + (className ?? "")}
       aria-hidden
     >
       <svg
         viewBox="0 0 100 100"
         preserveAspectRatio="xMidYMid slice"
         className="h-full w-full text-muted opacity-40"
+        style={{ 
+          // Pause animations when not visible
+          animationPlayState: isVisible ? 'running' : 'paused'
+        }}
       >
-        {/* Huge circle on the right side (centered off-canvas to the right). Single moving arc segment */}
-        <motion.circle
+        {/* Huge circle on the right side */}
+        <circle
           cx="120"
           cy="38"
           r="62"
@@ -33,36 +56,45 @@ export default function BackgroundLineArt({ className }: BackgroundLineArtProps)
           stroke="currentColor"
           strokeWidth={1}
           vectorEffect="non-scaling-stroke"
-          initial={{ pathLength: 1, pathSpacing: 0.5, pathOffset: 0 }}
-          animate={{ pathLength: 1, pathSpacing: 0.5, pathOffset: 1 }}
-          transition={loopLinear(16)}
+          strokeDasharray="195 195"
+          className="line-art-animate"
+          style={{ 
+            animationDuration: '16s',
+            animationPlayState: isVisible ? 'running' : 'paused'
+          }}
         />
 
         {/* Diagonal lines across the canvas */}
-        <motion.path
+        <path
           d="M -10 82 L 110 22"
           fill="none"
           stroke="currentColor"
           strokeWidth={0.4}
           vectorEffect="non-scaling-stroke"
-          initial={{ pathLength: 0.85, pathSpacing: 0.15, pathOffset: 0 }}
-          animate={{ pathLength: 0.85, pathSpacing: 0.15, pathOffset: 1 }}
-          transition={loopLinear(10)}
+          strokeDasharray="144 25"
+          className="line-art-animate"
+          style={{ 
+            animationDuration: '10s',
+            animationPlayState: isVisible ? 'running' : 'paused'
+          }}
         />
 
-        <motion.path
+        <path
           d="M -6 94 L 106 54"
           fill="none"
           stroke="currentColor"
           strokeWidth={0.35}
           vectorEffect="non-scaling-stroke"
-          initial={{ pathLength: 0.7, pathSpacing: 0.3, pathOffset: 0 }}
-          animate={{ pathLength: 0.7, pathSpacing: 0.3, pathOffset: 1 }}
-          transition={loopLinear(11.5)}
+          strokeDasharray="112 48"
+          className="line-art-animate"
+          style={{ 
+            animationDuration: '11.5s',
+            animationPlayState: isVisible ? 'running' : 'paused'
+          }}
         />
 
         {/* Fine straight guides */}
-        <motion.line
+        <line
           x1="6"
           y1="18"
           x2="96"
@@ -70,13 +102,15 @@ export default function BackgroundLineArt({ className }: BackgroundLineArtProps)
           stroke="currentColor"
           strokeWidth={0.3}
           vectorEffect="non-scaling-stroke"
-          initial={{ pathLength: 0.6, pathSpacing: 0.4, pathOffset: 0 }}
-          animate={{ pathLength: 0.6, pathSpacing: 0.4, pathOffset: 1 }}
-          transition={loopLinear(8.5)}
+          strokeDasharray="54 36"
+          className="line-art-animate"
+          style={{ 
+            animationDuration: '8.5s',
+            animationPlayState: isVisible ? 'running' : 'paused'
+          }}
         />
 
-
-        <motion.line
+        <line
           x1="8"
           y1="12"
           x2="8"
@@ -84,21 +118,27 @@ export default function BackgroundLineArt({ className }: BackgroundLineArtProps)
           stroke="currentColor"
           strokeWidth={0.3}
           vectorEffect="non-scaling-stroke"
-          initial={{ pathLength: 0.5, pathSpacing: 0.5, pathOffset: 0 }}
-          animate={{ pathLength: 0.5, pathSpacing: 0.5, pathOffset: 1 }}
-          transition={loopLinear(7.8)}
+          strokeDasharray="40 40"
+          className="line-art-animate"
+          style={{ 
+            animationDuration: '7.8s',
+            animationPlayState: isVisible ? 'running' : 'paused'
+          }}
         />
 
         {/* Subtle angled accent near bottom-right */}
-        <motion.path
+        <path
           d="M 60 86 L 108 66"
           fill="none"
           stroke="currentColor"
           strokeWidth={0.35}
           vectorEffect="non-scaling-stroke"
-          initial={{ pathLength: 0.65, pathSpacing: 0.35, pathOffset: 0 }}
-          animate={{ pathLength: 0.65, pathSpacing: 0.35, pathOffset: 1 }}
-          transition={loopLinear(8.2)}
+          strokeDasharray="36 20"
+          className="line-art-animate"
+          style={{ 
+            animationDuration: '8.2s',
+            animationPlayState: isVisible ? 'running' : 'paused'
+          }}
         />
       </svg>
     </div>

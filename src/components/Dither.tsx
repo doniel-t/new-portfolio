@@ -7,6 +7,28 @@ import { EffectComposer, wrapEffect } from '@react-three/postprocessing';
 import { Effect } from 'postprocessing';
 import * as THREE from 'three';
 
+// Hook to detect if element is visible in viewport
+function useIsVisible(ref: React.RefObject<HTMLElement | null>) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: '100px' }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return isVisible;
+}
+
 const waveVertexShader = `
 precision highp float;
 varying vec2 vUv;
@@ -312,28 +334,34 @@ export default function Dither({
   enableMouseInteraction = true,
   mouseRadius = 1
 }: DitherProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isVisible = useIsVisible(containerRef);
+  
   return (
-    <Canvas
-      className="w-full h-full relative"
-      camera={{ position: [0, 0, 6] }}
-      dpr={1}
-      gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
-      onCreated={({ gl }) => {
-        gl.setClearColor(0x000000, 0);
-      }}
-    >
-      <DitheredWaves
-        waveSpeed={waveSpeed}
-        waveFrequency={waveFrequency}
-        waveAmplitude={waveAmplitude}
-        waveColor={waveColor}
-        colorNum={colorNum}
-        pixelSize={pixelSize}
-        disableAnimation={disableAnimation}
-        enableMouseInteraction={enableMouseInteraction}
-        mouseRadius={mouseRadius}
-      />
-    </Canvas>
+    <div ref={containerRef} className="w-full h-full relative">
+      <Canvas
+        className="w-full h-full"
+        camera={{ position: [0, 0, 6] }}
+        dpr={1}
+        frameloop={isVisible ? "always" : "never"}
+        gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(0x000000, 0);
+        }}
+      >
+        <DitheredWaves
+          waveSpeed={waveSpeed}
+          waveFrequency={waveFrequency}
+          waveAmplitude={waveAmplitude}
+          waveColor={waveColor}
+          colorNum={colorNum}
+          pixelSize={pixelSize}
+          disableAnimation={disableAnimation || !isVisible}
+          enableMouseInteraction={enableMouseInteraction}
+          mouseRadius={mouseRadius}
+        />
+      </Canvas>
+    </div>
   );
 }
 

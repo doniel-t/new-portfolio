@@ -1,5 +1,5 @@
 'use client';
-import React, { useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { gsap } from 'gsap';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
 
@@ -15,6 +15,28 @@ const throttle = (func: (...args: any[]) => void, limit: number) => {
     }
   };
 };
+
+// Hook to detect if element is visible in viewport
+function useIsVisible(ref: React.RefObject<HTMLElement | null>) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: '50px' }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return isVisible;
+}
 
 interface Dot {
   cx: number;
@@ -78,6 +100,9 @@ const DotGrid: React.FC<DotGridProps> = ({
     lastX: 0,
     lastY: 0
   });
+  
+  // Only run animation when visible
+  const isVisible = useIsVisible(wrapperRef);
 
   const baseRgb = useMemo(() => hexToRgb(baseColor), [baseColor]);
   const activeRgb = useMemo(() => hexToRgb(activeColor), [activeColor]);
@@ -130,12 +155,15 @@ const DotGrid: React.FC<DotGridProps> = ({
   }, [dotSize, gap]);
 
   useEffect(() => {
-    if (!circlePath) return;
+    if (!circlePath || !isVisible) return;
 
     let rafId: number;
+    let isRunning = true;
     const proxSq = proximity * proximity;
 
     const draw = () => {
+      if (!isRunning) return;
+      
       const canvas = canvasRef.current;
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
@@ -172,8 +200,11 @@ const DotGrid: React.FC<DotGridProps> = ({
     };
 
     draw();
-    return () => cancelAnimationFrame(rafId);
-  }, [proximity, baseColor, activeRgb, baseRgb, circlePath]);
+    return () => {
+      isRunning = false;
+      cancelAnimationFrame(rafId);
+    };
+  }, [proximity, baseColor, activeRgb, baseRgb, circlePath, isVisible]);
 
   useEffect(() => {
     buildGrid();

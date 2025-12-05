@@ -1,10 +1,32 @@
 "use client";
 
-import React, { useEffect, forwardRef, useRef } from 'react';
+import React, { useEffect, forwardRef, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
 import { EffectComposer } from '@react-three/postprocessing';
 import { Effect } from 'postprocessing';
 import * as THREE from 'three';
+
+// Hook to detect if element is visible in viewport
+function useIsVisible(ref: React.RefObject<HTMLElement | null>) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: '100px' }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return isVisible;
+}
 
 const ditherSepiaFragmentShader = `
 precision highp float;
@@ -125,14 +147,13 @@ function ImagePlane({ src }: { src: string }) {
 function DitherScene({ src, active }: { src: string; active: boolean }) {
   const effectRef = useRef<RetroSepiaEffectImpl>(null);
   const elapsedRef = useRef(0);
+  const completedRef = useRef(false);
   const targetPixelSize = 2.5;
   const duration = 1; // Animation duration in seconds
   
   useFrame((state, delta) => {
-    if (active && effectRef.current) {
-      const currentVal = effectRef.current.uniforms.get('pixelSize')?.value;
-      if (currentVal <= targetPixelSize && elapsedRef.current > duration) return;
-
+    // Only animate if active and not yet completed
+    if (active && effectRef.current && !completedRef.current) {
       elapsedRef.current += delta;
       const progress = Math.min(elapsedRef.current / duration, 1);
       
@@ -141,6 +162,11 @@ function DitherScene({ src, active }: { src: string; active: boolean }) {
       
       const newPixelSize = Math.max(current, targetPixelSize);
       effectRef.current.uniforms.get('pixelSize')!.value = newPixelSize;
+      
+      // Mark as complete when animation finishes
+      if (progress >= 1) {
+        completedRef.current = true;
+      }
     }
   });
 
@@ -161,11 +187,15 @@ interface DitherImageProps {
 }
 
 export default function DitherImage({ src, active = false, className }: DitherImageProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isVisible = useIsVisible(containerRef);
+  
   return (
-    <div className={className}>
+    <div ref={containerRef} className={className}>
       <Canvas
         camera={{ position: [0, 0, 5] }}
         dpr={[1, 2]}
+        frameloop={isVisible ? "always" : "never"}
         gl={{ antialias: false, preserveDrawingBuffer: true }}
       >
         <React.Suspense fallback={null}>

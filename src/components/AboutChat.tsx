@@ -75,23 +75,24 @@ export default function AboutChat({ active = false }: AboutChatProps) {
     },
   }), [isMobile]);
 
+  // Optimized variants: removed expensive filter and clipPath animations
+  // Using only GPU-accelerated properties (opacity, transform)
   const item: Variants = useMemo(() => ({
     hidden: {
       opacity: 0,
-      y: isMobile ? 0 : 14,
-      scale: isMobile ? 1 : 0.985,
-      skewY: isMobile ? 0 : 2,
-      filter: isMobile ? "blur(0)" : "blur(2px)",
-      clipPath: isMobile ? "inset(0 0 0 0 round 6px)" : "inset(0 100% 0 0 round 6px)", // hidden with 0% width, reveals L→R
+      y: isMobile ? 0 : 16,
+      x: isMobile ? 0 : -8,
+      scale: isMobile ? 1 : 0.98,
     },
     show: {
       opacity: 1,
       y: 0,
+      x: 0,
       scale: 1,
-      skewY: 0,
-      filter: "blur(0)",
-      clipPath: "inset(0 0% 0 0 round 6px)",
-      transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1] },
+      transition: { 
+        duration: isMobile ? 0.3 : 0.5, 
+        ease: [0.25, 0.46, 0.45, 0.94] // Smoother ease curve
+      },
     },
   }), [isMobile]);
 
@@ -110,7 +111,7 @@ export default function AboutChat({ active = false }: AboutChatProps) {
         style={{ transform: "translateX(-12px)" }}
       />
 
-      <motion.li variants={item}>
+      <motion.li variants={item} style={{ willChange: 'transform, opacity' }}>
         <Tile title="PROFILE" active={active}>
           <p className="text-sm leading-relaxed text-foreground">
             I’m a front‑end engineer crafting calm, performant interfaces with a soft sci‑fi aesthetic.
@@ -118,7 +119,7 @@ export default function AboutChat({ active = false }: AboutChatProps) {
         </Tile>
       </motion.li>
 
-      <motion.li variants={item}>
+      <motion.li variants={item} style={{ willChange: 'transform, opacity' }}>
         <Tile title="STACK" active={active}>
           <div className="flex flex-wrap gap-2">
             {['Next.js','TypeScript','Tailwind','Framer Motion','WebGL'].map((t) => (
@@ -128,7 +129,7 @@ export default function AboutChat({ active = false }: AboutChatProps) {
         </Tile>
       </motion.li>
 
-      <motion.li variants={item}>
+      <motion.li variants={item} style={{ willChange: 'transform, opacity' }}>
         <Tile title="ETHOS" active={active}>
           <div className="space-y-2.5">
             <Meter label="Clarity" value={88} />
@@ -138,7 +139,7 @@ export default function AboutChat({ active = false }: AboutChatProps) {
         </Tile>
       </motion.li>
 
-      <motion.li variants={item}>
+      <motion.li variants={item} style={{ willChange: 'transform, opacity' }}>
         <Tile title="RESULT" active={active}>
           <div className="flex items-center gap-3 text-sm text-foreground">
             <span className="font-mono text-[12px] tracking-wider">+22% conversion</span>
@@ -148,14 +149,14 @@ export default function AboutChat({ active = false }: AboutChatProps) {
         </Tile>
       </motion.li>
 
-      <motion.li variants={item}>
+      <motion.li variants={item} style={{ willChange: 'transform, opacity' }}>
         <Tile title="SIDE QUESTS" active={active}>
           <Matrix cols={12} rows={4} fill={0.58} />
           <p className="mt-2 text-xs text-foreground/70">Shaders · generative art · rapid prototyping</p>
         </Tile>
       </motion.li>
 
-      <motion.li variants={item}>
+      <motion.li variants={item} style={{ willChange: 'transform, opacity' }}>
         <Tile title="STATUS" active={active}>
           <div className="flex items-center gap-2 text-sm text-foreground">
             <span className="dot-led" /> Available for freelance & collaborations

@@ -334,3 +334,21 @@ body::after {
   background: var(--foreground);
   box-shadow: 0 0 0 2px rgba(19,14,5,0.2) inset;
 }
+
+/* BackgroundLineArt CSS animation - more performant than Framer Motion */
+@keyframes line-art-dash {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dashoffset: 200;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.line-art-animate {
+  animation: line-art-dash 10s ease-in-out infinite;
+  will-change: stroke-dashoffset;
+}
