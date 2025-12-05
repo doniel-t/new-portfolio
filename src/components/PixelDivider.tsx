@@ -6,8 +6,9 @@ type PixelDividerProps = {
   color?: string;
   pixelSize?: number; // px
   durationSec?: number; // seconds
-  rise?: string; // e.g. "-160%"
+  rise?: string; // e.g. "-160%" for up, "160%" for down
   streamsPerCol?: number; // number of simultaneous square streams per column
+  direction?: "up" | "down"; // animation direction
   className?: string;
   style?: React.CSSProperties;
 };
@@ -18,6 +19,7 @@ export default function PixelDivider({
   durationSec = 4.5,
   rise = "-180%",
   streamsPerCol = 5,
+  direction = "up",
   className = "",
   style = {},
 }: PixelDividerProps) {
@@ -46,16 +48,26 @@ export default function PixelDivider({
     }
   }
 
-  const maskStyle: React.CSSProperties = {
-    WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
-    maskImage: "linear-gradient(to top, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
-  };
+  // Mask gradient direction based on animation direction
+  const maskStyle: React.CSSProperties = direction === "up"
+    ? {
+        WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
+        maskImage: "linear-gradient(to top, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
+      }
+    : {
+        WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
+        maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
+      };
+
+  // CSS variable and animation name based on direction
+  const cssVar = direction === "up" ? "--pixel-rise" : "--pixel-fall";
+  const animationName = direction === "up" ? "pixel-divider-rise" : "pixel-divider-fall";
 
   return (
     <div
       ref={containerRef}
       className={`relative w-full h-full overflow-hidden pointer-events-none ${className}`}
-      style={{ ...style, ...maskStyle, ["--pixel-rise" as any]: rise } as React.CSSProperties}
+      style={{ ...style, ...maskStyle, [cssVar as any]: rise } as React.CSSProperties}
     >
       {squares.map((sq, idx) => (
         <div
@@ -64,11 +76,12 @@ export default function PixelDivider({
           style={{
             position: "absolute",
             left: sq.left,
-            bottom: -pixelSize,
+            // Position at bottom for up animation, top for down animation
+            ...(direction === "up" ? { bottom: -pixelSize } : { top: -pixelSize }),
             width: pixelSize,
             height: pixelSize,
             background: color,
-            animation: `pixel-divider-rise var(${"--duration"}, ${durationSec}s) linear infinite`,
+            animation: `${animationName} var(${"--duration"}, ${durationSec}s) linear infinite`,
             animationDelay: `${sq.delay}s`,
           } as React.CSSProperties}
         />)

@@ -166,6 +166,21 @@ body {
   }
 }
 
+/* Pixel divider animation inverted (top -> bottom, fade out near bottom) */
+@keyframes pixel-divider-fall {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(var(--pixel-fall, 120%));
+    opacity: 0;
+  }
+}
+
 /* Site-wide noise overlay */
 .noise-overlay {
   position: fixed;
