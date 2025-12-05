@@ -514,7 +514,7 @@ function InViewHobbyBlock() {
                 <motion.div 
                   layoutId={`hobby-card-${cardIndex}`}
                   onClick={() => setExpandedCard(cardIndex)}
-                  className="group relative overflow-hidden rounded-xl border border-foreground/20 cursor-pointer h-[400px] lg:h-[480px]" 
+                  className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_10px_rgba(0,0,0,0.1)] cursor-pointer h-[400px] lg:h-[480px]" 
                   style={{ direction: "ltr" }}
                   whileHover={isMobile ? {} : { scale: 1.02 }}
                   whileTap={isMobile ? {} : { scale: 0.98 }}
@@ -556,35 +556,42 @@ function InViewHobbyBlock() {
                   </div>
 
                   {/* Card Content */}
-                  <div className="relative z-20 h-full flex flex-col justify-end p-8">
-                    {/* Index tag */}
-                    <div className="absolute top-6 right-6 font-mono text-xs tracking-widest text-foreground/40 group-hover:text-white/50 uppercase transition-colors duration-300">
-                      [{String(cardIndex + 1).padStart(2, "0")}]
+                  <div className="relative z-20 h-full flex flex-col p-8">
+                    {/* Top row: Index left, Click hint right */}
+                    <div className="flex items-center justify-between">
+                      <div className="font-mono text-xs tracking-widest text-foreground/40 group-hover:text-white/50 uppercase transition-colors duration-300">
+                        [{String(cardIndex + 1).padStart(2, "0")}]
+                      </div>
+                      <div className="font-mono text-[10px] tracking-widest text-foreground/30 group-hover:text-white/40 uppercase transition-colors duration-300">
+                        Click to expand
+                      </div>
                     </div>
 
-                    {/* Click hint */}
-                    <div className="absolute top-6 left-6 font-mono text-[10px] tracking-widest text-foreground/30 group-hover:text-white/40 uppercase transition-colors duration-300">
-                      Click to expand
-                    </div>
-
-                    <h3 className="font-display text-4xl sm:text-5xl lg:text-6xl tracking-tight text-foreground group-hover:text-white mb-4 transition-colors duration-300" >
-                      {card.title}
-                    </h3>
-                    
-                    {/* Items list */}
-                    <div className="flex flex-wrap gap-2">
-                      {card.items.map((item, itemIndex) => (
-                        <span
-                          key={item}
-                          className="inline-block text-sm font-mono text-foreground group-hover:text-white bg-background/90 group-hover:bg-[#130e05]/90 px-3 py-1.5 rounded border border-foreground/20 group-hover:border-white/20 transition-colors  duration-300 shadow-lg backdrop-blur-3xl"
-                        >
-                          <DecodingWord 
-                            word={item} 
-                            startDelayMs={isMobile ? 0 : (cardIndex * 100) + (itemIndex * 50) + 400} 
-                            active={isInViewOnce} 
-                          />
-                        </span>
-                      ))}
+                    {/* Title + Items - slightly below center */}
+                    <div className="flex-1 flex flex-col justify-center pt-12">
+                      <h3 className="font-display text-4xl sm:text-5xl lg:text-6xl tracking-tight text-foreground group-hover:text-white transition-colors duration-300 mb-4">
+                        {card.title}
+                      </h3>
+                      
+                      {/* Items - NieR Automata UI style */}
+                      <div className="flex flex-wrap gap-2">
+                        {card.items.map((item, itemIndex) => (
+                          <span
+                            key={item}
+                            className="relative inline-flex items-center text-[9px] font-mono uppercase tracking-widest text-foreground/60 group-hover:text-white/80 bg-foreground/[0.03] group-hover:bg-white/[0.08] px-2.5 py-1 border border-foreground/20 group-hover:border-white/30 transition-all duration-300"
+                          >
+                            {/* Corner accents */}
+                            <span className="absolute top-0 left-0 w-1 h-1 border-t border-l border-foreground/40 group-hover:border-white/60" />
+                            <span className="absolute top-0 right-0 w-1 h-1 border-t border-r border-foreground/40 group-hover:border-white/60" />
+                            <span className="absolute bottom-0 left-0 w-1 h-1 border-b border-l border-foreground/40 group-hover:border-white/60" />
+                            <span className="absolute bottom-0 right-0 w-1 h-1 border-b border-r border-foreground/40 group-hover:border-white/60" />
+                            
+                            {/* Index prefix */}
+                            <span className="text-foreground/30 group-hover:text-white/40 mr-1.5">{String(itemIndex + 1).padStart(2, "0")}</span>
+                            {item}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -603,7 +610,7 @@ function InViewHobbyBlock() {
                   <div className="grid grid-cols-3 gap-4 py-6 border-y border-foreground/10">
                     {card.stats.map((stat, statIndex) => (
                       <div key={stat.label} className="text-center lg:text-left">
-                        <div className="font-mono text-xs tracking-widest text-muted/60 uppercase mb-1">
+                        <div className="font-bold font-mono text-xs tracking-widest text-muted uppercase mb-1">
                           {stat.label}
                         </div>
                         <div className="font-display text-xl lg:text-2xl text-foreground">
@@ -656,7 +663,7 @@ function InViewHobbyBlock() {
             {/* Dark overlay */}
             <div className="absolute inset-0 bg-[#130e05]/70" />
             {/* Dither wave overlay */}
-            <div className="absolute inset-0 opacity-[0.08] pointer-events-none">
+            <div className="absolute inset-0 opacity-0 pointer-events-none animate-[fadeInDither_0.5s_ease-out_0.3s_forwards]">
               <Dither
                 waveColor={[165 / 100, 158 / 100, 141 / 100]}
                 disableAnimation={false}
@@ -729,7 +736,7 @@ function InViewHobbyBlock() {
                     {HOBBIES[expandedCard].items.map((item) => (
                       <span
                         key={item}
-                        className="inline-block text-sm font-mono text-white/80 bg-white/10 backdrop-blur-sm px-4 py-2 rounded border border-white/20"
+                        className="inline-block text-sm font-mono text-white/90 bg-white/5 backdrop-blur-xl px-4 py-2 rounded border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]"
                       >
                         {item}
                       </span>

@@ -377,3 +377,13 @@ body::after {
     opacity: 1;
   }
 }
+
+/* Delayed fade in for Dither overlay (fades to 8% opacity) */
+@keyframes fadeInDither {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.08;
+  }
+}
