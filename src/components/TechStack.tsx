@@ -6,7 +6,7 @@ import { SiNextdotjs, SiReact, SiTypescript, SiTailwindcss, SiGo, SiPython, SiPo
 import DecodingWord from "./DecodingWord";
 import TargetCursor from "./TargetCursor";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import PixelBlast from "./PixelBlast";
+import Dither from "./Dither";
 
 type TechItem = {
   name: string;
@@ -167,25 +167,23 @@ export default function TechStack() {
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#A69F8D]/30 to-transparent z-10" />
       <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-[var(--dark)] to-transparent z-0 pointer-events-none" />
 
-      {/* PixelBlast animated background */}
+      {/* Dither animated background */}
       {!isMobile && !prefersReducedMotion && (
         <div 
-          className="absolute inset-0 -z-15 opacity-20 pointer-events-none" 
+          className="absolute inset-0 -z-15 opacity-[0.16] pointer-events-none" 
           style={{ 
-            maskImage: "linear-gradient(to bottom, transparent 0%, black 150px)", 
-            WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 150px)"
+            maskImage: "linear-gradient(to bottom, transparent 20%, black 100%)", 
+            WebkitMaskImage: "linear-gradient(to bottom, transparent 20%, black 100%)"
           }}
         >
-          <PixelBlast
-            color="#A69F8D"
-            pixelSize={4}
-            patternScale={2.5}
-            patternDensity={0.7}
-            speed={0.25}
-            enableRipples={false}
-            edgeFade={0.2}
-            autoPauseOffscreen={true}
-            variant="square"
+          <Dither
+            waveColor={[166 / 255, 159 / 255, 141 / 255]}
+            disableAnimation={false}
+            enableMouseInteraction={false}
+            colorNum={2}
+            waveAmplitude={0.1}
+            waveFrequency={2}
+            waveSpeed={0.05}
           />
         </div>
       )}
