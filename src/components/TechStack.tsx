@@ -168,7 +168,7 @@ export default function TechStack() {
       <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-[var(--dark)] to-transparent z-0 pointer-events-none" />
 
       {/* Dither animated background */}
-      {!isMobile && !prefersReducedMotion && (
+      {!prefersReducedMotion && (
         <div 
           className="absolute inset-0 -z-15 opacity-[0.16] pointer-events-none" 
           style={{ 
