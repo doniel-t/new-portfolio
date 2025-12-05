@@ -192,9 +192,6 @@ export default function TechStack() {
       {/* Header */}
       <div className="max-w-7xl mx-auto px-8 mb-16">
          <motion.div 
-           initial={prefersReducedMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-           animate={prefersReducedMotion ? { opacity: 1, x: 0 } : isInView ? { opacity: 1, x: 0 } : {}}
-           transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }}
            className="flex items-center gap-4 border-b border-[#A69F8D]/30 pb-4 mb-8"
          >
             <div className="w-2 h-2 bg-[#A69F8D] rotate-45" />
@@ -334,9 +331,6 @@ const Chip = memo(function Chip({
   return (
     <motion.div
       ref={setRef}
-      initial="hidden"
-      animate={active ? "visible" : "hidden"}
-      variants={variants}
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
       onFocus={onHoverStart}

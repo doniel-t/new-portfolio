@@ -335,10 +335,8 @@ function InViewAboutBlock() {
           <DitherImage src="/asa noodles crop.png" active={isInViewOnce} className="w-full h-full" />
         </div>
 
-        {/* Overlay details */}
         <div className="absolute inset-0 pointer-events-none z-10 ring-1 ring-inset ring-white/10 rounded-2xl" />
 
-        {/* Corner brackets decoration */}
         <div className="absolute top-4 left-4 w-2 h-2 border-t border-l border-white/40" />
         <div className="absolute top-4 right-4 w-2 h-2 border-t border-r border-white/40" />
         <div className="absolute bottom-4 left-4 w-2 h-2 border-b border-l border-white/40" />
@@ -575,7 +573,7 @@ function InViewHobbyBlock() {
                       pixelSize={isMobile ? 10 : 48} 
                       durationSec={10} 
                       rise="-250%" 
-                      streamsPerCol={9}
+                      streamsPerCol={4}
                       direction="up"
                     />
                   </div>
@@ -711,7 +709,7 @@ function InViewHobbyBlock() {
                 {/* Close button */}
                 <button
                   onClick={() => setExpandedCard(null)}
-                  className="absolute top-6 right-6 z-30 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors border border-white/20"
+                  className="absolute top-6 right-6 z-30 w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors border border-white/20"
                 >
                   <X size={20} className="text-white" />
                 </button>
