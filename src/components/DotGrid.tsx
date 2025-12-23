@@ -3,6 +3,7 @@ import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react'
 import { gsap } from 'gsap';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
 import { useGPUDetection, usePageVisibility } from '@/hooks/useGPUDetection';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 gsap.registerPlugin(InertiaPlugin);
 
@@ -105,8 +106,10 @@ const DotGrid: React.FC<DotGridProps> = ({
   const isVisible = useIsVisible(wrapperRef);
   const isPageVisible = usePageVisibility();
   const gpuSupport = useGPUDetection();
+  const isMobile = useIsMobile();
   
-  const shouldRunAnimation = isVisible && isPageVisible && gpuSupport !== 'none';
+  // Disable animation entirely on mobile for performance
+  const shouldRunAnimation = isVisible && isPageVisible && gpuSupport !== 'none' && !isMobile;
 
   const baseRgb = useMemo(() => hexToRgb(baseColor), [baseColor]);
   const activeRgb = useMemo(() => hexToRgb(activeColor), [activeColor]);

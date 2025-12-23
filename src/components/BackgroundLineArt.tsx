@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 type BackgroundLineArtProps = {
   className?: string;
@@ -31,6 +32,10 @@ function useIsVisible(ref: React.RefObject<HTMLElement | null>) {
 export default function BackgroundLineArt({ className }: BackgroundLineArtProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isVisible = useIsVisible(containerRef);
+  const isMobile = useIsMobile();
+  
+  // Pause all animations on mobile
+  const shouldAnimate = isVisible && !isMobile;
   
   return (
     <div 
@@ -43,8 +48,8 @@ export default function BackgroundLineArt({ className }: BackgroundLineArtProps)
         preserveAspectRatio="xMidYMid slice"
         className="h-full w-full text-muted opacity-40"
         style={{ 
-          // Pause animations when not visible
-          animationPlayState: isVisible ? 'running' : 'paused'
+          // Pause animations when not visible or on mobile
+          animationPlayState: shouldAnimate ? 'running' : 'paused'
         }}
       >
         {/* Huge circle on the right side */}
@@ -57,10 +62,10 @@ export default function BackgroundLineArt({ className }: BackgroundLineArtProps)
           strokeWidth={1}
           vectorEffect="non-scaling-stroke"
           strokeDasharray="195 195"
-          className="line-art-animate"
+          className={shouldAnimate ? "line-art-animate" : ""}
           style={{ 
             animationDuration: '16s',
-            animationPlayState: isVisible ? 'running' : 'paused'
+            animationPlayState: shouldAnimate ? 'running' : 'paused'
           }}
         />
 
@@ -72,10 +77,10 @@ export default function BackgroundLineArt({ className }: BackgroundLineArtProps)
           strokeWidth={0.4}
           vectorEffect="non-scaling-stroke"
           strokeDasharray="144 25"
-          className="line-art-animate"
+          className={shouldAnimate ? "line-art-animate" : ""}
           style={{ 
             animationDuration: '10s',
-            animationPlayState: isVisible ? 'running' : 'paused'
+            animationPlayState: shouldAnimate ? 'running' : 'paused'
           }}
         />
 
@@ -86,10 +91,10 @@ export default function BackgroundLineArt({ className }: BackgroundLineArtProps)
           strokeWidth={0.35}
           vectorEffect="non-scaling-stroke"
           strokeDasharray="112 48"
-          className="line-art-animate"
+          className={shouldAnimate ? "line-art-animate" : ""}
           style={{ 
             animationDuration: '11.5s',
-            animationPlayState: isVisible ? 'running' : 'paused'
+            animationPlayState: shouldAnimate ? 'running' : 'paused'
           }}
         />
 
@@ -103,10 +108,10 @@ export default function BackgroundLineArt({ className }: BackgroundLineArtProps)
           strokeWidth={0.3}
           vectorEffect="non-scaling-stroke"
           strokeDasharray="54 36"
-          className="line-art-animate"
+          className={shouldAnimate ? "line-art-animate" : ""}
           style={{ 
             animationDuration: '8.5s',
-            animationPlayState: isVisible ? 'running' : 'paused'
+            animationPlayState: shouldAnimate ? 'running' : 'paused'
           }}
         />
 
@@ -119,10 +124,10 @@ export default function BackgroundLineArt({ className }: BackgroundLineArtProps)
           strokeWidth={0.3}
           vectorEffect="non-scaling-stroke"
           strokeDasharray="40 40"
-          className="line-art-animate"
+          className={shouldAnimate ? "line-art-animate" : ""}
           style={{ 
             animationDuration: '7.8s',
-            animationPlayState: isVisible ? 'running' : 'paused'
+            animationPlayState: shouldAnimate ? 'running' : 'paused'
           }}
         />
 
@@ -134,10 +139,10 @@ export default function BackgroundLineArt({ className }: BackgroundLineArtProps)
           strokeWidth={0.35}
           vectorEffect="non-scaling-stroke"
           strokeDasharray="36 20"
-          className="line-art-animate"
+          className={shouldAnimate ? "line-art-animate" : ""}
           style={{ 
             animationDuration: '8.2s',
-            animationPlayState: isVisible ? 'running' : 'paused'
+            animationPlayState: shouldAnimate ? 'running' : 'paused'
           }}
         />
       </svg>

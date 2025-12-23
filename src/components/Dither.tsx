@@ -7,6 +7,7 @@ import { EffectComposer, wrapEffect } from '@react-three/postprocessing';
 import { Effect } from 'postprocessing';
 import * as THREE from 'three';
 import { useGPUDetection, usePageVisibility } from '@/hooks/useGPUDetection';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 function useIsVisible(ref: React.RefObject<HTMLElement | null>) {
   const [isVisible, setIsVisible] = useState(false);
@@ -351,9 +352,11 @@ export default function Dither({
   const isVisible = useIsVisible(containerRef);
   const isPageVisible = usePageVisibility();
   const gpuSupport = useGPUDetection();
+  const isMobile = useIsMobile();
   
-  const shouldUseCanvas = gpuSupport !== 'none' && isPageVisible && isVisible;
-  const isDisabled = disableAnimation || !shouldUseCanvas;
+  // Disable canvas entirely on mobile for performance
+  const shouldUseCanvas = gpuSupport !== 'none' && isPageVisible && isVisible && !isMobile;
+  const isDisabled = disableAnimation || !shouldUseCanvas || isMobile;
 
   return (
     <div ref={containerRef} className="w-full h-full relative">

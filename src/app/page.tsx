@@ -85,19 +85,21 @@ export default function Home() {
 
 
       <main className="relative min-h-[100vh] sm:min-h-[100vh] flex items-center justify-center p-8 sm:p-16">
-        {/* Dither effect background for hero section */}
-        <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
-          <Dither
-            waveColor={[165 / 100, 158 / 100, 141 / 100]}
-            disableAnimation={false}
-            enableMouseInteraction={true}
-            mouseRadius={0.5}
-            colorNum={2}
-            waveAmplitude={0.002}
-            waveFrequency={2.2}
-            waveSpeed={0.09}
-          />
-        </div>
+        {/* Dither effect background for hero section - disabled on mobile */}
+        {!isMobile && (
+          <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
+            <Dither
+              waveColor={[165 / 100, 158 / 100, 141 / 100]}
+              disableAnimation={false}
+              enableMouseInteraction={true}
+              mouseRadius={0.5}
+              colorNum={2}
+              waveAmplitude={0.002}
+              waveFrequency={2.2}
+              waveSpeed={0.09}
+            />
+          </div>
+        )}
         <motion.div
           className="relative grid w-full max-w-6xl grid-cols-1 gap-10 lg:grid-cols-2 items-center"
           variants={gridContainer}
@@ -242,19 +244,21 @@ export default function Home() {
 
       {/* Hobby Section */}
       <section className="relative w-full py-20 sm:py-28">
-        {/* Dither effect background (same as hero) */}
-        <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
-          <Dither
-            waveColor={[165 / 100, 158 / 100, 141 / 100]}
-            disableAnimation={false}
-            enableMouseInteraction={true}
-            mouseRadius={0.5}
-            colorNum={2}
-            waveAmplitude={0.002}
-            waveFrequency={2.2}
-            waveSpeed={0.09}
-          />
-        </div>
+        {/* Dither effect background (same as hero) - disabled on mobile */}
+        {!isMobile && (
+          <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
+            <Dither
+              waveColor={[165 / 100, 158 / 100, 141 / 100]}
+              disableAnimation={false}
+              enableMouseInteraction={true}
+              mouseRadius={0.5}
+              colorNum={2}
+              waveAmplitude={0.002}
+              waveFrequency={2.2}
+              waveSpeed={0.09}
+            />
+          </div>
+        )}
         <div className="relative mx-auto w-full max-w-6xl px-8">
           <InViewHobbyBlock />
         </div>
@@ -687,18 +691,20 @@ function InViewHobbyBlock() {
             />
             {/* Dark overlay */}
             <div className="absolute inset-0 bg-[#130e05]/70" />
-            {/* Dither wave overlay */}
-            <div className="absolute inset-0 opacity-0 pointer-events-none animate-[fadeInDither_0.5s_ease-out_0.3s_forwards]">
-              <Dither
-                waveColor={[165 / 100, 158 / 100, 141 / 100]}
-                disableAnimation={false}
-                enableMouseInteraction={false}
-                colorNum={2}
-                waveAmplitude={0.002}
-                waveFrequency={1.5}
-                waveSpeed={0.05}
-              />
-            </div>
+            {/* Dither wave overlay - disabled on mobile */}
+            {!isMobile && (
+              <div className="absolute inset-0 opacity-0 pointer-events-none animate-[fadeInDither_0.5s_ease-out_0.3s_forwards]">
+                <Dither
+                  waveColor={[165 / 100, 158 / 100, 141 / 100]}
+                  disableAnimation={false}
+                  enableMouseInteraction={false}
+                  colorNum={2}
+                  waveAmplitude={0.002}
+                  waveFrequency={1.5}
+                  waveSpeed={0.05}
+                />
+              </div>
+            )}
           </div>
 
           {/* Expanded Content */}

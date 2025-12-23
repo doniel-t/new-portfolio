@@ -151,6 +151,17 @@ body {
   }
 }
 
+/* Pause all CSS animations on mobile for performance */
+@media (max-width: 768px), (hover: none) {
+  .line-art-animate,
+  .glitch-jitter,
+  .glitch-lines,
+  .pixel-divider-square {
+    animation-play-state: paused !important;
+    animation: none !important;
+  }
+}
+
 /* Pixel divider animation (bottom -> top, fade out near top) */
 @keyframes pixel-divider-rise {
   0% {

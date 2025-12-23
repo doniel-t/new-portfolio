@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 type PixelDividerProps = {
   color?: string;
@@ -25,6 +26,7 @@ export default function PixelDivider({
 }: PixelDividerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [columns, setColumns] = useState<number>(0);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const el = containerRef.current;
@@ -62,6 +64,17 @@ export default function PixelDivider({
   // CSS variable and animation name based on direction
   const cssVar = direction === "up" ? "--pixel-rise" : "--pixel-fall";
   const animationName = direction === "up" ? "pixel-divider-rise" : "pixel-divider-fall";
+
+  // Don't render animation squares on mobile for performance
+  if (isMobile) {
+    return (
+      <div
+        ref={containerRef}
+        className={`relative w-full h-full overflow-hidden pointer-events-none ${className}`}
+        style={style}
+      />
+    );
+  }
 
   return (
     <div
