@@ -96,7 +96,7 @@ export default function Home() {
             waveAmplitude={0.002}
             waveFrequency={2.2}
             waveSpeed={0.09}
-            enableOnMobile={true}
+            enableOnMobile={false}
           />
         </div>
         <motion.div
