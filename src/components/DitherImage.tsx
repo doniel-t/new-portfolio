@@ -5,8 +5,8 @@ import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
 import { EffectComposer } from '@react-three/postprocessing';
 import { Effect } from 'postprocessing';
 import * as THREE from 'three';
+import { useGPUDetection, usePageVisibility } from '@/hooks/useGPUDetection';
 
-// Hook to detect if element is visible in viewport
 function useIsVisible(ref: React.RefObject<HTMLElement | null>) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -186,22 +186,43 @@ interface DitherImageProps {
   className?: string;
 }
 
+function FallbackDitherImage({ src, className }: { src: string; className?: string }) {
+  return (
+    <div className={`relative w-full h-full ${className}`}>
+      <img
+        src={src}
+        alt=""
+        className="w-full h-full object-cover sepia-[0.3] opacity-90"
+        loading="lazy"
+      />
+    </div>
+  );
+}
+
 export default function DitherImage({ src, active = false, className }: DitherImageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isVisible = useIsVisible(containerRef);
+  const isPageVisible = usePageVisibility();
+  const gpuSupport = useGPUDetection();
   
+  const shouldUseCanvas = gpuSupport !== 'none' && isPageVisible && isVisible;
+
   return (
     <div ref={containerRef} className={className}>
-      <Canvas
-        camera={{ position: [0, 0, 5] }}
-        dpr={[1, 2]}
-        frameloop={isVisible ? "always" : "never"}
-        gl={{ antialias: false, preserveDrawingBuffer: true }}
-      >
-        <React.Suspense fallback={null}>
-          <DitherScene src={src} active={active} />
-        </React.Suspense>
-      </Canvas>
+      {shouldUseCanvas ? (
+        <Canvas
+          camera={{ position: [0, 0, 5] }}
+          dpr={[1, 2]}
+          frameloop={isPageVisible ? "always" : "never"}
+          gl={{ antialias: false, preserveDrawingBuffer: true }}
+        >
+          <React.Suspense fallback={null}>
+            <DitherScene src={src} active={active} />
+          </React.Suspense>
+        </Canvas>
+      ) : (
+        <FallbackDitherImage src={src} className={className} />
+      )}
     </div>
   );
 }

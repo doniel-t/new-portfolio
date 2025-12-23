@@ -709,7 +709,7 @@ function InViewHobbyBlock() {
                 {/* Close button */}
                 <button
                   onClick={() => setExpandedCard(null)}
-                  className="absolute top-6 right-6 z-30 w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors border border-white/20"
+                  className="absolute top-6 right-6 z-30 w-10 h-10 flex items-center justify-center  bg-white/10 hover:bg-white/20 transition-colors border border-white/20"
                 >
                   <X size={20} className="text-white" />
                 </button>

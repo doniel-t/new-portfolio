@@ -6,8 +6,8 @@ import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber';
 import { EffectComposer, wrapEffect } from '@react-three/postprocessing';
 import { Effect } from 'postprocessing';
 import * as THREE from 'three';
+import { useGPUDetection, usePageVisibility } from '@/hooks/useGPUDetection';
 
-// Hook to detect if element is visible in viewport
 function useIsVisible(ref: React.RefObject<HTMLElement | null>) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -323,6 +323,19 @@ interface DitherProps {
   mouseRadius?: number;
 }
 
+function FallbackDither({ waveColor }: { waveColor: [number, number, number] }) {
+  const colorCss = `rgb(${Math.round(waveColor[0] * 255)}, ${Math.round(waveColor[1] * 255)}, ${Math.round(waveColor[2] * 255)})`;
+  
+  return (
+    <div 
+      className="w-full h-full"
+      style={{
+        background: `radial-gradient(circle at 50% 50%, ${colorCss}22, ${colorCss}0a)`,
+      }}
+    />
+  );
+}
+
 export default function Dither({
   waveSpeed = 0.05,
   waveFrequency = 3,
@@ -336,31 +349,40 @@ export default function Dither({
 }: DitherProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isVisible = useIsVisible(containerRef);
+  const isPageVisible = usePageVisibility();
+  const gpuSupport = useGPUDetection();
   
+  const shouldUseCanvas = gpuSupport !== 'none' && isPageVisible && isVisible;
+  const isDisabled = disableAnimation || !shouldUseCanvas;
+
   return (
     <div ref={containerRef} className="w-full h-full relative">
-      <Canvas
-        className="w-full h-full"
-        camera={{ position: [0, 0, 6] }}
-        dpr={1}
-        frameloop={isVisible ? "always" : "never"}
-        gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
-        onCreated={({ gl }) => {
-          gl.setClearColor(0x000000, 0);
-        }}
-      >
-        <DitheredWaves
-          waveSpeed={waveSpeed}
-          waveFrequency={waveFrequency}
-          waveAmplitude={waveAmplitude}
-          waveColor={waveColor}
-          colorNum={colorNum}
-          pixelSize={pixelSize}
-          disableAnimation={disableAnimation || !isVisible}
-          enableMouseInteraction={enableMouseInteraction}
-          mouseRadius={mouseRadius}
-        />
-      </Canvas>
+      {shouldUseCanvas ? (
+        <Canvas
+          className="w-full h-full"
+          camera={{ position: [0, 0, 6] }}
+          dpr={1}
+          frameloop={isPageVisible ? "always" : "never"}
+          gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
+          onCreated={({ gl }) => {
+            gl.setClearColor(0x000000, 0);
+          }}
+        >
+          <DitheredWaves
+            waveSpeed={waveSpeed}
+            waveFrequency={waveFrequency}
+            waveAmplitude={waveAmplitude}
+            waveColor={waveColor}
+            colorNum={colorNum}
+            pixelSize={pixelSize}
+            disableAnimation={isDisabled}
+            enableMouseInteraction={enableMouseInteraction}
+            mouseRadius={mouseRadius}
+          />
+        </Canvas>
+      ) : (
+        <FallbackDither waveColor={waveColor} />
+      )}
     </div>
   );
 }

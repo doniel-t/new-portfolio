@@ -7,6 +7,7 @@ import DecodingWord from "./DecodingWord";
 import TargetCursor from "./TargetCursor";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import Dither from "./Dither";
+import { useGPUDetection } from "@/hooks/useGPUDetection";
 
 type TechItem = {
   name: string;
@@ -83,11 +84,12 @@ export default function TechStack() {
   const isInView = useInView(containerRef, { once: true, margin: "-10% 0px" });
   const isMobile = useIsMobile();
   const prefersReducedMotion = useReducedMotion();
+  const gpuSupport = useGPUDetection();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [activeRect, setActiveRect] = useState<ActiveRect | null>(null);
 
-  const enableHoverParticles = !isMobile && !prefersReducedMotion;
-  const enableCursor = !prefersReducedMotion;
+  const enableHoverParticles = !isMobile && !prefersReducedMotion && gpuSupport !== 'none';
+  const enableCursor = !prefersReducedMotion && gpuSupport !== 'none';
   const particleColor = hoveredIndex !== null ? "#130e05" : "#A69F8D";
 
   const updateActiveRect = useCallback(() => {

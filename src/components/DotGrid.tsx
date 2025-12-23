@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { gsap } from 'gsap';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
+import { useGPUDetection, usePageVisibility } from '@/hooks/useGPUDetection';
 
 gsap.registerPlugin(InertiaPlugin);
 
@@ -101,8 +102,11 @@ const DotGrid: React.FC<DotGridProps> = ({
     lastY: 0
   });
   
-  // Only run animation when visible
   const isVisible = useIsVisible(wrapperRef);
+  const isPageVisible = usePageVisibility();
+  const gpuSupport = useGPUDetection();
+  
+  const shouldRunAnimation = isVisible && isPageVisible && gpuSupport !== 'none';
 
   const baseRgb = useMemo(() => hexToRgb(baseColor), [baseColor]);
   const activeRgb = useMemo(() => hexToRgb(activeColor), [activeColor]);
@@ -155,7 +159,7 @@ const DotGrid: React.FC<DotGridProps> = ({
   }, [dotSize, gap]);
 
   useEffect(() => {
-    if (!circlePath || !isVisible) return;
+    if (!circlePath || !shouldRunAnimation) return;
 
     let rafId: number;
     let isRunning = true;
@@ -204,9 +208,19 @@ const DotGrid: React.FC<DotGridProps> = ({
       isRunning = false;
       cancelAnimationFrame(rafId);
     };
-  }, [proximity, baseColor, activeRgb, baseRgb, circlePath, isVisible]);
+  }, [proximity, baseColor, activeRgb, baseRgb, circlePath, shouldRunAnimation]);
 
   useEffect(() => {
+    if (!shouldRunAnimation) {
+      dotsRef.current = [];
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      return;
+    }
+
     buildGrid();
     let ro: ResizeObserver | null = null;
     if ('ResizeObserver' in window) {
@@ -222,6 +236,8 @@ const DotGrid: React.FC<DotGridProps> = ({
   }, [buildGrid]);
 
   useEffect(() => {
+    if (!shouldRunAnimation) return;
+
     const onMove = (e: MouseEvent) => {
       const now = performance.now();
       const pr = pointerRef.current;
@@ -307,7 +323,7 @@ const DotGrid: React.FC<DotGridProps> = ({
       window.removeEventListener('mousemove', throttledMove);
       window.removeEventListener('click', onClick);
     };
-  }, [maxSpeed, speedTrigger, proximity, resistance, returnDuration, shockRadius, shockStrength]);
+  }, [maxSpeed, speedTrigger, proximity, resistance, returnDuration, shockRadius, shockStrength, shouldRunAnimation]);
 
   return (
     <section className={`p-4 flex items-center justify-center h-full w-full relative ${className}`} style={style}>
