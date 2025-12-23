@@ -151,12 +151,11 @@ body {
   }
 }
 
-/* Pause all CSS animations on mobile for performance */
+/* Pause most CSS animations on mobile for performance (keep pixel dividers running) */
 @media (max-width: 768px), (hover: none) {
   .line-art-animate,
   .glitch-jitter,
-  .glitch-lines,
-  .pixel-divider-square {
+  .glitch-lines {
     animation-play-state: paused !important;
     animation: none !important;
   }

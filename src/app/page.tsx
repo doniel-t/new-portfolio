@@ -85,21 +85,20 @@ export default function Home() {
 
 
       <main className="relative min-h-[100vh] sm:min-h-[100vh] flex items-center justify-center p-8 sm:p-16">
-        {/* Dither effect background for hero section - disabled on mobile */}
-        {!isMobile && (
-          <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
-            <Dither
-              waveColor={[165 / 100, 158 / 100, 141 / 100]}
-              disableAnimation={false}
-              enableMouseInteraction={true}
-              mouseRadius={0.5}
-              colorNum={2}
-              waveAmplitude={0.002}
-              waveFrequency={2.2}
-              waveSpeed={0.09}
-            />
-          </div>
-        )}
+        {/* Dither effect background for hero section - enabled on all devices */}
+        <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
+          <Dither
+            waveColor={[165 / 100, 158 / 100, 141 / 100]}
+            disableAnimation={false}
+            enableMouseInteraction={!isMobile}
+            mouseRadius={0.5}
+            colorNum={2}
+            waveAmplitude={0.002}
+            waveFrequency={2.2}
+            waveSpeed={0.09}
+            enableOnMobile={true}
+          />
+        </div>
         <motion.div
           className="relative grid w-full max-w-6xl grid-cols-1 gap-10 lg:grid-cols-2 items-center"
           variants={gridContainer}
@@ -545,8 +544,8 @@ function InViewHobbyBlock() {
                     whileHover={isMobile ? {} : { scale: 1.02 }}
                     whileTap={isMobile ? {} : { scale: 0.98 }}
                   >
-                    {/* Background Image - hidden by default, shown on hover */}
-                    <div className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    {/* Background Image - 50% visible on mobile (no hover), hidden by default on desktop */}
+                    <div className={`absolute inset-0 z-0 transition-opacity duration-500 ${isMobile ? 'opacity-50' : 'opacity-0 group-hover:opacity-100'}`}>
                     <Image
                       src={card.image}
                       alt={card.title}

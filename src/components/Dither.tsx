@@ -322,6 +322,7 @@ interface DitherProps {
   disableAnimation?: boolean;
   enableMouseInteraction?: boolean;
   mouseRadius?: number;
+  enableOnMobile?: boolean; // Force enable on mobile (for hero section)
 }
 
 function FallbackDither({ waveColor }: { waveColor: [number, number, number] }) {
@@ -346,7 +347,8 @@ export default function Dither({
   pixelSize = 2,
   disableAnimation = false,
   enableMouseInteraction = true,
-  mouseRadius = 1
+  mouseRadius = 1,
+  enableOnMobile = false
 }: DitherProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isVisible = useIsVisible(containerRef);
@@ -354,9 +356,10 @@ export default function Dither({
   const gpuSupport = useGPUDetection();
   const isMobile = useIsMobile();
   
-  // Disable canvas entirely on mobile for performance
-  const shouldUseCanvas = gpuSupport !== 'none' && isPageVisible && isVisible && !isMobile;
-  const isDisabled = disableAnimation || !shouldUseCanvas || isMobile;
+  // Disable canvas on mobile unless explicitly enabled (e.g., hero section)
+  const mobileDisabled = isMobile && !enableOnMobile;
+  const shouldUseCanvas = gpuSupport !== 'none' && isPageVisible && isVisible && !mobileDisabled;
+  const isDisabled = disableAnimation || !shouldUseCanvas;
 
   return (
     <div ref={containerRef} className="w-full h-full relative">
