@@ -227,7 +227,6 @@ function DitheredWaves({
   mouseRadius
 }: DitheredWavesProps) {
   const mesh = useRef<THREE.Mesh>(null);
-  const mouseRef = useRef(new THREE.Vector2());
   const { viewport, size, gl } = useThree();
 
   const waveUniformsRef = useRef<WaveUniforms>({
@@ -271,18 +270,9 @@ function DitheredWaves({
 
     u.enableMouseInteraction.value = enableMouseInteraction ? 1 : 0;
     u.mouseRadius.value = mouseRadius;
-
-    if (enableMouseInteraction) {
-      u.mousePos.value.copy(mouseRef.current);
-    }
   });
 
-  const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
-    if (!enableMouseInteraction) return;
-    const rect = gl.domElement.getBoundingClientRect();
-    const dpr = gl.getPixelRatio();
-    mouseRef.current.set((e.clientX - rect.left) * dpr, (e.clientY - rect.top) * dpr);
-  };
+
 
   return (
     <>
@@ -300,7 +290,6 @@ function DitheredWaves({
       </EffectComposer>
 
       <mesh
-        onPointerMove={handlePointerMove}
         position={[0, 0, 0.01]}
         scale={[viewport.width, viewport.height, 1]}
         visible={false}

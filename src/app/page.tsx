@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { motion, type Variants, useMotionValue, useTransform, useSpring, useInView } from "framer-motion";
-import { ArrowRight, X } from "lucide-react";
+import { ArrowRight, X, Mail, Github, Linkedin } from "lucide-react";
 import PixelTransition from "@/components/PixelTransition";
 import DecodingWord from "@/components/DecodingWord";
 import PixelDivider from "@/components/PixelDivider";
@@ -13,10 +13,12 @@ import Dither from "@/components/Dither";
 import DitherImage from "@/components/DitherImage";
 import DotGrid from "@/components/DotGrid";
 import TechStack from "@/components/TechStack";
+import ContactForm from "@/components/ContactForm";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function Home() {
   const isMobile = useIsMobile();
+  const footerRef = React.useRef<HTMLElement>(null);
 
   const headingText = "Modern web experiences with a refined, understated aesthetic.";
   const headingWords = headingText.split(" ");
@@ -187,7 +189,7 @@ export default function Home() {
       {/* Pixelated divider overlay (no extra layout height) */}
       <div className="relative w-full h-0" aria-hidden>
         <div className="absolute inset-x-0" style={{ top: "-180px", height: "180px", zIndex: 5 }}>
-          <PixelDivider color={"#130e05"} pixelSize={isMobile ? 12 : 24} durationSec={8} rise="-200%" streamsPerCol={4} />
+          <PixelDivider color={"#0d0b08"} pixelSize={isMobile ? 12 : 24} durationSec={8} rise="-200%" streamsPerCol={4} />
         </div>
       </div>
 
@@ -231,7 +233,7 @@ export default function Home() {
       <div className="relative w-full h-0" aria-hidden>
         <div className="absolute inset-x-0" style={{ bottom: "-180px", height: "180px", zIndex: 5 }}>
           <PixelDivider 
-            color={"#130e05"} 
+            color={"#0d0b08"} 
             pixelSize={isMobile ? 12 : 24} 
             durationSec={8} 
             rise="200%" 
@@ -242,26 +244,237 @@ export default function Home() {
       </div>
 
       {/* Hobby Section */}
-      <section className="relative w-full py-20 sm:py-28">
-        {/* Dither effect background (same as hero) - disabled on mobile */}
-        {!isMobile && (
-          <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
-            <Dither
-              waveColor={[165 / 100, 158 / 100, 141 / 100]}
-              disableAnimation={false}
-              enableMouseInteraction={true}
-              mouseRadius={0.5}
-              colorNum={2}
-              waveAmplitude={0.002}
-              waveFrequency={2.2}
-              waveSpeed={0.09}
-            />
-          </div>
-        )}
+      <section id="hobbies" className="relative w-full py-20 sm:py-28">
         <div className="relative mx-auto w-full max-w-6xl px-8">
           <InViewHobbyBlock />
         </div>
       </section>
+
+      {/* Footer */}
+      <footer ref={footerRef} id="contact" className="relative w-full bg-[#0d0b08] overflow-hidden">
+        {/* PixelDivider at very top of footer - white, going down */}
+        <div className="absolute top-0 left-0 right-0 h-40 z-10 overflow-hidden pointer-events-none" aria-hidden>
+          <PixelDivider 
+            color="#ffffff" 
+            pixelSize={isMobile ? 8 : 16} 
+            durationSec={6} 
+            rise="200%" 
+            streamsPerCol={3}
+            direction="down"
+          />
+        </div>
+
+        {/* Floating geometric shapes - decorative */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+          {/* Large diamond shape - top left */}
+          <div className="absolute -top-20 -left-20 w-80 h-80 border border-white/[0.03] rotate-45" />
+          <div className="absolute -top-16 -left-16 w-72 h-72 border border-white/[0.05] rotate-45" />
+          
+          {/* Concentric squares - top right */}
+          <div className="absolute top-12 right-12 w-40 h-40 border border-white/[0.04]" />
+          <div className="absolute top-16 right-16 w-32 h-32 border border-white/[0.06]" />
+          <div className="absolute top-20 right-20 w-24 h-24 border border-white/[0.08]" />
+          
+          {/* Diagonal lines - crossing the footer */}
+          <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-white/[0.04] to-transparent rotate-12 origin-top" />
+          <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-white/[0.03] to-transparent -rotate-12 origin-top" />
+          
+          {/* Scattered small squares */}
+          <div className="absolute top-1/4 left-1/3 w-4 h-4 border border-white/[0.08] rotate-45" />
+          <div className="absolute top-1/3 right-1/4 w-6 h-6 border border-white/[0.06] rotate-12" />
+          <div className="absolute bottom-1/3 left-1/5 w-3 h-3 bg-white/[0.04]" />
+          <div className="absolute top-2/3 right-1/5 w-5 h-5 border border-white/[0.05] -rotate-12" />
+          
+          {/* Large circle outline - bottom */}
+          <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] border border-white/[0.02] rounded-full" />
+          <div className="absolute -bottom-36 left-1/2 -translate-x-1/2 w-[520px] h-[520px] border border-white/[0.03] rounded-full" />
+          
+          {/* Hexagon-like shape - left side */}
+          <svg className="absolute top-1/2 -left-10 w-40 h-40 opacity-[0.03]" viewBox="0 0 100 100" fill="none">
+            <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" stroke="white" strokeWidth="1" />
+          </svg>
+          
+          {/* Triangle - right side */}
+          <svg className="absolute bottom-1/4 -right-8 w-32 h-32 opacity-[0.04]" viewBox="0 0 100 100" fill="none">
+            <polygon points="50,10 90,90 10,90" stroke="white" strokeWidth="1" />
+          </svg>
+          
+          {/* Dotted grid pattern overlay */}
+          <div className="absolute inset-0 opacity-[0.015]" style={{
+            backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+          }} />
+        </div>
+
+        {/* Main content */}
+        <div className="relative z-20 mx-auto w-full max-w-6xl px-8 py-20 sm:py-28">
+          {/* Top section - Contact Form + Info */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 mb-20">
+            
+            {/* Contact Form Section */}
+            <div>
+              <div className="flex items-center gap-4 mb-2">
+                <div className="w-8 h-px bg-white/30" />
+                <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Get in touch</span>
+              </div>
+              <h2 className="font-display text-5xl sm:text-6xl tracking-tight text-white mb-8">
+                Contact
+              </h2>
+              
+              <ContactForm />
+            </div>
+
+            {/* Info Section - Links + Social */}
+            <div className="space-y-12">
+              {/* Quick Navigation */}
+              <div>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-2 h-2 rotate-45 bg-white/20" />
+                  <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Navigate</span>
+                </div>
+                <nav className="flex flex-col gap-3">
+                  <a 
+                    href="#" 
+                    onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
+                  >
+                    <div className="w-4 h-px bg-white/20 group-hover:bg-white/50 group-hover:w-6 transition-all duration-300" />
+                    <span className="font-mono text-sm">Home</span>
+                  </a>
+                  <a 
+                    href="#work" 
+                    className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
+                  >
+                    <div className="w-4 h-px bg-white/20 group-hover:bg-white/50 group-hover:w-6 transition-all duration-300" />
+                    <span className="font-mono text-sm">About</span>
+                  </a>
+                  <a 
+                    href="#hobbies" 
+                    className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
+                  >
+                    <div className="w-4 h-px bg-white/20 group-hover:bg-white/50 group-hover:w-6 transition-all duration-300" />
+                    <span className="font-mono text-sm">Hobbies</span>
+                  </a>
+                  <a 
+                    href="#contact" 
+                    className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
+                  >
+                    <div className="w-4 h-px bg-white/20 group-hover:bg-white/50 group-hover:w-6 transition-all duration-300" />
+                    <span className="font-mono text-sm">Contact</span>
+                  </a>
+                </nav>
+              </div>
+
+              {/* Social Links */}
+              <div>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-2 h-2 rotate-45 bg-white/20" />
+                  <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Connect</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <a 
+                    href="https://linkedin.com/in/danieltheil" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative w-12 h-12 flex items-center justify-center border border-white/10 text-white/50 hover:text-white hover:border-white/30 transition-all duration-300"
+                    aria-label="LinkedIn"
+                  >
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20 group-hover:border-white/50 transition-colors" />
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20 group-hover:border-white/50 transition-colors" />
+                    <Linkedin size={18} />
+                  </a>
+                  <a 
+                    href="https://github.com/danieltheil" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative w-12 h-12 flex items-center justify-center border border-white/10 text-white/50 hover:text-white hover:border-white/30 transition-all duration-300"
+                    aria-label="GitHub"
+                  >
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20 group-hover:border-white/50 transition-colors" />
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20 group-hover:border-white/50 transition-colors" />
+                    <Github size={18} />
+                  </a>
+                  <a 
+                    href="mailto:daniel.theil.g@gmail.com" 
+                    className="group relative w-12 h-12 flex items-center justify-center border border-white/10 text-white/50 hover:text-white hover:border-white/30 transition-all duration-300"
+                    aria-label="Email"
+                  >
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20 group-hover:border-white/50 transition-colors" />
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20 group-hover:border-white/50 transition-colors" />
+                    <Mail size={18} />
+                  </a>
+                </div>
+              </div>
+
+              {/* Status */}
+              <div className="flex items-center gap-3 pt-4">
+                <div className="relative">
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <div className="absolute inset-0 w-2 h-2 rounded-full bg-green-500 animate-ping opacity-75" />
+                </div>
+                <span className="font-mono text-xs tracking-wider text-white/40 uppercase">
+                  Available for work
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Impressum Section */}
+          <div className="relative">
+            {/* Impressum Content */}
+            <div className="pt-8 border-t border-white/10">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-2 h-2 rotate-45 border border-white/30" />
+                <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Legal</span>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="font-display text-2xl text-white mb-4">Impressum</h3>
+                  <div className="text-white/50 space-y-2 font-mono text-sm">
+                    <p className="text-white/70">Daniel Theil</p>
+                    <p>Sonnenstraße 24</p>
+                    <p>85080 Gaimersheim</p>
+                    <p>Germany</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="font-display text-2xl text-white mb-4">Contact</h3>
+                  <div className="text-white/50 space-y-2 font-mono text-sm">
+                    <p>
+                      <span className="text-white/30 mr-2">Email:</span>
+                      <a href="mailto:daniel.theil.g@gmail.com" className="hover:text-white transition-colors">
+                        daniel.theil.g@gmail.com
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="mt-16 pt-8 border-t border-white/5">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="font-mono text-xs text-white/30">
+                © {new Date().getFullYear()} Daniel Theil. All rights reserved.
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-1 h-1 bg-white/20" />
+                  <div className="w-1 h-1 bg-white/20" />
+                  <div className="w-1 h-1 bg-white/20" />
+                </div>
+                <span className="font-mono text-xs text-white/20">Built with Next.js</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Full-width grainy name */}
+        <FooterName name="DANIEL THEIL" footerRef={footerRef} />
+      </footer>
     </>
   );
 }
@@ -431,24 +644,31 @@ function HobbyCardComponent({ card, cardIndex, isMobile, onExpand }: HobbyCardPr
   // Use useInView to reveal background as user scrolls into view on mobile
   const isCardInView = useInView(cardRef, { once: true, margin: "-20% 0px -20% 0px" });
   
+  // Preload the full-size image for the expanded modal when card comes into view
+  React.useEffect(() => {
+    if (isCardInView && card.image) {
+      const img = new window.Image();
+      img.src = card.image;
+    }
+  }, [isCardInView, card.image]);
+  
   return (
     <motion.div 
       ref={cardRef}
       layoutId={`hobby-card-${cardIndex}`}
       onClick={onExpand}
-      className="relative overflow-hidden rounded-xl border border-white/10 bg-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_10px_rgba(0,0,0,0.1)] cursor-pointer h-[400px] lg:h-[480px]" 
+      className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_10px_rgba(0,0,0,0.1)] cursor-pointer h-[400px] lg:h-[480px]" 
       whileHover={isMobile ? {} : { scale: 1.02 }}
       whileTap={isMobile ? {} : { scale: 0.98 }}
     >
-      {/* Background Image - 100% visible on mobile when in view, hidden by default on desktop */}
+      {/* Background Image - 100% visible on mobile when in view, hidden by default on desktop with hover reveal */}
       <motion.div 
-        className="absolute inset-0 z-0"
-        initial={isMobile ? { opacity: 0 } : { opacity: 0 }}
+        className={`absolute inset-0 z-0 ${!isMobile ? 'opacity-0 group-hover:opacity-100 transition-opacity duration-500' : ''}`}
+        initial={isMobile ? { opacity: 0 } : false}
         animate={isMobile ? { opacity: isCardInView ? 1 : 0 } : undefined}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        style={!isMobile ? { opacity: 0 } : undefined}
       >
-        <div className={`absolute inset-0 ${!isMobile ? 'opacity-0 group-hover:opacity-100 transition-opacity duration-500' : ''}`}>
+        <div className="absolute inset-0">
           <Image
             src={card.image}
             alt={card.title}
@@ -457,8 +677,8 @@ function HobbyCardComponent({ card, cardIndex, isMobile, onExpand }: HobbyCardPr
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 560px"
             loading="lazy"
           />
-          {/* Dark gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#130e05] via-[#130e05]/60 to-[#130e05]/30" />
+          {/* Dark gradient overlay - darker on hover for better contrast */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08] via-[#0d0b08]/70 to-[#0d0b08]/40 group-hover:from-[#0d0b08] group-hover:via-[#0d0b08]/80 group-hover:to-[#0d0b08]/50 transition-all duration-500" />
           {/* Scanline overlay */}
           <div className="absolute inset-0 scanlines opacity-20 pointer-events-none" />
         </div>
@@ -471,13 +691,13 @@ function HobbyCardComponent({ card, cardIndex, isMobile, onExpand }: HobbyCardPr
       <div className={`absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 z-20 transition-colors duration-300 ${isMobile && isCardInView ? 'border-white/60' : 'border-foreground/30 group-hover:border-white/60'}`} />
 
       {/* Dark bar at bottom - only on desktop */}
-      {!isMobile && <div className="absolute bottom-0 left-0 right-0 h-4 bg-[#130e05] z-[15]" />}
+      {!isMobile && <div className="absolute bottom-0 left-0 right-0 h-4 bg-[#0d0b08] z-[15]" />}
 
       {/* Pixel divider animation at bottom - only on desktop */}
       {!isMobile && (
         <div className="absolute bottom-0 left-0 right-0 h-96 z-10 overflow-hidden pointer-events-none">
           <PixelDivider 
-            color="#130e05" 
+            color="#0d0b08" 
             pixelSize={48} 
             durationSec={10} 
             rise="-250%" 
@@ -542,13 +762,6 @@ function InViewHobbyBlock() {
   const isInViewOnce = useInView(containerRef, { once: true, margin: "-10% 0px -10% 0px" });
   const isMobile = useIsMobile();
   const [expandedCard, setExpandedCard] = React.useState<number | null>(null);
-  const [shouldPreload, setShouldPreload] = React.useState(false);
-
-  // Defer image preloading until after first render
-  React.useEffect(() => {
-    const timer = setTimeout(() => setShouldPreload(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Close on escape key
   React.useEffect(() => {
@@ -567,22 +780,7 @@ function InViewHobbyBlock() {
 
   return (
     <div ref={containerRef}>
-      {/* Preload all hobby images in background after first render */}
-      {shouldPreload && (
-        <div className="fixed -left-[9999px] w-px h-px overflow-hidden" aria-hidden="true">
-          {HOBBIES.map((hobby) => (
-            <Image
-              key={`preload-${hobby.title}`}
-              src={hobby.image}
-              alt=""
-              width={1}
-              height={1}
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
-              loading="eager"
-            />
-          ))}
-        </div>
-      )}
+      {/* Images are preloaded per-card when they enter viewport via HobbyCardComponent */}
 
       <motion.div
         initial="hidden"
@@ -726,7 +924,7 @@ function InViewHobbyBlock() {
               quality={25}
             />
             {/* Dark overlay */}
-            <div className="absolute inset-0 bg-[#130e05]/70" />
+            <div className="absolute inset-0 bg-[#0d0b08]/70" />
             {/* Dither wave overlay - disabled on mobile */}
             {!isMobile && (
               <div className="absolute inset-0 opacity-0 pointer-events-none animate-[fadeInDither_0.5s_ease-out_0.3s_forwards]">
@@ -746,7 +944,7 @@ function InViewHobbyBlock() {
           {/* Expanded Content */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 pointer-events-none">
             <div
-              className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/20 bg-[#130e05] pointer-events-auto animate-[fadeIn_0.3s_ease-out]"
+              className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/20 bg-[#0d0b08] pointer-events-auto animate-[fadeIn_0.3s_ease-out]"
             >
                 {/* Close button */}
                 <button
@@ -766,7 +964,7 @@ function InViewHobbyBlock() {
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
                     priority
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#130e05] via-[#130e05]/80 to-[#130e05]/50" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08] via-[#0d0b08]/80 to-[#0d0b08]/50" />
                   <div className="absolute inset-0 scanlines opacity-15 pointer-events-none" />
                 </div>
 
@@ -858,6 +1056,62 @@ function InViewHobbyBlock() {
           </>
         )}
       
+    </div>
+  );
+}
+
+// Footer name component with grainy texture clipped to text - tracks mouse across entire footer
+function FooterName({ name, footerRef }: { name: string; footerRef: React.RefObject<HTMLElement | null> }) {
+  const nameRef = React.useRef<HTMLDivElement>(null);
+  const [mousePosition, setMousePosition] = React.useState({ x: -1000, y: -1000 });
+  const [isHovering, setIsHovering] = React.useState(false);
+
+  React.useEffect(() => {
+    const footer = footerRef.current;
+    if (!footer) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!nameRef.current) return;
+      const rect = nameRef.current.getBoundingClientRect();
+      // Calculate position relative to the name element
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setMousePosition({ x, y });
+    };
+
+    const handleMouseEnter = () => setIsHovering(true);
+    const handleMouseLeave = () => setIsHovering(false);
+
+    footer.addEventListener('mousemove', handleMouseMove);
+    footer.addEventListener('mouseenter', handleMouseEnter);
+    footer.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      footer.removeEventListener('mousemove', handleMouseMove);
+      footer.removeEventListener('mouseenter', handleMouseEnter);
+      footer.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, [footerRef]);
+
+  // Create the text content - repeated enough to fill the screen
+  const textContent = `${name}   -   ${name}   -   ${name}   -   ${name}   -   ${name}   -   `;
+
+  return (
+    <div 
+      ref={nameRef}
+      className={`footer-name-wrapper absolute bottom-0 left-0 right-0 pb-4 sm:pb-8 ${isHovering ? 'is-hovering' : ''}`}
+      style={{
+        "--mouse-x": `${mousePosition.x}%`,
+        "--mouse-y": `${mousePosition.y}%`,
+      } as React.CSSProperties}
+    >
+      <div className="footer-name-container">
+        <div className="footer-name-track">
+          {/* Two identical text elements for seamless loop */}
+          <div className="footer-name-text">{textContent}</div>
+          <div className="footer-name-text">{textContent}</div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -90,7 +90,7 @@ export default function TechStack() {
 
   const enableHoverParticles = !isMobile && !prefersReducedMotion && gpuSupport !== 'none';
   const enableCursor = !prefersReducedMotion && gpuSupport !== 'none';
-  const particleColor = hoveredIndex !== null ? "#130e05" : "#A69F8D";
+  const particleColor = hoveredIndex !== null ? "#0d0b08" : "#A69F8D";
 
   const updateActiveRect = useCallback(() => {
     if (hoveredIndex === null || !gridContainerRef.current) {
@@ -163,7 +163,7 @@ export default function TechStack() {
       )}
 
       {/* Background decorations */}
-      <div className="absolute inset-0 bg-[#130e05]/95 -z-20" style={{ backgroundColor: "var(--dark)" }} />
+      <div className="absolute inset-0 bg-[#0d0b08]/95 -z-20" style={{ backgroundColor: "var(--dark)" }} />
       
       {/* Decorative Separator & Fade Mask */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#A69F8D]/30 to-transparent z-10" />
@@ -340,14 +340,14 @@ const Chip = memo(function Chip({
       tabIndex={0}
       className={`
         relative min-h-[140px] h-auto p-4 border transition-colors duration-200 cursor-default group overflow-hidden tech-card
-        ${isHovered ? 'bg-[#A69F8D] border-[#A69F8D] text-[#130e05]' : 'bg-[#130e05]/40 border-[#A69F8D]/30 text-[#A69F8D] hover:border-[#A69F8D]/80'}
+        ${isHovered ? 'bg-[#A69F8D] border-[#A69F8D] text-[#0d0b08]' : 'bg-[#0d0b08]/40 border-[#A69F8D]/30 text-[#A69F8D] hover:border-[#A69F8D]/80'}
       `}
     >
       {/* Corner decorative markers */}
-      <div className={`absolute top-0 left-0 w-1 h-1 transition-colors ${isHovered ? 'bg-[#130e05]' : 'bg-[#A69F8D]'}`} />
-      <div className={`absolute top-0 right-0 w-1 h-1 transition-colors ${isHovered ? 'bg-[#130e05]' : 'bg-[#A69F8D]'}`} />
-      <div className={`absolute bottom-0 left-0 w-1 h-1 transition-colors ${isHovered ? 'bg-[#130e05]' : 'bg-[#A69F8D]'}`} />
-      <div className={`absolute bottom-0 right-0 w-1 h-1 transition-colors ${isHovered ? 'bg-[#130e05]' : 'bg-[#A69F8D]'}`} />
+      <div className={`absolute top-0 left-0 w-1 h-1 transition-colors ${isHovered ? 'bg-[#0d0b08]' : 'bg-[#A69F8D]'}`} />
+      <div className={`absolute top-0 right-0 w-1 h-1 transition-colors ${isHovered ? 'bg-[#0d0b08]' : 'bg-[#A69F8D]'}`} />
+      <div className={`absolute bottom-0 left-0 w-1 h-1 transition-colors ${isHovered ? 'bg-[#0d0b08]' : 'bg-[#A69F8D]'}`} />
+      <div className={`absolute bottom-0 right-0 w-1 h-1 transition-colors ${isHovered ? 'bg-[#0d0b08]' : 'bg-[#A69F8D]'}`} />
 
       {/* Icon in Top Left */}
       <div className="absolute top-3 left-3 transition-colors opacity-80 group-hover:opacity-100">
