@@ -2,12 +2,11 @@
 
 import React from "react";
 import Image from "next/image";
-import { motion, type Variants, useMotionValue, useTransform, useSpring, useInView } from "framer-motion";
+import { motion, type Variants, useMotionValue, useTransform, useSpring, useInView, useScroll } from "framer-motion";
 import { ArrowRight, X, Mail, Github, Linkedin } from "lucide-react";
 import PixelTransition from "@/components/PixelTransition";
 import DecodingWord from "@/components/DecodingWord";
 import PixelDivider from "@/components/PixelDivider";
-import AboutChat from "@/components/AboutChat";
 import BackgroundLineArt from "@/components/BackgroundLineArt";
 import Dither from "@/components/Dither";
 import DitherImage from "@/components/DitherImage";
@@ -198,7 +197,7 @@ export default function Home() {
         <div className="absolute inset-0 -z-10" style={{ backgroundColor: "var(--dark)" }} />
         {/* DotGrid background for About me section */}
         <div className="absolute inset-0 -z-10 opacity-60" aria-hidden>
-          <DotGrid baseColor="#6c673b" activeColor="#A69F8D" dotSize={1.5} gap={32} proximity={75} className="w-full h-full" />
+          <DotGrid baseColor="#6c673b" activeColor="#A69F8D" dotSize={1.5} gap={24} proximity={75} className="w-full h-full" />
         </div>
         {/* Geometric line art background */}
         <BackgroundLineArt className="-z-0" />
@@ -245,7 +244,7 @@ export default function Home() {
 
       {/* Hobby Section */}
       <section id="hobbies" className="relative w-full py-20 sm:py-28">
-        <div className="relative mx-auto w-full max-w-6xl px-8">
+        <div className="relative w-full px-8 sm:px-12 lg:px-16">
           <InViewHobbyBlock />
         </div>
       </section>
@@ -484,79 +483,208 @@ function InViewAboutBlock() {
   const isInViewOnce = useInView(containerRef, { once: true, margin: "-10% 0px -10% 0px" });
   const isMobile = useIsMobile();
 
+  const bentoItemVariants: Variants = {
+    hidden: { opacity: 0, y: isMobile ? 0 : 20, scale: isMobile ? 1 : 0.98 },
+    show: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1] as const } 
+    }
+  };
+
   return (
-    <div ref={containerRef} className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-10 sm:mb-12">
+    <div ref={containerRef} className="mb-10 sm:mb-12">
       <motion.div
         initial="hidden"
         animate={isInViewOnce ? "show" : "hidden"}
         variants={{
           hidden: {},
           show: {
-            transition: { staggerChildren: isMobile ? 0 : 0.15, delayChildren: isMobile ? 0 : 0.05 },
+            transition: { staggerChildren: isMobile ? 0 : 0.1, delayChildren: isMobile ? 0 : 0.05 },
           },
         }}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[minmax(140px,auto)]"
       >
-        <motion.h2
-          variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1] } } }}
-          className="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight text-muted"
+        {/* Main Image - Large cell spanning 2 cols and 2 rows */}
+        <motion.div
+          variants={bentoItemVariants}
+          className="relative md:col-span-2 md:row-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/40 shadow-2xl min-h-[300px] md:min-h-[400px]"
         >
-          {/* Unscramble heading when in view */}
-          {"About me".split(" ").map((word, i) => (
-            <span key={`${word}-${i}`} className="inline-block" style={{ display: "inline-block" }}>
-              <DecodingWord word={word} startDelayMs={isMobile ? 0 : i * 180} active={isInViewOnce} />{i < 1 ? "\u00A0" : ""}
-            </span>
-          ))}
-        </motion.h2>
-        <motion.p
-          variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1], delay: isMobile ? 0 : 0.1 } } }}
-          className="mt-4 text-muted/80 text-lg leading-relaxed"
+          <div className="absolute inset-0 z-0">
+            <DitherImage src="/asa noodles crop.png" active={isInViewOnce} className="w-full h-full" />
+          </div>
+          <div className="absolute inset-0 pointer-events-none z-10 ring-1 ring-inset ring-white/10 rounded-2xl" />
+          <div className="absolute top-4 left-4 w-2 h-2 border-t border-l border-white/40" />
+          <div className="absolute top-4 right-4 w-2 h-2 border-t border-r border-white/40" />
+          <div className="absolute bottom-4 left-4 w-2 h-2 border-b border-l border-white/40" />
+          <div className="absolute bottom-4 right-4 w-2 h-2 border-b border-r border-white/40" />
+        </motion.div>
+
+        {/* Title Cell */}
+        <motion.div
+          variants={bentoItemVariants}
+          className="relative md:col-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/20 p-6 flex flex-col justify-center"
         >
-          {/* Unscramble paragraph in chunks for readability */}
-          {[
-            "I",
-            "am",
-            "a",
-            "software",
-            "engineer",
-            "with",
-            "a",
-            "passion",
-            "for",
-            "building",
-            "products",
-            "that",
-            "help",
-            "people",
-            "live",
-            "better",
-            "lives.",
-          ].map((word, i, arr) => (
-            <span key={`about-word-${i}`} className="inline-block" style={{ display: "inline-block" }}>
-              <DecodingWord word={word} startDelayMs={isMobile ? 0 : i * 5} active={isInViewOnce} />{i < arr.length - 1 ? "\u00A0" : ""}
-            </span>
-          ))}
-        </motion.p>
-        <div className="mt-8">
-          <AboutChat active={isInViewOnce} />
-        </div>
-      </motion.div>
+          <div className="absolute top-3 left-3 w-2 h-2 border-t border-l border-muted/30" />
+          <div className="absolute top-3 right-3 w-2 h-2 border-t border-r border-muted/30" />
+          <div className="absolute bottom-3 left-3 w-2 h-2 border-b border-l border-muted/30" />
+          <div className="absolute bottom-3 right-3 w-2 h-2 border-b border-r border-muted/30" />
+          
+          <p className="text-xs tracking-widest text-muted/60 font-mono uppercase mb-2">[01] Introduction</p>
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight text-muted">
+              <span className="inline-block" style={{ display: "inline-block" }}>
+                Hi, im Daniel Theil
+              </span>
+          </h2>
+        </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, scale: isMobile ? 1 : 0.95, filter: "grayscale(100%)" }}
-        animate={isInViewOnce ? { opacity: 1, scale: 1, filter: "grayscale(0%)" } : { opacity: 0, scale: isMobile ? 1 : 0.95, filter: "grayscale(100%)" }}
-        transition={{ duration: isMobile ? 0.5 : 1, ease: [0.16, 1, 0.3, 1], delay: isMobile ? 0 : 0.2 }}
-        className="relative w-full aspect-[4/5] lg:aspect-square max-w-md mx-auto lg:max-w-none rounded-2xl overflow-hidden border border-muted/10 bg-black/40 shadow-2xl"
-      >
-        <div className="absolute inset-0 z-0">
-          <DitherImage src="/asa noodles crop.png" active={isInViewOnce} className="w-full h-full" />
-        </div>
+        {/* Bio Text Cell */}
+        <motion.div
+          variants={bentoItemVariants}
+          className="relative md:col-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/20 p-6 flex flex-col justify-center"
+        >
+          <div className="absolute top-3 left-3 w-2 h-2 border-t border-l border-muted/30" />
+          <div className="absolute top-3 right-3 w-2 h-2 border-t border-r border-muted/30" />
+          <div className="absolute bottom-3 left-3 w-2 h-2 border-b border-l border-muted/30" />
+          <div className="absolute bottom-3 right-3 w-2 h-2 border-b border-r border-muted/30" />
+          
+          <p className="text-xs tracking-widest text-muted/60 font-mono uppercase mb-3">[02] Bio</p>
+          <p className="text-muted/80 text-lg leading-relaxed">
+            {[
+              "I",
+              "am",
+              "a",
+              "software",
+              "engineer",
+              "with",
+              "a",
+              "passion",
+              "for",
+              "building",
+              "products",
+              "that",
+              "help",
+              "people",
+              "live",
+              "better",
+              "lives.",
+            ].map((word, i, arr) => (
+              <span key={`about-word-${i}`} className="inline-block" style={{ display: "inline-block" }}>
+                <DecodingWord word={word} startDelayMs={isMobile ? 0 : i * 5} active={isInViewOnce} />{i < arr.length - 1 ? "\u00A0" : ""}
+              </span>
+            ))}
+          </p>
+        </motion.div>
 
-        <div className="absolute inset-0 pointer-events-none z-10 ring-1 ring-inset ring-white/10 rounded-2xl" />
+        {/* Profile Card */}
+        <motion.div
+          variants={bentoItemVariants}
+          className="relative col-span-1 md:col-span-2 rounded-[6px] overflow-hidden border border-muted/60 bg-muted p-5 shadow-sm tile-grid"
+        >
+          <div className="mb-2 font-mono text-[11px] tracking-wider uppercase text-foreground/80 flex items-center gap-2">
+            <span className="inline-block h-[10px] w-[10px] rounded-[2px] bg-foreground/70" />
+            <span>PROFILE</span>
+            <span className="ml-auto text-foreground/40">▮▯</span>
+          </div>
+          <p className="text-sm leading-relaxed text-foreground">
+            I&apos;m a front‑end engineer crafting calm, performant interfaces with a soft sci‑fi aesthetic.
+          </p>
+        </motion.div>
 
-        <div className="absolute top-4 left-4 w-2 h-2 border-t border-l border-white/40" />
-        <div className="absolute top-4 right-4 w-2 h-2 border-t border-r border-white/40" />
-        <div className="absolute bottom-4 left-4 w-2 h-2 border-b border-l border-white/40" />
-        <div className="absolute bottom-4 right-4 w-2 h-2 border-b border-r border-white/40" />
+        {/* Stack Card */}
+        <motion.div
+          variants={bentoItemVariants}
+          className="relative col-span-1 md:col-span-2 rounded-[6px] overflow-hidden border border-muted/60 bg-muted p-5 shadow-sm tile-grid"
+        >
+          <div className="mb-2 font-mono text-[11px] tracking-wider uppercase text-foreground/80 flex items-center gap-2">
+            <span className="inline-block h-[10px] w-[10px] rounded-[2px] bg-foreground/70" />
+            <span>STACK</span>
+            <span className="ml-auto text-foreground/40">▮▯</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {['Next.js','TypeScript','Tailwind','Framer Motion','WebGL'].map((t) => (
+              <span key={t} className="inline-flex items-center rounded-[4px] border border-foreground/20 bg-[color:rgba(19,14,5,0.12)] px-2 py-1 font-mono text-[11px] tracking-wide text-foreground/80">{t}</span>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Work Experience Card - 2 rows tall */}
+        <motion.div
+          variants={bentoItemVariants}
+          className="relative col-span-1 md:col-span-2 md:row-span-2 rounded-[6px] overflow-hidden border border-muted/60 bg-muted p-5 shadow-sm tile-grid"
+        >
+          <div className="mb-3 font-mono text-[11px] tracking-wider uppercase text-foreground/80 flex items-center gap-2">
+            <span className="inline-block h-[10px] w-[10px] rounded-[2px] bg-foreground/70" />
+            <span>EXPERIENCE</span>
+            <span className="ml-auto text-foreground/40">▮▯</span>
+          </div>
+          <div className="space-y-4">
+            <div className="border-l-2 border-foreground/30 pl-3">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-mono text-[12px] text-foreground font-medium">Fullstack Engineer</span>
+                <span className="inline-flex items-center rounded-[3px] border border-foreground/30 bg-foreground/10 px-1.5 py-0.5 font-mono text-[9px] tracking-wider text-foreground/70">CURRENT</span>
+              </div>
+              <p className="font-mono text-[11px] text-foreground/60">Komma-D</p>
+            </div>
+            <div className="border-l-2 border-foreground/20 pl-3">
+              <p className="font-mono text-[12px] text-foreground mb-1">Intern Software Engineer</p>
+              <p className="font-mono text-[11px] text-foreground/60">ASAP</p>
+            </div>
+            <div className="border-l-2 border-foreground/20 pl-3">
+              <p className="font-mono text-[12px] text-foreground mb-1">Working Student Software Engineer</p>
+              <p className="font-mono text-[11px] text-foreground/60">eSolutions</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Location Card */}
+        <motion.div
+          variants={bentoItemVariants}
+          className="relative col-span-2 rounded-[6px] overflow-hidden border border-muted/60 bg-muted p-5 shadow-sm tile-grid"
+        >
+          <div className="mb-2 font-mono text-[11px] tracking-wider uppercase text-foreground/80 flex items-center gap-2">
+            <span className="inline-block h-[10px] w-[10px] rounded-[2px] bg-foreground/70" />
+            <span>LOCATION</span>
+            <span className="ml-auto text-foreground/40">▮▯</span>
+          </div>
+          <div className="space-y-1">
+            <p className="font-mono text-[13px] text-foreground">Bavaria, Germany</p>
+            <p className="font-mono text-[10px] text-foreground/50 tracking-wider">CET (UTC+1)</p>
+          </div>
+        </motion.div>
+
+        {/* Stats Card */}
+        <motion.div
+          variants={bentoItemVariants}
+          className="relative col-span-2 rounded-[6px] overflow-hidden border border-muted/60 bg-muted p-5 shadow-sm tile-grid"
+        >
+          <div className="mb-2 font-mono text-[11px] tracking-wider uppercase text-foreground/80 flex items-center gap-2">
+            <span className="inline-block h-[10px] w-[10px] rounded-[2px] bg-foreground/70" />
+            <span>STATS</span>
+            <span className="ml-auto text-foreground/40">▮▯</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-foreground">
+            <div>
+              <p className="font-mono text-[10px] text-foreground/50 uppercase tracking-wider">Age</p>
+              <p className="font-mono text-[13px]">25</p>
+            </div>
+            <div>
+              <p className="font-mono text-[10px] text-foreground/50 uppercase tracking-wider">Gender</p>
+              <p className="font-mono text-[13px]">Male</p>
+            </div>
+            <div>
+              <p className="font-mono text-[10px] text-foreground/50 uppercase tracking-wider">Status</p>
+              <p className="font-mono text-[13px] flex items-center gap-1.5">
+                <span className="dot-led" /> Open
+              </p>
+            </div>
+            <div>
+              <p className="font-mono text-[10px] text-foreground/50 uppercase tracking-wider">Languages</p>
+              <p className="font-mono text-[13px]">EN / DE</p>
+            </div>
+          </div>
+        </motion.div>
       </motion.div>
     </div>
   );
@@ -641,6 +769,8 @@ type HobbyCardProps = {
 
 function HobbyCardComponent({ card, cardIndex, isMobile, onExpand }: HobbyCardProps) {
   const cardRef = React.useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = React.useState(false);
+  
   // Use useInView to reveal background as user scrolls into view on mobile
   const isCardInView = useInView(cardRef, { once: true, margin: "-20% 0px -20% 0px" });
   
@@ -652,21 +782,38 @@ function HobbyCardComponent({ card, cardIndex, isMobile, onExpand }: HobbyCardPr
     }
   }, [isCardInView, card.image]);
   
+  // Image opacity: only on hover (or inView on mobile)
+  const finalImageOpacity = isMobile 
+    ? (isCardInView ? 1 : 0) 
+    : (isHovered ? 1 : 0);
+  
+  // Text, PixelDivider, and bottom decorative line switch to white only on hover
+  const useWhiteText = isHovered;
+  
+  // Calculate border radius and shadow based on hover
+  const borderRadius = isHovered ? 12 : 0; // 0px to 12px on hover
+  const shadowOpacity = isHovered ? 0.1 : 0; // 0 to 0.1 on hover
+  const insetShadowOpacity = isHovered ? 0.1 : 0; // 0 to 0.1 on hover
+  
   return (
     <motion.div 
       ref={cardRef}
       layoutId={`hobby-card-${cardIndex}`}
       onClick={onExpand}
-      className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_10px_rgba(0,0,0,0.1)] cursor-pointer h-[400px] lg:h-[480px]" 
-      whileHover={isMobile ? {} : { scale: 1.02 }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="group relative overflow-hidden border border-white/10 bg-white/20 cursor-pointer h-[400px] lg:h-[480px] transition-[border-radius,box-shadow] duration-300" 
+      style={{
+        borderRadius: `${borderRadius}px`,
+        boxShadow: `inset 0 1px 1px rgba(255,255,255,${insetShadowOpacity}), 0 2px 10px rgba(0,0,0,${shadowOpacity})`,
+      }}
+      whileHover={isMobile ? {} : { scale: 1.015 }}
       whileTap={isMobile ? {} : { scale: 0.98 }}
     >
-      {/* Background Image - 100% visible on mobile when in view, hidden by default on desktop with hover reveal */}
-      <motion.div 
-        className={`absolute inset-0 z-0 ${!isMobile ? 'opacity-0 group-hover:opacity-100 transition-opacity duration-500' : ''}`}
-        initial={isMobile ? { opacity: 0 } : false}
-        animate={isMobile ? { opacity: isCardInView ? 1 : 0 } : undefined}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      {/* Background Image - opacity based on scroll position or hover */}
+      <div 
+        className="absolute inset-0 z-0 transition-opacity duration-300"
+        style={{ opacity: finalImageOpacity }}
       >
         <div className="absolute inset-0">
           <Image
@@ -677,27 +824,27 @@ function HobbyCardComponent({ card, cardIndex, isMobile, onExpand }: HobbyCardPr
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 560px"
             loading="lazy"
           />
-          {/* Dark gradient overlay - darker on hover for better contrast */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08] via-[#0d0b08]/70 to-[#0d0b08]/40 group-hover:from-[#0d0b08] group-hover:via-[#0d0b08]/80 group-hover:to-[#0d0b08]/50 transition-all duration-500" />
+          {/* Dark gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08] via-[#0d0b08]/80 to-[#0d0b08]/50" />
           {/* Scanline overlay */}
           <div className="absolute inset-0 scanlines opacity-20 pointer-events-none" />
         </div>
-      </motion.div>
+      </div>
 
       {/* Corner brackets */}
-      <div className={`absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 z-20 transition-colors duration-300 ${isMobile && isCardInView ? 'border-white/60' : 'border-foreground/30 group-hover:border-white/60'}`} />
-      <div className={`absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 z-20 transition-colors duration-300 ${isMobile && isCardInView ? 'border-white/60' : 'border-foreground/30 group-hover:border-white/60'}`} />
-      <div className={`absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 z-20 transition-colors duration-300 ${isMobile && isCardInView ? 'border-white/60' : 'border-foreground/30 group-hover:border-white/60'}`} />
-      <div className={`absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 z-20 transition-colors duration-300 ${isMobile && isCardInView ? 'border-white/60' : 'border-foreground/30 group-hover:border-white/60'}`} />
+      <div className={`absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 z-20 transition-colors duration-300 ${useWhiteText ? 'border-white/60' : 'border-foreground/30'}`} />
+      <div className={`absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 z-20 transition-colors duration-300 ${useWhiteText ? 'border-white/60' : 'border-foreground/30'}`} />
+      <div className={`absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 z-20 transition-colors duration-300 ${useWhiteText ? 'border-white/60' : 'border-foreground/30'}`} />
+      <div className={`absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 z-20 transition-colors duration-300 ${useWhiteText ? 'border-white/60' : 'border-foreground/30'}`} />
 
-      {/* Dark bar at bottom - only on desktop */}
-      {!isMobile && <div className="absolute bottom-0 left-0 right-0 h-4 bg-[#0d0b08] z-[15]" />}
+      {/* Dark bar at bottom - only on desktop, white on hover */}
+      {!isMobile && <div className={`absolute bottom-0 left-0 right-0 h-4 z-[15] transition-colors duration-300 ${useWhiteText ? 'bg-white' : 'bg-[#0d0b08]'}`} />}
 
-      {/* Pixel divider animation at bottom - only on desktop */}
+      {/* Pixel divider animation at bottom - only on desktop, white on hover */}
       {!isMobile && (
         <div className="absolute bottom-0 left-0 right-0 h-96 z-10 overflow-hidden pointer-events-none">
           <PixelDivider 
-            color="#0d0b08" 
+            color={useWhiteText ? "#ffffff" : "#0d0b08"}
             pixelSize={48} 
             durationSec={10} 
             rise="-250%" 
@@ -711,17 +858,17 @@ function HobbyCardComponent({ card, cardIndex, isMobile, onExpand }: HobbyCardPr
       <div className="relative z-20 h-full flex flex-col p-8">
         {/* Top row: Index left, Click hint right */}
         <div className="flex items-center justify-between">
-          <div className={`font-mono text-xs tracking-widest uppercase transition-colors duration-300 ${isMobile && isCardInView ? 'text-white/50' : 'text-foreground/40 group-hover:text-white/50'}`}>
+          <div className={`font-mono text-xs tracking-widest uppercase transition-colors duration-300 ${useWhiteText ? 'text-white/50' : 'text-foreground/40'}`}>
             [{String(cardIndex + 1).padStart(2, "0")}]
           </div>
-          <div className={`font-mono text-[10px] tracking-widest uppercase transition-colors duration-300 ${isMobile && isCardInView ? 'text-white/40' : 'text-foreground/30 group-hover:text-white/40'}`}>
+          <div className={`font-mono text-[10px] tracking-widest uppercase transition-colors duration-300 ${useWhiteText ? 'text-white/40' : 'text-foreground/30'}`}>
             Click to expand
           </div>
         </div>
 
         {/* Title + Items - slightly below center */}
         <div className="flex-1 flex flex-col justify-center pt-12">
-          <h3 className={`font-display text-4xl sm:text-5xl lg:text-6xl tracking-tight transition-colors duration-300 mb-4 ${isMobile && isCardInView ? 'text-white' : 'text-foreground group-hover:text-white'}`}>
+          <h3 className={`font-display text-4xl sm:text-5xl lg:text-6xl tracking-tight transition-colors duration-300 mb-4 ${useWhiteText ? 'text-white' : 'text-foreground'}`}>
             {card.title}
           </h3>
           
@@ -731,19 +878,19 @@ function HobbyCardComponent({ card, cardIndex, isMobile, onExpand }: HobbyCardPr
               <span
                 key={item}
                 className={`relative inline-flex items-center text-[9px] font-mono uppercase tracking-widest px-2.5 py-1 border transition-all duration-300 ${
-                  isMobile && isCardInView 
+                  useWhiteText 
                     ? 'text-white/80 bg-white/[0.08] border-white/30' 
-                    : 'text-foreground/60 group-hover:text-white/80 bg-foreground/[0.03] group-hover:bg-white/[0.08] border-foreground/20 group-hover:border-white/30'
+                    : 'text-foreground/60 bg-foreground/[0.03] border-foreground/20'
                 }`}
               >
                 {/* Corner accents */}
-                <span className={`absolute top-0 left-0 w-1 h-1 border-t border-l ${isMobile && isCardInView ? 'border-white/60' : 'border-foreground/40 group-hover:border-white/60'}`} />
-                <span className={`absolute top-0 right-0 w-1 h-1 border-t border-r ${isMobile && isCardInView ? 'border-white/60' : 'border-foreground/40 group-hover:border-white/60'}`} />
-                <span className={`absolute bottom-0 left-0 w-1 h-1 border-b border-l ${isMobile && isCardInView ? 'border-white/60' : 'border-foreground/40 group-hover:border-white/60'}`} />
-                <span className={`absolute bottom-0 right-0 w-1 h-1 border-b border-r ${isMobile && isCardInView ? 'border-white/60' : 'border-foreground/40 group-hover:border-white/60'}`} />
+                <span className={`absolute top-0 left-0 w-1 h-1 border-t border-l ${useWhiteText ? 'border-white/60' : 'border-foreground/40'}`} />
+                <span className={`absolute top-0 right-0 w-1 h-1 border-t border-r ${useWhiteText ? 'border-white/60' : 'border-foreground/40'}`} />
+                <span className={`absolute bottom-0 left-0 w-1 h-1 border-b border-l ${useWhiteText ? 'border-white/60' : 'border-foreground/40'}`} />
+                <span className={`absolute bottom-0 right-0 w-1 h-1 border-b border-r ${useWhiteText ? 'border-white/60' : 'border-foreground/40'}`} />
                 
                 {/* Index prefix */}
-                <span className={`mr-1.5 ${isMobile && isCardInView ? 'text-white/40' : 'text-foreground/30 group-hover:text-white/40'}`}>{String(itemIndex + 1).padStart(2, "0")}</span>
+                <span className={`mr-1.5 ${useWhiteText ? 'text-white/40' : 'text-foreground/30'}`}>{String(itemIndex + 1).padStart(2, "0")}</span>
                 {item}
               </span>
             ))}
@@ -752,7 +899,143 @@ function HobbyCardComponent({ card, cardIndex, isMobile, onExpand }: HobbyCardPr
       </div>
 
       {/* Bottom decorative line */}
-      <div className={`absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent to-transparent transition-colors duration-300 z-20 ${isMobile && isCardInView ? 'via-white/30' : 'via-foreground/20 group-hover:via-white/30'}`} />
+      <div className={`absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent to-transparent transition-colors duration-300 z-20 ${useWhiteText ? 'via-white/30' : 'via-foreground/20'}`} />
+    </motion.div>
+  );
+}
+
+// Individual hobby card row with scroll-driven animation
+function HobbyCardRow({ 
+  card, 
+  cardIndex, 
+  isMobile, 
+  isInViewOnce, 
+  onExpand 
+}: { 
+  card: HobbyCard; 
+  cardIndex: number; 
+  isMobile: boolean; 
+  isInViewOnce: boolean;
+  onExpand: () => void;
+}) {
+  const rowRef = React.useRef<HTMLDivElement>(null);
+  const isEven = cardIndex % 2 === 0;
+  
+  // Scroll-driven animation: track this row's position in viewport
+  const { scrollYProgress } = useScroll({
+    target: rowRef,
+    offset: ["start end", "end start"], // from when top enters bottom, to when bottom leaves top
+  });
+  
+  // Transform scroll progress to horizontal movement
+  // Cards fly in from left (negative x) or right (positive x) based on even/odd
+  // At progress 0 (entering): card is offset; at progress 0.5 (center): card is at 0; at progress 1 (leaving): card moves opposite
+  const cardRange = isMobile ? 15 : 30; // subtle pixels for card to move
+  const textRange = isMobile ? 5 : 12; // very subtle movement for text
+  
+  const cardX = useTransform(
+    scrollYProgress,
+    [0, 0.3, 0.5, 0.7, 1],
+    isEven 
+      ? [-cardRange, -cardRange * 0.3, 0, cardRange * 0.3, cardRange] // even cards: left to right
+      : [cardRange, cardRange * 0.3, 0, -cardRange * 0.3, -cardRange]  // odd cards: right to left
+  );
+  
+  // Text content has subtle movement from the opposite direction
+  const textX = useTransform(
+    scrollYProgress,
+    [0, 0.35, 0.5, 0.65, 1],
+    isEven 
+      ? [textRange, textRange * 0.2, 0, -textRange * 0.2, -textRange] // even: text from right (subtle)
+      : [-textRange, -textRange * 0.2, 0, textRange * 0.2, textRange]  // odd: text from left (subtle)
+  );
+  
+  // Smooth the movement
+  const smoothCardX = useSpring(cardX, { stiffness: 100, damping: 30, mass: 0.5 });
+  const smoothTextX = useSpring(textX, { stiffness: 100, damping: 30, mass: 0.5 });
+  
+  // Opacity based on scroll position - fade in as it enters, fade out as it leaves
+  const cardOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.15, 0.4, 0.6, 0.85, 1],
+    [0.3, 0.7, 1, 1, 0.7, 0.3]
+  );
+  
+  return (
+    <motion.div
+      ref={rowRef}
+      key={card.title}
+      initial={{ opacity: 0 }}
+      animate={isInViewOnce ? { opacity: 1 } : { opacity: 0 }}
+      transition={{ duration: 0.5, delay: cardIndex * 0.1 }}
+      className={`grid grid-cols-1 lg:grid-cols-[0.75fr_1fr] gap-8 lg:gap-16 items-center ${isEven ? "" : "lg:grid-cols-[1fr_0.75fr]"}`}
+      style={!isEven ? { direction: "rtl" } : undefined}
+    >
+      {/* Card */}
+      <motion.div 
+        className="group relative z-10 lg:-mr-16"
+        style={{ 
+          direction: "ltr",
+          x: smoothCardX,
+          opacity: cardOpacity,
+          marginRight: isEven ? undefined : 0,
+          marginLeft: isEven ? 0 : undefined,
+        }}
+      >
+        <HobbyCardComponent 
+          card={card} 
+          cardIndex={cardIndex} 
+          isMobile={isMobile} 
+          onExpand={onExpand}
+        />
+      </motion.div>
+
+      {/* Text Content Side */}
+      <motion.div 
+        className={`flex flex-col justify-center space-y-6 w-[85%] ${isEven ? 'lg:ml-16' : 'lg:mr-16'}`}
+        style={{ 
+          direction: "ltr",
+          x: smoothTextX,
+          opacity: cardOpacity,
+        }}
+      >
+        {/* Description */}
+        <p className="text-lg lg:text-xl text-foreground/70 leading-relaxed">
+          {card.description}
+        </p>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-3 gap-4 py-6 border-y border-foreground/10">
+          {card.stats.map((stat, statIndex) => (
+            <div key={stat.label} className="text-center lg:text-left">
+              <div className="font-bold font-mono text-xs tracking-widest text-muted uppercase mb-1">
+                {stat.label}
+              </div>
+              <div className="font-display text-xl lg:text-2xl text-foreground">
+                <DecodingWord 
+                  word={stat.value} 
+                  startDelayMs={isMobile ? 0 : (cardIndex * 150) + (statIndex * 80) + 500} 
+                  active={isInViewOnce} 
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Quote (if exists) */}
+        {card.quote && (
+          <blockquote className="text-foreground/50 italic font-mono text-sm border-l-2 border-muted/30 pl-4">
+            {card.quote}
+          </blockquote>
+        )}
+
+        {/* Decorative element */}
+        <div className="flex items-center gap-3 pt-2">
+          <div className="w-8 h-px bg-muted/40" />
+          <div className="w-2 h-2 rotate-45 border border-muted/40" />
+          <div className="flex-1 h-px bg-gradient-to-r from-muted/20 to-transparent" />
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -792,117 +1075,44 @@ function InViewHobbyBlock() {
           },
         }}
       >
-        <motion.p
-          variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.5, ease: [0.16, 1, 0.3, 1] } } }}
-          className="text-sm tracking-widest text-muted font-bold mb-3 mt-24"
-        >
-          BEYOND THE CODE
-        </motion.p>
-        <motion.h2
-          variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1] } } }}
-          className="font-display text-5xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight text-foreground drop-shadow-md mb-6"
-        >
-          {"Hobbies & Interests".split(" ").map((word, i, arr) => (
-            <span key={`hobby-title-${i}`} className="inline-block" style={{ display: "inline-block" }}>
-              <DecodingWord word={word} startDelayMs={isMobile ? 0 : i * 180} active={isInViewOnce} />{i < arr.length - 1 ? "\u00A0" : ""}
-            </span>
-          ))}
-        </motion.h2>
-        <motion.p
-          variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1], delay: isMobile ? 0 : 0.1 } } }}
-          className="text-lg sm:text-xl text-foreground/80 font-medium mb-12 max-w-prose"
-        >
-          When I&apos;m not coding, you&apos;ll find me immersed in stories, exploring virtual worlds, or out on my bike.
-        </motion.p>
+        {/* Title section - aligned left */}
+        <div className="max-w-2xl">
+          <motion.p
+            variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.5, ease: [0.16, 1, 0.3, 1] } } }}
+            className="text-sm tracking-widest text-muted font-bold mb-3 mt-24"
+          >
+            BEYOND THE CODE
+          </motion.p>
+          <motion.h2
+            variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1] } } }}
+            className="font-display text-5xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight text-foreground drop-shadow-md mb-6"
+          >
+            {"Hobbies & Interests".split(" ").map((word, i, arr) => (
+              <span key={`hobby-title-${i}`} className="inline-block" style={{ display: "inline-block" }}>
+                <DecodingWord word={word} startDelayMs={isMobile ? 0 : i * 180} active={isInViewOnce} />{i < arr.length - 1 ? "\u00A0" : ""}
+              </span>
+            ))}
+          </motion.h2>
+          <motion.p
+            variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1], delay: isMobile ? 0 : 0.1 } } }}
+            className="text-lg sm:text-xl text-foreground/80 font-medium mb-12"
+          >
+            When I&apos;m not coding, you&apos;ll find me immersed in stories, exploring virtual worlds, or out on my bike.
+          </motion.p>
+        </div>
 
-        {/* Hobby Cards - Alternating Left/Right Layout */}
+        {/* Hobby Cards - Alternating Left/Right Layout with scroll-driven animations */}
         <div className="space-y-20 lg:space-y-32">
-          {HOBBIES.map((card, cardIndex) => {
-            const isEven = cardIndex % 2 === 0;
-            return (
-              <motion.div
-                key={card.title}
-                variants={{
-                  hidden: { opacity: 0, y: isMobile ? 0 : 30 },
-                  show: {
-                    opacity: 1,
-                    y: 0,
-                    transition: {
-                      duration: isMobile ? 0.3 : 0.7,
-                      ease: [0.16, 1, 0.3, 1],
-                      delay: isMobile ? 0 : cardIndex * 0.15,
-                    },
-                  },
-                }}
-                className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center ${isEven ? "" : "lg:direction-rtl"}`}
-                style={!isEven ? { direction: "rtl" } : undefined}
-              >
-                {/* Card */}
-                <div className="group relative" style={{ direction: "ltr" }}>
-                  {/* Image-sensitive shadow - scaled, blurred duplicate */}
-                  <div className="absolute inset-x-4 inset-y-1 z-0 opacity-0 group-hover:opacity-25 group-hover:saturate-200 transition-opacity duration-500 scale-x-[1.15] scale-y-[1.10] pointer-events-none blur-md">
-                    <div className="relative w-full h-full">
-                      <Image
-                        src={card.image}
-                        alt=""
-                        fill
-                        className="object-cover rounded-lg"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 560px"
-                        loading="lazy"
-                      />
-                    </div>
-                  </div>
-                  
-                  <HobbyCardComponent 
-                    card={card} 
-                    cardIndex={cardIndex} 
-                    isMobile={isMobile} 
-                    onExpand={() => setExpandedCard(cardIndex)} 
-                  />
-                </div>
-
-                {/* Text Content Side */}
-                <div className="flex flex-col justify-center space-y-6" style={{ direction: "ltr" }}>
-                  {/* Description */}
-                  <p className="text-lg lg:text-xl text-foreground/70 leading-relaxed">
-                    {card.description}
-                  </p>
-
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-3 gap-4 py-6 border-y border-foreground/10">
-                    {card.stats.map((stat, statIndex) => (
-                      <div key={stat.label} className="text-center lg:text-left">
-                        <div className="font-bold font-mono text-xs tracking-widest text-muted uppercase mb-1">
-                          {stat.label}
-                        </div>
-                        <div className="font-display text-xl lg:text-2xl text-foreground">
-                          <DecodingWord 
-                            word={stat.value} 
-                            startDelayMs={isMobile ? 0 : (cardIndex * 150) + (statIndex * 80) + 500} 
-                            active={isInViewOnce} 
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Quote (if exists) */}
-                  {card.quote && (
-                    <blockquote className="text-foreground/50 italic font-mono text-sm border-l-2 border-muted/30 pl-4">
-                      {card.quote}
-                    </blockquote>
-                  )}
-
-                  {/* Decorative element */}
-                  <div className="flex items-center gap-3 pt-2">
-                    <div className="w-8 h-px bg-muted/40" />
-                    <div className="w-2 h-2 rotate-45 border border-muted/40" />
-                    <div className="flex-1 h-px bg-gradient-to-r from-muted/20 to-transparent" />
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
+          {HOBBIES.map((card, cardIndex) => (
+            <HobbyCardRow
+              key={card.title}
+              card={card}
+              cardIndex={cardIndex}
+              isMobile={isMobile}
+              isInViewOnce={isInViewOnce}
+              onExpand={() => setExpandedCard(cardIndex)}
+            />
+          ))}
         </div>
       </motion.div>
 

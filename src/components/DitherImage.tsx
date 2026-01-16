@@ -145,16 +145,27 @@ function ImagePlane({ src }: { src: string }) {
   );
 }
 
-function DitherScene({ src, active }: { src: string; active: boolean }) {
+function DitherScene({ src, active, hasAnimated, onAnimationComplete }: { 
+  src: string; 
+  active: boolean; 
+  hasAnimated: boolean;
+  onAnimationComplete: () => void;
+}) {
   const effectRef = useRef<RetroSepiaEffectImpl>(null);
   const elapsedRef = useRef(0);
-  const completedRef = useRef(false);
   const targetPixelSize = 2.5;
   const duration = 1; // Animation duration in seconds
   
+  // If already animated, start at the final state
+  useEffect(() => {
+    if (hasAnimated && effectRef.current) {
+      effectRef.current.uniforms.get('pixelSize')!.value = targetPixelSize;
+    }
+  }, [hasAnimated]);
+  
   useFrame((state, delta) => {
     // Only animate if active and not yet completed
-    if (active && effectRef.current && !completedRef.current) {
+    if (active && effectRef.current && !hasAnimated) {
       elapsedRef.current += delta;
       const progress = Math.min(elapsedRef.current / duration, 1);
       
@@ -166,7 +177,7 @@ function DitherScene({ src, active }: { src: string; active: boolean }) {
       
       // Mark as complete when animation finishes
       if (progress >= 1) {
-        completedRef.current = true;
+        onAnimationComplete();
       }
     }
   });
@@ -175,7 +186,7 @@ function DitherScene({ src, active }: { src: string; active: boolean }) {
     <>
       <ImagePlane src={src} />
       <EffectComposer>
-        <RetroSepiaEffect ref={effectRef} colorNum={5} pixelSize={1024} />
+        <RetroSepiaEffect ref={effectRef} colorNum={5} pixelSize={hasAnimated ? targetPixelSize : 1024} />
       </EffectComposer>
     </>
   );
@@ -206,21 +217,39 @@ export default function DitherImage({ src, active = false, className }: DitherIm
   const isPageVisible = usePageVisibility();
   const gpuSupport = useGPUDetection();
   const isMobile = useIsMobile();
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const [hasRenderedOnce, setHasRenderedOnce] = useState(false);
   
-  // Use fallback on mobile for performance (no WebGL animation)
-  const shouldUseCanvas = gpuSupport !== 'none' && isPageVisible && isVisible && !isMobile;
+  // Track if canvas has ever been rendered
+  const canUseCanvas = gpuSupport !== 'none' && !isMobile;
+  const shouldRenderCanvas = canUseCanvas && (hasRenderedOnce || isVisible);
+  
+  // Mark as rendered once visible for the first time
+  React.useEffect(() => {
+    if (canUseCanvas && isVisible && !hasRenderedOnce) {
+      setHasRenderedOnce(true);
+    }
+  }, [canUseCanvas, isVisible, hasRenderedOnce]);
+  
+  // Control frameloop based on visibility
+  const frameloop = isPageVisible && isVisible ? "always" : "never";
 
   return (
     <div ref={containerRef} className={className}>
-      {shouldUseCanvas ? (
+      {shouldRenderCanvas ? (
         <Canvas
           camera={{ position: [0, 0, 5] }}
           dpr={[1, 2]}
-          frameloop={isPageVisible ? "always" : "never"}
+          frameloop={frameloop}
           gl={{ antialias: false, preserveDrawingBuffer: true }}
         >
           <React.Suspense fallback={null}>
-            <DitherScene src={src} active={active} />
+            <DitherScene 
+              src={src} 
+              active={active} 
+              hasAnimated={hasAnimated}
+              onAnimationComplete={() => setHasAnimated(true)}
+            />
           </React.Suspense>
         </Canvas>
       ) : (

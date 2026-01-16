@@ -1,8 +1,8 @@
 'use client';
-import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react';
+import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import { gsap } from 'gsap';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
-import { useGPUDetection, usePageVisibility } from '@/hooks/useGPUDetection';
+import { usePageVisibility } from '@/hooks/useGPUDetection';
 import { useIsMobile } from '@/hooks/useIsMobile';
 
 gsap.registerPlugin(InertiaPlugin);
@@ -17,28 +17,6 @@ const throttle = (func: (...args: any[]) => void, limit: number) => {
     }
   };
 };
-
-// Hook to detect if element is visible in viewport
-function useIsVisible(ref: React.RefObject<HTMLElement | null>) {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0, rootMargin: '50px' }
-    );
-
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [ref]);
-
-  return isVisible;
-}
 
 interface Dot {
   cx: number;
@@ -92,6 +70,7 @@ const DotGrid: React.FC<DotGridProps> = ({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dotsRef = useRef<Dot[]>([]);
+  const dimensionsRef = useRef({ width: 0, height: 0 });
   const pointerRef = useRef({
     x: 0,
     y: 0,
@@ -103,13 +82,11 @@ const DotGrid: React.FC<DotGridProps> = ({
     lastY: 0
   });
   
-  const isVisible = useIsVisible(wrapperRef);
   const isPageVisible = usePageVisibility();
-  const gpuSupport = useGPUDetection();
   const isMobile = useIsMobile();
   
-  // Disable animation entirely on mobile for performance
-  const shouldRunAnimation = isVisible && isPageVisible && gpuSupport !== 'none' && !isMobile;
+  // Always render on desktop, disable only on mobile for performance
+  const shouldRunAnimation = isPageVisible && !isMobile;
 
   const baseRgb = useMemo(() => hexToRgb(baseColor), [baseColor]);
   const activeRgb = useMemo(() => hexToRgb(activeColor), [activeColor]);
@@ -129,6 +106,9 @@ const DotGrid: React.FC<DotGridProps> = ({
 
     const { width, height } = wrap.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
+
+    // Store CSS dimensions for proper clearing
+    dimensionsRef.current = { width, height };
 
     canvas.width = width * dpr;
     canvas.height = height * dpr;
@@ -175,7 +155,9 @@ const DotGrid: React.FC<DotGridProps> = ({
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Use CSS dimensions for clearing (context is already scaled by dpr)
+      const { width, height } = dimensionsRef.current;
+      ctx.clearRect(0, 0, width, height);
 
       const { x: px, y: py } = pointerRef.current;
 
@@ -236,7 +218,7 @@ const DotGrid: React.FC<DotGridProps> = ({
       if (ro) ro.disconnect();
       else window.removeEventListener('resize', buildGrid);
     };
-  }, [buildGrid]);
+  }, [buildGrid, shouldRunAnimation]);
 
   useEffect(() => {
     if (!shouldRunAnimation) return;

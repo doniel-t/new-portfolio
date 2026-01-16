@@ -347,17 +347,19 @@ export default function Dither({
   
   // Disable canvas on mobile unless explicitly enabled (e.g., hero section)
   const mobileDisabled = isMobile && !enableOnMobile;
-  const shouldUseCanvas = gpuSupport !== 'none' && isPageVisible && isVisible && !mobileDisabled;
-  const isDisabled = disableAnimation || !shouldUseCanvas;
+  const canUseCanvas = gpuSupport !== 'none' && !mobileDisabled;
+  // Keep canvas mounted but pause animation when not visible
+  const shouldAnimate = isPageVisible && isVisible;
+  const isDisabled = disableAnimation || !shouldAnimate;
 
   return (
     <div ref={containerRef} className="w-full h-full relative">
-      {shouldUseCanvas ? (
+      {canUseCanvas ? (
         <Canvas
           className="w-full h-full"
           camera={{ position: [0, 0, 6] }}
           dpr={1}
-          frameloop={isPageVisible ? "always" : "never"}
+          frameloop={shouldAnimate ? "always" : "never"}
           gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
           onCreated={({ gl }) => {
             gl.setClearColor(0x000000, 0);

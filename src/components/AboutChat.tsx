@@ -8,18 +8,28 @@ type AboutChatProps = {
   active?: boolean;
 };
 
-// Small helpers for reference-inspired tiles
-function Tile({ title, children, active }: { title: string; children: React.ReactNode; active: boolean }) {
+// NieR Automata-inspired bento card component
+function BentoCard({ 
+  title, 
+  children, 
+  active,
+  className = ""
+}: { 
+  title: string; 
+  children: React.ReactNode; 
+  active: boolean;
+  className?: string;
+}) {
   const isMobile = useIsMobile();
   return (
-    <div className="relative inline-block w-full sm:w-auto rounded-[6px] border border-muted/60 bg-muted px-5 py-3.5 sm:px-6 sm:py-4 shadow-sm tile-grid overflow-hidden">
+    <div className={`relative h-full rounded-[6px] border border-muted/60 bg-muted px-5 py-4 shadow-sm tile-grid overflow-hidden ${className}`}>
       {active && !isMobile && (
         <motion.span
           aria-hidden
           className="pointer-events-none absolute inset-y-0 left-0 w-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
           initial={{ width: 0, x: 0, opacity: 0.7 }}
           animate={{ width: "100%", x: "100%", opacity: 0 }}
-          transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] as const }}
         />
       )}
       <div className="mb-2 font-mono text-[11px] tracking-wider uppercase text-foreground/80 flex items-center gap-2">
@@ -52,18 +62,18 @@ function Chip({ text }: { text: string }) {
 
 function Matrix({ cols = 10, rows = 4, fill = 0.45 }: { cols?: number; rows?: number; fill?: number }) {
   const total = cols * rows;
-  const active = Math.round(total * fill);
+  const activeCount = Math.round(total * fill);
   return (
     <div className="grid gap-[3px]" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
       {Array.from({ length: total }).map((_, i) => (
-        <span key={i} className={`h-2.5 rounded-[2px] border border-foreground/20 ${i < active ? "bg-foreground/80" : "bg-[color:rgba(19,14,5,0.18)]"}`} />
+        <span key={i} className={`h-2.5 rounded-[2px] border border-foreground/20 ${i < activeCount ? "bg-foreground/80" : "bg-[color:rgba(19,14,5,0.18)]"}`} />
       ))}
     </div>
   );
 }
 
 /**
- * Left-aligned, Nier Automata-inspired chat feed used in the About section.
+ * NieR Automata-inspired bento grid layout for About section info cards.
  */
 export default function AboutChat({ active = false }: AboutChatProps) {
   const isMobile = useIsMobile();
@@ -71,12 +81,10 @@ export default function AboutChat({ active = false }: AboutChatProps) {
   const container: Variants = useMemo(() => ({
     hidden: {},
     show: {
-      transition: { staggerChildren: isMobile ? 0 : 0.12, delayChildren: isMobile ? 0 : 0.05 },
+      transition: { staggerChildren: isMobile ? 0 : 0.08, delayChildren: isMobile ? 0 : 0.05 },
     },
   }), [isMobile]);
 
-  // Optimized variants: removed expensive filter and clipPath animations
-  // Using only GPU-accelerated properties (opacity, transform)
   const item: Variants = useMemo(() => ({
     hidden: {
       opacity: 0,
@@ -91,78 +99,81 @@ export default function AboutChat({ active = false }: AboutChatProps) {
       scale: 1,
       transition: { 
         duration: isMobile ? 0.3 : 0.5, 
-        ease: [0.25, 0.46, 0.45, 0.94] // Smoother ease curve
+        ease: [0.25, 0.46, 0.45, 0.94] as const
       },
     },
   }), [isMobile]);
 
   return (
-    <motion.ol
-      aria-label="About chat"
-      className="relative mt-6 max-w-prose lg:max-w-[38rem] text-muted space-y-5 sm:space-y-6"
+    <motion.div
+      aria-label="About info"
+      className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 text-muted"
       variants={container}
       initial="hidden"
       animate={active ? "show" : "hidden"}
     >
-      {/* Left timeline rail */}
-      <span
-        aria-hidden
-        className="absolute left-0 top-0 h-full w-[2px] left-rail"
-        style={{ transform: "translateX(-12px)" }}
-      />
-
-      <motion.li variants={item} style={{ willChange: 'transform, opacity' }}>
-        <Tile title="PROFILE" active={active}>
+      {/* Profile - spans 2 cols */}
+      <motion.div variants={item} className="col-span-2" style={{ willChange: 'transform, opacity' }}>
+        <BentoCard title="PROFILE" active={active}>
           <p className="text-sm leading-relaxed text-foreground">
-            I’m a front‑end engineer crafting calm, performant interfaces with a soft sci‑fi aesthetic.
+            I&apos;m a front‑end engineer crafting calm, performant interfaces with a soft sci‑fi aesthetic.
           </p>
-        </Tile>
-      </motion.li>
+        </BentoCard>
+      </motion.div>
 
-      <motion.li variants={item} style={{ willChange: 'transform, opacity' }}>
-        <Tile title="STACK" active={active}>
-          <div className="flex flex-wrap gap-2">
-            {['Next.js','TypeScript','Tailwind','Framer Motion','WebGL'].map((t) => (
-              <Chip key={t} text={t} />
-            ))}
+      {/* Status - spans 2 cols */}
+      <motion.div variants={item} className="col-span-2" style={{ willChange: 'transform, opacity' }}>
+        <BentoCard title="STATUS" active={active}>
+          <div className="flex items-center gap-2 text-sm text-foreground">
+            <span className="dot-led" /> Available for freelance & collaborations
           </div>
-        </Tile>
-      </motion.li>
+        </BentoCard>
+      </motion.div>
 
-      <motion.li variants={item} style={{ willChange: 'transform, opacity' }}>
-        <Tile title="ETHOS" active={active}>
-          <div className="space-y-2.5">
-            <Meter label="Clarity" value={88} />
-            <Meter label="Tactile" value={82} />
-            <Meter label="Performance" value={91} />
-          </div>
-        </Tile>
-      </motion.li>
-
-      <motion.li variants={item} style={{ willChange: 'transform, opacity' }}>
-        <Tile title="RESULT" active={active}>
+      {/* Results - spans 2 cols */}
+      <motion.div variants={item} className="col-span-2" style={{ willChange: 'transform, opacity' }}>
+        <BentoCard title="RESULTS" active={active}>
           <div className="flex items-center gap-3 text-sm text-foreground">
             <span className="font-mono text-[12px] tracking-wider">+22% conversion</span>
             <span className="opacity-40">|</span>
             <span className="font-mono text-[12px] tracking-wider">~1.2s LCP</span>
           </div>
-        </Tile>
-      </motion.li>
+        </BentoCard>
+      </motion.div>
 
-      <motion.li variants={item} style={{ willChange: 'transform, opacity' }}>
-        <Tile title="SIDE QUESTS" active={active}>
-          <Matrix cols={12} rows={4} fill={0.58} />
-          <p className="mt-2 text-xs text-foreground/70">Shaders · generative art · rapid prototyping</p>
-        </Tile>
-      </motion.li>
-
-      <motion.li variants={item} style={{ willChange: 'transform, opacity' }}>
-        <Tile title="STATUS" active={active}>
-          <div className="flex items-center gap-2 text-sm text-foreground">
-            <span className="dot-led" /> Available for freelance & collaborations
+      {/* Stack - spans 3 cols on lg, 2 on md */}
+      <motion.div variants={item} className="col-span-2 md:col-span-2 lg:col-span-3" style={{ willChange: 'transform, opacity' }}>
+        <BentoCard title="STACK" active={active}>
+          <div className="flex flex-wrap gap-2">
+            {['Next.js','TypeScript','Tailwind','Framer Motion','WebGL'].map((t) => (
+              <Chip key={t} text={t} />
+            ))}
           </div>
-        </Tile>
-      </motion.li>
-    </motion.ol>
+        </BentoCard>
+      </motion.div>
+
+      {/* Ethos - spans 3 cols on lg, 2 on md */}
+      <motion.div variants={item} className="col-span-2 md:col-span-2 lg:col-span-3" style={{ willChange: 'transform, opacity' }}>
+        <BentoCard title="ETHOS" active={active}>
+          <div className="space-y-2.5">
+            <Meter label="Clarity" value={88} />
+            <Meter label="Tactile" value={82} />
+            <Meter label="Performance" value={91} />
+          </div>
+        </BentoCard>
+      </motion.div>
+
+      {/* Side Quests - spans full width */}
+      <motion.div variants={item} className="col-span-2 md:col-span-4 lg:col-span-6" style={{ willChange: 'transform, opacity' }}>
+        <BentoCard title="SIDE QUESTS" active={active}>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex-1">
+              <Matrix cols={12} rows={4} fill={0.58} />
+            </div>
+            <p className="text-xs text-foreground/70 sm:max-w-[200px]">Shaders · generative art · rapid prototyping</p>
+          </div>
+        </BentoCard>
+      </motion.div>
+    </motion.div>
   );
 }
