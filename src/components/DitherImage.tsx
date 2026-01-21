@@ -154,7 +154,7 @@ function DitherScene({ src, active, hasAnimated, onAnimationComplete, skipAnimat
 }) {
   const effectRef = useRef<RetroSepiaEffectImpl>(null);
   const elapsedRef = useRef(0);
-  const targetPixelSize = 2.5;
+  const targetPixelSize = 3;
   const duration = 1; // Animation duration in seconds
   
   // If skipAnimation is true or already animated, start at the final state
@@ -189,7 +189,7 @@ function DitherScene({ src, active, hasAnimated, onAnimationComplete, skipAnimat
     <>
       <ImagePlane src={src} />
       <EffectComposer>
-        <RetroSepiaEffect ref={effectRef} colorNum={5} pixelSize={shouldSkip ? targetPixelSize : 1024} />
+        <RetroSepiaEffect ref={effectRef} colorNum={6} pixelSize={shouldSkip ? targetPixelSize : 1024} />
       </EffectComposer>
     </>
   );
@@ -225,7 +225,7 @@ function FallbackDitherImage({ src, className }: { src: string; className?: stri
       <img
         src={src}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover sepia-[0.3] opacity-90"
+        className="absolute inset-0 w-full h-full object-cover opacity-90"
         loading="lazy"
       />
     </div>
@@ -270,7 +270,7 @@ export default function DitherImage({ src, active = false, className, skipAnimat
           dpr={[1, 2]}
           frameloop={frameloop}
           gl={{ antialias: false, preserveDrawingBuffer: true }}
-          className="relative z-10"
+          className="relative z-10 grayscale-50 brightness-110 saturate-50"
         >
           <React.Suspense fallback={null}>
             <DitherScene 
