@@ -8,6 +8,7 @@ import BackgroundLineArt from "@/components/BackgroundLineArt";
 import PixelDivider from "@/components/PixelDivider";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { getAboutVariants } from "./variants";
+import LocalTimeClient from "./LocalTime";
 
 
 const STACK_ITEMS = ["Next.js", "TypeScript", "Tailwind", "Go"];
@@ -388,8 +389,8 @@ function InViewAboutBlock() {
                 <p className="font-mono text-[13px] text-foreground font-bold tracking-wide">Bavaria, Germany</p>
               </div>
               <div className="flex items-baseline gap-3">
-                <span className="font-mono text-[8px] text-foreground/50 tracking-wider">ZONE:</span>
-                <p className="font-mono text-[11px] text-foreground/70 tracking-wider">CET (UTC+1)</p>
+                <span className="font-mono text-[8px] text-foreground/50 tracking-wider">LOCAL TIME:</span>
+                <LocalTimeClient />
               </div>
             </div>
             <div className="mt-4 pt-3 border-t border-foreground/20 flex items-center justify-between">
