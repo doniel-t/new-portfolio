@@ -11,95 +11,139 @@ type HobbyCardRowProps = {
   card: HobbyCardType;
   cardIndex: number;
   isMobile: boolean;
-  isInViewOnce: boolean;
   onExpand: () => void;
 };
 
-function HobbyCardRow({ card, cardIndex, isMobile, isInViewOnce, onExpand }: HobbyCardRowProps) {
-  const isEven = cardIndex % 2 === 0;
+function HobbyCardRow({ card, cardIndex, isMobile, onExpand }: HobbyCardRowProps) {
+  const rowRef = React.useRef<HTMLDivElement>(null);
+  const isRowInView = useInView(rowRef, { once: true, margin: "-15% 0px -15% 0px" });
+  
+  // Alternating layout: even = IMAGE on left, TEXT on right
+  // odd = TEXT on left, IMAGE on right
+  const isImageFirst = cardIndex % 2 === 0;
 
-  return (
+  // Text content component
+  const TextContent = (
     <motion.div
-      key={card.title}
-      variants={{
-        hidden: { opacity: 0, y: isMobile ? 0 : 30 },
-        show: {
-          opacity: 1,
-          y: 0,
-          transition: {
-            duration: isMobile ? 0.3 : 0.7,
-            ease: [0.16, 1, 0.3, 1],
-            delay: isMobile ? 0 : cardIndex * 0.15,
-          },
-        },
-      }}
-      className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center ${isEven ? "" : "lg:direction-rtl"}`}
-      style={!isEven ? { direction: "rtl" } : undefined}
+      className="flex flex-col justify-center space-y-5 lg:space-y-6"
+      initial={{ opacity: 0, x: isImageFirst ? 30 : -30 }}
+      animate={isRowInView ? { opacity: 1, x: 0 } : { opacity: 0, x: isImageFirst ? 30 : -30 }}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
     >
-      {/* Card */}
-      <div className="group relative" style={{ direction: "ltr" }}>
-        {/* Image-sensitive shadow - scaled, blurred duplicate */}
-        <div className="absolute inset-x-4 inset-y-1 z-0 opacity-0 group-hover:opacity-25 group-hover:saturate-200 transition-opacity duration-500 scale-x-[1.15] scale-y-[1.10] pointer-events-none blur-md">
-          <div className="relative w-full h-full">
-            <Image
-              src={card.image}
-              alt=""
-              fill
-              className="object-cover rounded-lg"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 560px"
-              loading="lazy"
-            />
-          </div>
-        </div>
-
-        <HobbyCard
-          card={card}
-          cardIndex={cardIndex}
-          isMobile={isMobile}
-          onExpand={onExpand}
-        />
+      {/* Section index - NieR style */}
+      <div className="flex items-center gap-3">
+        <span className="font-mono text-[10px] text-foreground/40 tracking-[0.2em]">
+          [{String(cardIndex + 1).padStart(2, "0")}]
+        </span>
+        <div className="flex-1 h-px bg-foreground/10" />
       </div>
 
-      {/* Text Content Side */}
-      <div className="flex flex-col justify-center space-y-6" style={{ direction: "ltr" }}>
-        {/* Description */}
-        <p className="text-lg lg:text-xl text-foreground/70 leading-relaxed">
-          {card.description}
-        </p>
+      {/* Title */}
+      <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl tracking-tight text-foreground">
+        {card.title}
+      </h3>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-4 py-6 border-y border-foreground/10">
+      {/* Description */}
+      <p className="text-base lg:text-lg text-foreground/60 leading-relaxed">
+        {card.description}
+      </p>
+
+      {/* Stats Grid - NieR Automata style */}
+      <div className="border border-foreground/10 bg-foreground/[0.02]">
+        <div className="grid grid-cols-3 divide-x divide-foreground/10">
           {card.stats.map((stat, statIndex) => (
-            <div key={stat.label} className="text-center lg:text-left">
-              <div className="font-bold font-mono text-xs tracking-widest text-muted uppercase mb-1">
+            <div key={stat.label} className="p-4 text-center">
+              <div className="font-mono text-[9px] tracking-[0.15em] text-foreground/40 uppercase mb-2">
                 {stat.label}
               </div>
-              <div className="font-display text-xl lg:text-2xl text-foreground">
+              <div className="font-display text-lg lg:text-xl text-foreground">
                 <DecodingWord
                   word={stat.value}
                   startDelayMs={isMobile ? 0 : (cardIndex * 150) + (statIndex * 80) + 500}
-                  active={isInViewOnce}
+                  active={isRowInView}
                 />
               </div>
             </div>
           ))}
         </div>
+        {/* Bottom decoration */}
+        <div className="h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
+      </div>
 
-        {/* Quote (if exists) */}
-        {card.quote && (
-          <blockquote className="text-foreground/50 italic font-mono text-sm border-l-2 border-muted/30 pl-4">
+      {/* Quote (if exists) */}
+      {card.quote && (
+        <div className="flex items-start gap-3">
+          <div className="flex flex-col items-center gap-1 pt-1">
+            <div className="w-1 h-1 bg-foreground/30" />
+            <div className="w-px h-full bg-foreground/20" />
+          </div>
+          <blockquote className="text-foreground/40 italic font-mono text-sm leading-relaxed">
             {card.quote}
           </blockquote>
-        )}
-
-        {/* Decorative element */}
-        <div className="flex items-center gap-3 pt-2">
-          <div className="w-8 h-px bg-muted/40" />
-          <div className="w-2 h-2 rotate-45 border border-muted/40" />
-          <div className="flex-1 h-px bg-gradient-to-r from-muted/20 to-transparent" />
         </div>
+      )}
+
+      {/* NieR-style decorative footer */}
+      <div className="flex items-center gap-3 pt-4">
+        <div className="w-2 h-2 border border-foreground/20" />
+        <div className="w-2 h-2 rotate-45 border border-foreground/30" />
+        <div className="flex-1 h-px bg-gradient-to-r from-foreground/20 to-transparent" />
+        <span className="font-mono text-[8px] text-foreground/20 tracking-widest">
+          END_BLOCK_{String(cardIndex + 1).padStart(2, "0")}
+        </span>
       </div>
     </motion.div>
+  );
+
+  // Card content component
+  const CardContent = (
+    <motion.div
+      className="group relative"
+      initial={{ opacity: 0, x: isImageFirst ? -30 : 30 }}
+      animate={isRowInView ? { opacity: 1, x: 0 } : { opacity: 0, x: isImageFirst ? -30 : 30 }}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {/* Image-sensitive shadow - scaled, blurred duplicate */}
+      <div className="absolute inset-x-4 inset-y-1 z-0 opacity-0 group-hover:opacity-25 group-hover:saturate-200 transition-opacity duration-500 scale-x-[1.15] scale-y-[1.10] pointer-events-none blur-md">
+        <div className="relative w-full h-full">
+          <Image
+            src={card.image}
+            alt=""
+            fill
+            className="object-cover rounded-lg"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 560px"
+            loading="lazy"
+          />
+        </div>
+      </div>
+
+      <HobbyCard
+        card={card}
+        cardIndex={cardIndex}
+        isMobile={isMobile}
+        onExpand={onExpand}
+      />
+    </motion.div>
+  );
+
+  return (
+    <div
+      ref={rowRef}
+      className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center"
+    >
+      {/* Render in order based on alternating pattern */}
+      {isImageFirst ? (
+        <>
+          {CardContent}
+          {TextContent}
+        </>
+      ) : (
+        <>
+          {TextContent}
+          {CardContent}
+        </>
+      )}
+    </div>
   );
 }
 

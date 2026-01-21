@@ -145,27 +145,30 @@ function ImagePlane({ src }: { src: string }) {
   );
 }
 
-function DitherScene({ src, active, hasAnimated, onAnimationComplete }: { 
+function DitherScene({ src, active, hasAnimated, onAnimationComplete, skipAnimation }: { 
   src: string; 
   active: boolean; 
   hasAnimated: boolean;
   onAnimationComplete: () => void;
+  skipAnimation?: boolean;
 }) {
   const effectRef = useRef<RetroSepiaEffectImpl>(null);
   const elapsedRef = useRef(0);
   const targetPixelSize = 2.5;
   const duration = 1; // Animation duration in seconds
   
-  // If already animated, start at the final state
+  // If skipAnimation is true or already animated, start at the final state
+  const shouldSkip = skipAnimation || hasAnimated;
+  
   useEffect(() => {
-    if (hasAnimated && effectRef.current) {
+    if (shouldSkip && effectRef.current) {
       effectRef.current.uniforms.get('pixelSize')!.value = targetPixelSize;
     }
-  }, [hasAnimated]);
+  }, [shouldSkip]);
   
   useFrame((state, delta) => {
-    // Only animate if active and not yet completed
-    if (active && effectRef.current && !hasAnimated) {
+    // Only animate if active, not skipping, and not yet completed
+    if (active && effectRef.current && !shouldSkip) {
       elapsedRef.current += delta;
       const progress = Math.min(elapsedRef.current / duration, 1);
       
@@ -186,7 +189,7 @@ function DitherScene({ src, active, hasAnimated, onAnimationComplete }: {
     <>
       <ImagePlane src={src} />
       <EffectComposer>
-        <RetroSepiaEffect ref={effectRef} colorNum={5} pixelSize={hasAnimated ? targetPixelSize : 1024} />
+        <RetroSepiaEffect ref={effectRef} colorNum={5} pixelSize={shouldSkip ? targetPixelSize : 1024} />
       </EffectComposer>
     </>
   );
@@ -196,6 +199,24 @@ interface DitherImageProps {
   src: string;
   active?: boolean;
   className?: string;
+  skipAnimation?: boolean;
+}
+
+function LoadingSpinner() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+      <div className="relative w-10 h-10">
+        <div 
+          className="absolute inset-0 border-2 border-muted/30 border-t-muted/80 rounded-full animate-spin"
+          style={{ animationDuration: '0.8s' }}
+        />
+        <div 
+          className="absolute inset-1 border-2 border-muted/20 border-b-muted/60 rounded-full animate-spin"
+          style={{ animationDuration: '1.2s', animationDirection: 'reverse' }}
+        />
+      </div>
+    </div>
+  );
 }
 
 function FallbackDitherImage({ src, className }: { src: string; className?: string }) {
@@ -211,7 +232,7 @@ function FallbackDitherImage({ src, className }: { src: string; className?: stri
   );
 }
 
-export default function DitherImage({ src, active = false, className }: DitherImageProps) {
+export default function DitherImage({ src, active = false, className, skipAnimation = false }: DitherImageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isVisible = useIsVisible(containerRef);
   const isPageVisible = usePageVisibility();
@@ -221,7 +242,8 @@ export default function DitherImage({ src, active = false, className }: DitherIm
   const [hasRenderedOnce, setHasRenderedOnce] = useState(false);
   
   // Track if canvas has ever been rendered
-  const canUseCanvas = gpuSupport !== 'none' && !isMobile;
+  // On mobile, allow canvas if skipAnimation is true (for static dithered image)
+  const canUseCanvas = gpuSupport !== 'none' && (!isMobile || skipAnimation);
   const shouldRenderCanvas = canUseCanvas && (hasRenderedOnce || isVisible);
   
   // Mark as rendered once visible for the first time
@@ -232,16 +254,23 @@ export default function DitherImage({ src, active = false, className }: DitherIm
   }, [canUseCanvas, isVisible, hasRenderedOnce]);
   
   // Control frameloop based on visibility
-  const frameloop = isPageVisible && isVisible ? "always" : "never";
+  // On mobile with skipAnimation, use "demand" to render once then stop (better performance)
+  const frameloop = skipAnimation && isMobile 
+    ? "demand" 
+    : (isPageVisible && isVisible ? "always" : "never");
 
   return (
-    <div ref={containerRef} className={className}>
+    <div ref={containerRef} className={`${className} relative`}>
+      {/* Loading spinner - always rendered behind, gets covered by canvas/image */}
+      <LoadingSpinner />
+      
       {shouldRenderCanvas ? (
         <Canvas
           camera={{ position: [0, 0, 5] }}
           dpr={[1, 2]}
           frameloop={frameloop}
           gl={{ antialias: false, preserveDrawingBuffer: true }}
+          className="relative z-10"
         >
           <React.Suspense fallback={null}>
             <DitherScene 
@@ -249,11 +278,14 @@ export default function DitherImage({ src, active = false, className }: DitherIm
               active={active} 
               hasAnimated={hasAnimated}
               onAnimationComplete={() => setHasAnimated(true)}
+              skipAnimation={skipAnimation}
             />
           </React.Suspense>
         </Canvas>
       ) : (
-        <FallbackDitherImage src={src} className={className} />
+        <div className="relative z-10 w-full h-full">
+          <FallbackDitherImage src={src} className={className} />
+        </div>
       )}
     </div>
   );

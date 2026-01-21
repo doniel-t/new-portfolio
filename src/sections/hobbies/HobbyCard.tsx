@@ -67,19 +67,17 @@ function HobbyCardComponent({ card, cardIndex, isMobile, onExpand }: HobbyCardPr
       {/* Dark bar at bottom - only on desktop */}
       {!isMobile && <div className="absolute bottom-0 left-0 right-0 h-4 bg-[#0d0b08] z-[15]" />}
 
-      {/* Pixel divider animation at bottom - only on desktop */}
-      {!isMobile && (
-        <div className="absolute bottom-0 left-0 right-0 h-96 z-10 overflow-hidden pointer-events-none">
-          <PixelDivider
-            color="#0d0b08"
-            pixelSize={48}
-            durationSec={10}
-            rise="-250%"
-            streamsPerCol={4}
-            direction="up"
-          />
-        </div>
-      )}
+      {/* Pixel divider animation at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-96 z-10 overflow-hidden pointer-events-none">
+        <PixelDivider
+          color={isMobile ? "#ffffff" : "#0d0b08"}
+          pixelSize={isMobile ? 32 : 48}
+          durationSec={10}
+          rise="-250%"
+          streamsPerCol={4}
+          direction="up"
+        />
+      </div>
 
       {/* Card Content */}
       <div className="relative z-20 h-full flex flex-col p-8">
@@ -126,7 +124,7 @@ function HobbyCardComponent({ card, cardIndex, isMobile, onExpand }: HobbyCardPr
       </div>
 
       {/* Bottom decorative line */}
-      <div className={`absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent to-transparent transition-colors duration-300 z-20 ${isMobile && isCardInView ? 'via-white/30' : 'via-foreground/20 group-hover:via-white/30'}`} />
+      <div className={`absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent to-transparent transition-colors duration-300 z-20 ${isMobile ? 'via-white/50' : 'via-foreground/20 group-hover:via-white/30'}`} />
     </motion.div>
   );
 }
