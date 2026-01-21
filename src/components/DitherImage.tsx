@@ -200,11 +200,11 @@ interface DitherImageProps {
 
 function FallbackDitherImage({ src, className }: { src: string; className?: string }) {
   return (
-    <div className={`relative w-full h-full ${className}`}>
+    <div className={`relative ${className}`} style={{ width: '100%', height: '100%', minHeight: '100%' }}>
       <img
         src={src}
         alt=""
-        className="w-full h-full object-cover sepia-[0.3] opacity-90"
+        className="absolute inset-0 w-full h-full object-cover sepia-[0.3] opacity-90"
         loading="lazy"
       />
     </div>

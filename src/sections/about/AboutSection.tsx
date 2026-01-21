@@ -77,10 +77,10 @@ function InViewAboutBlock() {
         {/* Main Image - Large cell spanning 2 cols and 2 rows */}
         <motion.div
           variants={bentoItemVariants}
-          className="relative md:col-span-2 md:row-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/40 shadow-2xl min-h-[300px] md:min-h-[400px]"
+          className="relative col-span-1 md:col-span-2 md:row-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/40 shadow-2xl min-h-[300px] md:min-h-[400px]"
         >
           <div className="absolute inset-0 z-0">
-            <DitherImage src="/asa noodles crop.png" active={isInViewOnce} className="w-full h-full" />
+            <DitherImage src="/asa noodles crop.png" active={isInViewOnce} className="w-full h-full absolute inset-0" />
           </div>
           <div className="absolute inset-0 pointer-events-none z-10 ring-1 ring-inset ring-white/10 rounded-2xl" />
           <div className="absolute top-4 left-4 w-2 h-2 border-t border-l border-white/40" />
@@ -92,7 +92,7 @@ function InViewAboutBlock() {
         {/* Title Cell */}
         <motion.div
           variants={bentoItemVariants}
-          className="relative md:col-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/20 p-6 flex flex-col justify-center"
+          className="relative col-span-1 md:col-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/20 p-6 flex flex-col justify-center"
         >
           <div className="absolute top-3 left-3 w-2 h-2 border-t border-l border-muted/30" />
           <div className="absolute top-3 right-3 w-2 h-2 border-t border-r border-muted/30" />
@@ -110,7 +110,7 @@ function InViewAboutBlock() {
         {/* Vibe Card */}
         <motion.div
           variants={bentoItemVariants}
-          className="relative md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]"
+          className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]"
         >
           {/* Scanline overlay */}
           <div className="absolute inset-0 pointer-events-none opacity-20"
@@ -137,8 +137,8 @@ function InViewAboutBlock() {
               <span className="ml-auto font-mono text-[9px] opacity-40">[0x02]</span>
             </div>
 
-            <div className="min-h-[48px] flex items-center">
-              <span className="font-mono text-3xl sm:text-4xl text-foreground font-bold tracking-wide">
+            <div className="min-h-[48px] flex items-center justify-center">
+              <span className="font-mono text-2xl sm:text-3xl md:text-4xl text-foreground font-bold tracking-wide whitespace-nowrap">
                 {displayedText}
                 <span className="inline-block w-[3px] h-[1.1em] bg-foreground/80 ml-1 animate-pulse align-middle" />
               </span>
@@ -350,7 +350,7 @@ function InViewAboutBlock() {
         {/* Location Card */}
         <motion.div
           variants={bentoItemVariants}
-          className="relative col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]"
+          className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]"
         >
           {/* Scanline overlay */}
           <div className="absolute inset-0 pointer-events-none opacity-20"
@@ -406,7 +406,7 @@ function InViewAboutBlock() {
         {/* Stats Card */}
         <motion.div
           variants={bentoItemVariants}
-          className="relative col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]"
+          className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]"
         >
           {/* Scanline overlay */}
           <div className="absolute inset-0 pointer-events-none opacity-20"
