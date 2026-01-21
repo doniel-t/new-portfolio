@@ -378,6 +378,16 @@ body::after {
   will-change: stroke-dashoffset;
 }
 
+/* Infinite loading bar animation */
+@keyframes loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
 /* Fade in animation for modals */
 @keyframes fadeIn {
   from {
