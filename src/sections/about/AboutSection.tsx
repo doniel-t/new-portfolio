@@ -193,7 +193,7 @@ function InViewAboutBlock() {
               <span className="ml-auto font-mono text-[9px] opacity-40">[0x01]</span>
             </div>
             <p className="text-sm leading-relaxed text-foreground font-medium tracking-wide mb-3">
-              I&apos;m a fullstack engineer creating software for the love of the game
+              I&apos;m a fullstack engineer creating software for the love of the game. <br></br> <span className="font-normal">I&apos;ve been coding for 5 years as hobby and 2 years professionally.</span>
             </p>
 
             {/* Progress bar UI element */}
@@ -298,7 +298,7 @@ function InViewAboutBlock() {
                     ACTIVE
                   </span>
                 </div>
-                <p className="font-mono text-[11px] text-foreground/70 mb-1">Komma-D</p>
+                <p className="font-mono text-[11px] text-foreground/70 mb-1">Komma-D  <span className="text-foreground/70 text-[11px]">(1.5 years)</span></p>
                 <p className="font-mono text-[10px] text-foreground/60 tracking-wide mt-2 mb-1">
                   <span className="text-foreground/40 mr-1">→</span>
                   {["Multi-tenant NextJS", "DevOps", "LLM-Chatbots"].join(" / ")}
@@ -315,8 +315,8 @@ function InViewAboutBlock() {
               </div>
               <div className="relative pl-4 border-l-[3px] border-foreground/50">
                 <div className="absolute left-[-6px] top-0 w-[9px] h-[9px] bg-foreground/60 border-2 border-muted" />
-                <p className="font-mono text-[12px] text-foreground font-bold tracking-wide mb-1.5">Intern Software Engineer</p>
-                <p className="font-mono text-[11px] text-foreground/70 mb-1">ASAP</p>
+                <p className="font-mono text-[12px] text-foreground font-bold tracking-wide mb-1.5">Intern Software Engineer <span className="text-foreground/70 text-[11px]">(0.5 years)</span></p>
+                <p className="font-mono text-[11px] text-foreground/70 mb-1">ASAP <span className="text-foreground/70 text-[11px]">(0.5 years)</span></p>
                 <p className="font-mono text-[10px] text-foreground/60 tracking-wide mt-2 mb-1">
                   <span className="text-foreground/40 mr-1">→</span>
                   {["Image Detection", "Kotlin App"].join(" / ")}
@@ -328,8 +328,8 @@ function InViewAboutBlock() {
               </div>
               <div className="relative pl-4 border-l-[3px] border-foreground/50">
                 <div className="absolute left-[-6px] top-0 w-[9px] h-[9px] bg-foreground/60 border-2 border-muted" />
-                <p className="font-mono text-[12px] text-foreground font-bold tracking-wide mb-1.5">Working Student Software Engineer</p>
-                <p className="font-mono text-[11px] text-foreground/70 mb-1">eSolutions</p>
+                <p className="font-mono text-[12px] text-foreground font-bold tracking-wide mb-1.5">Working Student Software Engineer <span className="text-foreground/70 text-[11px]">(0.5 years)</span></p>
+                <p className="font-mono text-[11px] text-foreground/70 mb-1">eSolutions <span className="text-foreground/70 text-[11px]">(0.5 years)</span></p>
                 <p className="font-mono text-[10px] text-foreground/60 tracking-wide mt-2 mb-1">
                   <span className="text-foreground/40 mr-1">→</span>
                   {["Internal Tooling", "Go", "Angular"].join(" / ")}
