@@ -104,20 +104,29 @@ function HobbiesSection() {
   // Track which hobby card is in view for the scroll spy
   const hobbyRefs = React.useRef<(HTMLDivElement | null)[]>([]);
 
-  // Track if the hobbies section is in viewport for showing/hiding scroll spy
+  // Track if the hobbies section covers at least 50% of the viewport
   React.useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsScrollSpyVisible(entry.isIntersecting);
-      },
-      { threshold: 0, rootMargin: "-10% 0px -10% 0px" }
-    );
-    
-    observer.observe(section);
-    return () => observer.disconnect();
+    const handleScroll = () => {
+      const rect = section.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+
+      // Calculate how much of the viewport is covered by the section
+      const visibleTop = Math.max(0, rect.top);
+      const visibleBottom = Math.min(viewportHeight, rect.bottom);
+      const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+      const viewportCoverage = visibleHeight / viewportHeight;
+
+      // Show scroll spy when section covers at least 50% of viewport
+      setIsScrollSpyVisible(viewportCoverage >= 0.7);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // Check initial state
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Track which hobby card is in view for the active indicator

@@ -1,5 +1,10 @@
-import React, { useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import { gsap } from 'gsap';
+
+// Check for reduced motion preference (cached at module level)
+const prefersReducedMotion = typeof window !== 'undefined'
+  ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  : false;
 
 export interface TargetCursorProps {
   targetSelector?: string;
@@ -26,11 +31,18 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
   const tickerFnRef = useRef<(() => void) | null>(null);
   const activeStrengthRef = useRef({ current: 0 });
 
+  // QuickTo instances for high-frequency cursor updates (reuses same tween)
+  const quickToRef = useRef<{ x: gsap.QuickToFunc | null; y: gsap.QuickToFunc | null }>({ x: null, y: null });
+  // Cache cursor position to avoid repeated getProperty calls
+  const cursorPosRef = useRef({ x: 0, y: 0 });
+
   const [isMobile, setIsMobile] = React.useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
       if (typeof window === 'undefined') return false;
+      // Skip custom cursor for reduced motion preference
+      if (prefersReducedMotion) return true;
       const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
       const isSmallScreen = window.innerWidth <= 768;
       const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
@@ -43,22 +55,20 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
 
   const constants = useMemo(() => ({ borderWidth: 3, cornerSize: 12 }), []);
 
-  const moveCursor = useCallback((x: number, y: number) => {
-    if (!cursorRef.current) return;
-    gsap.to(cursorRef.current, { x, y, duration: 0.1, ease: 'power3.out' });
-  }, []);
-
   useEffect(() => {
     if (isMobile || !cursorRef.current) return;
 
     // Check if cursor is inside the parent section
-    const section = cursorRef.current.closest('section');
     let isInsideSection = false;
 
     const originalCursor = document.body.style.cursor;
 
     const cursor = cursorRef.current;
     cornersRef.current = cursor.querySelectorAll<HTMLDivElement>('.target-cursor-corner');
+
+    // Initialize quickTo for cursor movement (reuses same tween, much faster than gsap.to)
+    quickToRef.current.x = gsap.quickTo(cursor, 'x', { duration: 0.1, ease: 'power3.out' });
+    quickToRef.current.y = gsap.quickTo(cursor, 'y', { duration: 0.1, ease: 'power3.out' });
 
     // Initially hide the cursor
     gsap.set(cursor, { opacity: 0 });
@@ -74,11 +84,16 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
       currentLeaveHandler = null;
     };
 
+    // Initialize cursor position
+    const initialX = window.innerWidth / 2;
+    const initialY = window.innerHeight / 2;
+    cursorPosRef.current = { x: initialX, y: initialY };
+
     gsap.set(cursor, {
       xPercent: -50,
       yPercent: -50,
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2
+      x: initialX,
+      y: initialY
     });
 
     const createSpinTimeline = () => {
@@ -92,14 +107,18 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
 
     createSpinTimeline();
 
+    // Ticker function - uses cached cursor position but preserves original snapping behavior
     const tickerFn = () => {
       if (!targetCornerPositionsRef.current || !cursorRef.current || !cornersRef.current) {
         return;
       }
       const strength = activeStrengthRef.current.current;
       if (strength === 0) return;
-      const cursorX = gsap.getProperty(cursorRef.current, 'x') as number;
-      const cursorY = gsap.getProperty(cursorRef.current, 'y') as number;
+
+      // Use cached cursor position instead of gsap.getProperty calls
+      const cursorX = cursorPosRef.current.x;
+      const cursorY = cursorPosRef.current.y;
+
       const corners = Array.from(cornersRef.current);
       corners.forEach((corner, i) => {
         const currentX = gsap.getProperty(corner, 'x') as number;
@@ -122,7 +141,15 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
     tickerFnRef.current = tickerFn;
 
     const moveHandler = (e: MouseEvent) => {
-      moveCursor(e.clientX, e.clientY);
+      // Update cached position
+      cursorPosRef.current.x = e.clientX;
+      cursorPosRef.current.y = e.clientY;
+
+      // Use quickTo instead of gsap.to (reuses same tween)
+      if (quickToRef.current.x && quickToRef.current.y) {
+        quickToRef.current.x(e.clientX);
+        quickToRef.current.y(e.clientY);
+      }
       
       // Check if mouse is inside a section containing this component
       if (cursorRef.current && cursorRef.current.parentElement) {
@@ -148,9 +175,10 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
     window.addEventListener('mousemove', moveHandler);
 
     const scrollHandler = () => {
-      if (!activeTarget || !cursorRef.current) return;
-      const mouseX = gsap.getProperty(cursorRef.current, 'x') as number;
-      const mouseY = gsap.getProperty(cursorRef.current, 'y') as number;
+      if (!activeTarget) return;
+      // Use cached position instead of gsap.getProperty
+      const mouseX = cursorPosRef.current.x;
+      const mouseY = cursorPosRef.current.y;
       const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
       const isStillOverTarget =
         elementUnderMouse &&
@@ -206,8 +234,9 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
 
       const rect = target.getBoundingClientRect();
       const { borderWidth, cornerSize } = constants;
-      const cursorX = gsap.getProperty(cursorRef.current, 'x') as number;
-      const cursorY = gsap.getProperty(cursorRef.current, 'y') as number;
+      // Use cached position instead of gsap.getProperty
+      const cursorX = cursorPosRef.current.x;
+      const cursorY = cursorPosRef.current.y;
 
       targetCornerPositionsRef.current = [
         { x: rect.left - borderWidth, y: rect.top - borderWidth },
@@ -295,8 +324,10 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
       isActiveRef.current = false;
       targetCornerPositionsRef.current = null;
       activeStrengthRef.current.current = 0;
+      // Clean up quickTo refs
+      quickToRef.current = { x: null, y: null };
     };
-  }, [targetSelector, spinDuration, moveCursor, constants, hideDefaultCursor, isMobile, hoverDuration, parallaxOn]);
+  }, [targetSelector, spinDuration, constants, hideDefaultCursor, isMobile, hoverDuration, parallaxOn]);
 
   useEffect(() => {
     if (isMobile || !cursorRef.current || !spinTl.current) return;

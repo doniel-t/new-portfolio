@@ -30,7 +30,12 @@ function handleSmoothScroll(e: React.MouseEvent<HTMLAnchorElement>, href: string
   }
 }
 
-// Pixel transition overlay component
+// Check for reduced motion preference (cached at module level for performance)
+const prefersReducedMotion = typeof window !== "undefined"
+  ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  : false;
+
+// Canvas-based pixel transition overlay - much more performant than DOM elements
 function PixelTransitionOverlay({
   isRevealing,
   pixelColor,
@@ -42,95 +47,119 @@ function PixelTransitionOverlay({
   onComplete: () => void;
   onShowContent?: () => void;
 }) {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const [pixels, setPixels] = React.useState<{ visible: boolean; x: number; y: number }[]>([]);
-  const [gridInfo, setGridInfo] = React.useState<{ cols: number; rows: number }>({ cols: 0, rows: 0 });
-  const timeoutsRef = React.useRef<NodeJS.Timeout[]>([]);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const animationRef = React.useRef<number>(0);
+  const hasCalledShowContent = React.useRef(false);
+  const hasCalledComplete = React.useRef(false);
 
-  // Calculate grid on mount
   React.useEffect(() => {
-    if (!containerRef.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    const rect = containerRef.current.getBoundingClientRect();
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+
+    // Reset callback flags
+    hasCalledShowContent.current = false;
+    hasCalledComplete.current = false;
+
+    // Get actual size and set canvas dimensions
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap DPR for performance
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    // For reduced motion, just do a simple fade
+    if (prefersReducedMotion) {
+      canvas.style.transition = "opacity 150ms ease-out";
+      canvas.style.opacity = isRevealing ? "1" : "0";
+      if (isRevealing) {
+        ctx.fillStyle = pixelColor;
+        ctx.fillRect(0, 0, rect.width, rect.height);
+      }
+      setTimeout(() => {
+        if (isRevealing && onShowContent) onShowContent();
+      }, 100);
+      setTimeout(onComplete, 200);
+      return;
+    }
+
     const cols = Math.ceil(rect.width / PIXEL_SIZE);
     const rows = Math.ceil(rect.height / PIXEL_SIZE);
-
-    setGridInfo({ cols, rows });
-
     const totalPixels = cols * rows;
-    const initialPixels = Array.from({ length: totalPixels }, (_, i) => ({
-      visible: !isRevealing, // Start hidden if revealing, visible if hiding
-      x: (i % cols) * PIXEL_SIZE,
-      y: Math.floor(i / cols) * PIXEL_SIZE,
-    }));
 
-    setPixels(initialPixels);
-  }, [isRevealing]);
-
-  // Animate pixels
-  React.useEffect(() => {
-    if (pixels.length === 0) return;
-
-    // Clear any existing timeouts
-    timeoutsRef.current.forEach(clearTimeout);
-    timeoutsRef.current = [];
-
-    const totalPixels = pixels.length;
-    const indices = Array.from({ length: totalPixels }, (_, i) => i);
-
-    // Shuffle indices for random order
+    // Create shuffled indices array once
+    const indices: number[] = Array.from({ length: totalPixels }, (_, i) => i);
     for (let i = indices.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [indices[i], indices[j]] = [indices[j], indices[i]];
     }
 
-    const staggerDelay = PIXEL_ANIMATION_DURATION / totalPixels;
-
-    indices.forEach((pixelIndex, i) => {
-      const timeout = setTimeout(() => {
-        setPixels((prev) => {
-          const next = [...prev];
-          if (next[pixelIndex]) {
-            next[pixelIndex] = { ...next[pixelIndex], visible: isRevealing };
-          }
-          return next;
-        });
-      }, i * staggerDelay);
-      timeoutsRef.current.push(timeout);
-    });
-
-    // Show content at 80% of reveal animation
-    if (isRevealing && onShowContent) {
-      const showContentTimeout = setTimeout(onShowContent, PIXEL_ANIMATION_DURATION * 0.8);
-      timeoutsRef.current.push(showContentTimeout);
+    // Track pixel visibility state (Uint8 for memory efficiency)
+    const pixelState = new Uint8Array(totalPixels);
+    if (!isRevealing) {
+      pixelState.fill(1); // Start all visible if hiding
     }
 
-    const completeTimeout = setTimeout(onComplete, PIXEL_ANIMATION_DURATION + 150);
-    timeoutsRef.current.push(completeTimeout);
+    const startTime = performance.now();
+
+    // Single animation loop using requestAnimationFrame
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / PIXEL_ANIMATION_DURATION, 1);
+
+      // Calculate how many pixels should be revealed/hidden by now
+      const targetPixelCount = Math.floor(progress * totalPixels);
+
+      // Update pixel states in batch
+      for (let i = 0; i < targetPixelCount; i++) {
+        const pixelIndex = indices[i];
+        pixelState[pixelIndex] = isRevealing ? 1 : 0;
+      }
+
+      // Clear and redraw canvas
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      ctx.fillStyle = pixelColor;
+
+      for (let i = 0; i < totalPixels; i++) {
+        if (pixelState[i]) {
+          const x = (i % cols) * PIXEL_SIZE;
+          const y = Math.floor(i / cols) * PIXEL_SIZE;
+          ctx.fillRect(x, y, PIXEL_SIZE, PIXEL_SIZE);
+        }
+      }
+
+      // Trigger callbacks at appropriate times
+      if (progress >= 0.8 && !hasCalledShowContent.current && isRevealing && onShowContent) {
+        hasCalledShowContent.current = true;
+        onShowContent();
+      }
+
+      if (progress < 1) {
+        animationRef.current = requestAnimationFrame(animate);
+      } else if (!hasCalledComplete.current) {
+        hasCalledComplete.current = true;
+        // Small delay after animation completes
+        setTimeout(onComplete, 50);
+      }
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
 
     return () => {
-      timeoutsRef.current.forEach(clearTimeout);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
     };
-  }, [pixels.length, isRevealing, onComplete]);
+  }, [isRevealing, pixelColor, onComplete, onShowContent]);
 
   return (
-    <div ref={containerRef} className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
-      {pixels.map((pixel, i) => (
-        <div
-          key={i}
-          style={{
-            position: "absolute",
-            left: pixel.x,
-            top: pixel.y,
-            width: PIXEL_SIZE,
-            height: PIXEL_SIZE,
-            backgroundColor: pixelColor,
-            opacity: pixel.visible ? 1 : 0,
-            transition: "opacity 100ms ease-out",
-          }}
-        />
-      ))}
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 pointer-events-none z-50"
+      style={{ width: "100%", height: "100%" }}
+    />
   );
 }
 
