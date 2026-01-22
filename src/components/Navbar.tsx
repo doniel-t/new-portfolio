@@ -136,6 +136,7 @@ function PixelTransitionOverlay({
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isHovered, setIsHovered] = React.useState(false);
   const [activeSection, setActiveSection] = React.useState("home");
   const [shouldShow, setShouldShow] = React.useState(false);
   const [isVisible, setIsVisible] = React.useState(false);
@@ -143,6 +144,9 @@ export default function Navbar() {
   const [isAnimating, setIsAnimating] = React.useState(false);
   const [showContent, setShowContent] = React.useState(false);
   const prevShouldShowRef = React.useRef(false);
+
+  // Desktop menu is expanded when hovered or clicked open
+  const isExpanded = isHovered || isOpen;
 
   // Track active section and visibility on scroll
   React.useEffect(() => {
@@ -238,13 +242,103 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Desktop Navbar */}
+      {/* Desktop Navbar - Burger menu that expands left */}
       {isVisible && (
-        <nav className="fixed top-0 right-[10%] z-50 hidden md:block">
+        <nav
+          className="fixed top-0 right-4 z-50 hidden md:flex items-stretch"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {/* Expanded nav links - slides in from right */}
+          <AnimatePresence>
+            {isExpanded && showContent && (
+              <motion.div
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: "auto", opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                className={`relative overflow-hidden border-2 border-r-0 ${bgColor} ${borderColor} ${shadowColor} transition-colors duration-300`}
+              >
+                {/* Scanline overlay */}
+                <div
+                  className="absolute inset-0 pointer-events-none opacity-10"
+                  style={{
+                    backgroundImage: isOnDarkBg
+                      ? "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px)"
+                      : "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.05) 2px, rgba(255,255,255,0.05) 4px)",
+                  }}
+                />
+
+                {/* Corner accents */}
+                <div
+                  className={`absolute bottom-0 left-0 w-2 h-2 border-l-2 border-b-2 ${cornerBorder} transition-colors duration-300`}
+                />
+
+                {/* Nav items */}
+                <div className="relative flex items-center whitespace-nowrap">
+                  {NAV_ITEMS.map((item, index) => {
+                    const isActive =
+                      activeSection === item.href.slice(1) ||
+                      (item.href === "#home" && activeSection === "home") ||
+                      (item.href === "#work" && activeSection === "work");
+
+                    return (
+                      <React.Fragment key={item.label}>
+                        <a
+                          href={item.href}
+                          onClick={(e) => {
+                            handleSmoothScroll(e, item.href);
+                            setIsOpen(false);
+                          }}
+                          className={`relative group px-4 py-3 font-mono text-[11px] tracking-[0.15em] uppercase transition-all duration-300 ${
+                            isActive
+                              ? `${textColor} ${activeBg}`
+                              : `${textColorMuted} hover:${textColor} ${hoverBg}`
+                          }`}
+                        >
+                          {/* Active indicator */}
+                          {isActive && (
+                            <motion.div
+                              layoutId="navbar-active"
+                              className={`absolute inset-0 ${activeBg} border-b-2 ${activeBorder} transition-colors duration-300`}
+                              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                            />
+                          )}
+
+                          {/* Label */}
+                          <span className="relative z-10 flex items-center gap-2">
+                            <span
+                              className={`w-[5px] h-[5px] transition-all duration-300 ${
+                                isActive ? accentBg : `${accentBgMuted} group-hover:${accentBgHover}`
+                              }`}
+                            />
+                            {item.label}
+                          </span>
+                        </a>
+
+                        {/* Separator */}
+                        {index < NAV_ITEMS.length - 1 && (
+                          <div className={`w-px h-4 ${separatorBg} transition-colors duration-300`} />
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+
+                {/* Decorative element on left */}
+                <div
+                  className={`absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 border ${cornerBorder} transition-colors duration-300`}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Burger button */}
           <div className="relative">
-            {/* Main container with NieR styling */}
-            <div
-              className={`relative border-2 ${!showContent ? "bg-transparent border-transparent shadow-none" : `${bgColor} ${borderColor} ${shadowColor}`} transition-colors duration-300`}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className={`relative w-12 h-full min-h-[44px] border-2 ${!showContent ? "bg-transparent border-transparent shadow-none" : `${bgColor} ${borderColor} ${shadowColor}`} flex items-center justify-center transition-colors duration-300`}
+              aria-label="Toggle menu"
             >
               {/* Pixel transition overlay */}
               {isAnimating && (
@@ -259,102 +353,41 @@ export default function Navbar() {
               {/* Only render content when showContent is true */}
               {showContent && (
                 <>
-                  {/* Scanline overlay */}
+                  {/* Corner accents - only bottom */}
                   <div
-                    className="absolute inset-0 pointer-events-none opacity-10"
-                    style={{
-                      backgroundImage: isOnDarkBg
-                        ? "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px)"
-                        : "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.05) 2px, rgba(255,255,255,0.05) 4px)",
-                    }}
-                  />
-
-                  {/* Corner accents - only bottom ones since top touches edge */}
-                  <div
-                    className={`absolute bottom-0 left-0 w-2 h-2 border-l-2 border-b-2 ${cornerBorder} transition-colors duration-300`}
+                    className={`absolute bottom-0 left-0 w-1.5 h-1.5 border-l border-b ${cornerBorder} transition-colors duration-300`}
                   />
                   <div
-                    className={`absolute bottom-0 right-0 w-2 h-2 border-r-2 border-b-2 ${cornerBorder} transition-colors duration-300`}
+                    className={`absolute bottom-0 right-0 w-1.5 h-1.5 border-r border-b ${cornerBorder} transition-colors duration-300`}
                   />
 
-                  {/* Nav items */}
-                  <div className="relative flex items-center">
-                    {NAV_ITEMS.map((item, index) => {
-                      const isActive =
-                        activeSection === item.href.slice(1) ||
-                        (item.href === "#home" && activeSection === "home") ||
-                        (item.href === "#work" && activeSection === "work");
-
-                      return (
-                        <React.Fragment key={item.label}>
-                          <a
-                            href={item.href}
-                            onClick={(e) => handleSmoothScroll(e, item.href)}
-                            className={`relative group px-4 py-3 font-mono text-[11px] tracking-[0.15em] uppercase transition-all duration-300 ${
-                              isActive
-                                ? `${textColor} ${activeBg}`
-                                : `${textColorMuted} hover:${textColor} ${hoverBg}`
-                            }`}
-                          >
-                            {/* Active indicator */}
-                            {isActive && (
-                              <motion.div
-                                layoutId="navbar-active"
-                                className={`absolute inset-0 ${activeBg} border-b-2 ${activeBorder} transition-colors duration-300`}
-                                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                              />
-                            )}
-
-                            {/* Label */}
-                            <span className="relative z-10 flex items-center gap-2">
-                              <span
-                                className={`w-[5px] h-[5px] transition-all duration-300 ${
-                                  isActive ? accentBg : `${accentBgMuted} group-hover:${accentBgHover}`
-                                }`}
-                              />
-                              {item.label}
-                            </span>
-                          </a>
-
-                          {/* Separator */}
-                          {index < NAV_ITEMS.length - 1 && (
-                            <div className={`w-px h-4 ${separatorBg} transition-colors duration-300`} />
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
+                  {/* Hamburger icon */}
+                  <div className="flex flex-col gap-1.5">
+                    <span
+                      className={`block w-5 h-0.5 ${accentBg} transition-all duration-300 origin-center ${
+                        isOpen ? "rotate-45 translate-y-2" : ""
+                      }`}
+                    />
+                    <span
+                      className={`block w-5 h-0.5 ${accentBg} transition-all duration-300 ${
+                        isOpen ? "opacity-0" : ""
+                      }`}
+                    />
+                    <span
+                      className={`block w-5 h-0.5 ${accentBg} transition-all duration-300 origin-center ${
+                        isOpen ? "-rotate-45 -translate-y-2" : ""
+                      }`}
+                    />
                   </div>
                 </>
               )}
+            </button>
 
-              {/* Invisible spacer to maintain size when content hidden */}
-              {!showContent && (
-                <div className="relative flex items-center invisible">
-                  {NAV_ITEMS.map((item, index) => (
-                    <React.Fragment key={item.label}>
-                      <span className="px-4 py-3 font-mono text-[11px] tracking-[0.15em] uppercase">
-                        <span className="flex items-center gap-2">
-                          <span className="w-[5px] h-[5px]" />
-                          {item.label}
-                        </span>
-                      </span>
-                      {index < NAV_ITEMS.length - 1 && <div className="w-px h-4" />}
-                    </React.Fragment>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Decorative elements - only show when content visible */}
+            {/* Decorative element on right */}
             {showContent && (
-              <>
-                <div
-                  className={`absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 border ${cornerBorder} transition-colors duration-300`}
-                />
-                <div
-                  className={`absolute -right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 ${accentBgMuted} transition-colors duration-300`}
-                />
-              </>
+              <div
+                className={`absolute -right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 ${accentBgMuted} transition-colors duration-300`}
+              />
             )}
           </div>
         </nav>
