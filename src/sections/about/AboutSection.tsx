@@ -69,6 +69,8 @@ function InViewAboutBlock() {
 
   return (
     <div ref={containerRef} className="mb-12 sm:mb-16">
+
+            
       <motion.div
         initial="hidden"
         animate={isInViewOnce ? "show" : "hidden"}

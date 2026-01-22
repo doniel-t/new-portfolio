@@ -150,7 +150,7 @@ export default function TechStack() {
   []);
   
   return (
-    <section className="relative w-full py-20 overflow-hidden" ref={containerRef}>
+    <section id="installed_chips" className="relative w-full py-20 overflow-hidden" ref={containerRef}>
       {/* Target Cursor for Tech Cards */}
       {enableCursor && (
         <TargetCursor 

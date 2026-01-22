@@ -271,6 +271,7 @@ export default function DitherImage({ src, active = false, className, skipAnimat
           frameloop={frameloop}
           gl={{ antialias: false, preserveDrawingBuffer: true }}
           className="relative z-10 grayscale-50 brightness-110 saturate-50"
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
         >
           <React.Suspense fallback={null}>
             <DitherScene 

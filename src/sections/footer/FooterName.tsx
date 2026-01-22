@@ -11,18 +11,29 @@ export default function FooterName({ name, footerRef }: FooterNameProps) {
   const nameRef = React.useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = React.useState({ x: -1000, y: -1000 });
   const [isHovering, setIsHovering] = React.useState(false);
+  const clientMousePos = React.useRef({ x: 0, y: 0 });
+
+  const updateRelativePosition = React.useCallback(() => {
+    if (!nameRef.current) return;
+    const rect = nameRef.current.getBoundingClientRect();
+    const x = ((clientMousePos.current.x - rect.left) / rect.width) * 100;
+    const y = ((clientMousePos.current.y - rect.top) / rect.height) * 100;
+    setMousePosition({ x, y });
+  }, []);
 
   React.useEffect(() => {
     const footer = footerRef.current;
     if (!footer) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!nameRef.current) return;
-      const rect = nameRef.current.getBoundingClientRect();
-      // Calculate position relative to the name element
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      setMousePosition({ x, y });
+      clientMousePos.current = { x: e.clientX, y: e.clientY };
+      updateRelativePosition();
+    };
+
+    const handleScroll = () => {
+      if (isHovering) {
+        updateRelativePosition();
+      }
     };
 
     const handleMouseEnter = () => setIsHovering(true);
@@ -31,13 +42,15 @@ export default function FooterName({ name, footerRef }: FooterNameProps) {
     footer.addEventListener("mousemove", handleMouseMove);
     footer.addEventListener("mouseenter", handleMouseEnter);
     footer.addEventListener("mouseleave", handleMouseLeave);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
       footer.removeEventListener("mousemove", handleMouseMove);
       footer.removeEventListener("mouseenter", handleMouseEnter);
       footer.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("scroll", handleScroll);
     };
-  }, [footerRef]);
+  }, [footerRef, isHovering, updateRelativePosition]);
 
   // Create the text content - repeated enough to fill the screen
   const textContent = `${name}   -   ${name}   -   ${name}   -   ${name}   -   ${name}   -   `;

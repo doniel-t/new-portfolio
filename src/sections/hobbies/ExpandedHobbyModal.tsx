@@ -1,11 +1,26 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
 import PixelDivider from "@/components/PixelDivider";
 import Dither from "@/components/Dither";
 import type { HobbyCard } from "./types";
+
+function LoadingSpinner() {
+  return (
+    <div className="relative w-10 h-10">
+      <div
+        className="absolute inset-0 border-2 border-muted/30 border-t-muted/80 rounded-full animate-spin"
+        style={{ animationDuration: '0.8s' }}
+      />
+      <div
+        className="absolute inset-1 border-2 border-muted/20 border-b-muted/60 rounded-full animate-spin"
+        style={{ animationDuration: '1.2s', animationDirection: 'reverse' }}
+      />
+    </div>
+  );
+}
 
 type ExpandedHobbyModalProps = {
   card: HobbyCard;
@@ -16,26 +31,55 @@ type ExpandedHobbyModalProps = {
 };
 
 function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: ExpandedHobbyModalProps) {
-  // Close on escape key
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
+
+  const isReady = imageLoaded && minTimeElapsed;
+
+  // Minimum loading time of 0.5 seconds
+  React.useEffect(() => {
+    const timer = setTimeout(() => setMinTimeElapsed(true), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Close on escape key and prevent scroll
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
+
+    // Prevent all scroll events on the document
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
     document.addEventListener("keydown", handleEscape);
     document.body.style.overflow = "hidden";
+    document.addEventListener("wheel", preventScroll, { passive: false });
+    document.addEventListener("touchmove", preventScroll, { passive: false });
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "";
+      document.removeEventListener("wheel", preventScroll);
+      document.removeEventListener("touchmove", preventScroll);
     };
   }, [onClose]);
 
   return (
     <>
-      {/* Backdrop with blurred card image */}
+      {/* Solid black base - prevents white flicker */}
+      <div className="fixed inset-0 z-50 bg-[#0d0b08] animate-[fadeIn_0.2s_ease-out]" />
+
+      {/* Loading spinner - fades out when ready */}
+      <div className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 ${isReady ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        <LoadingSpinner />
+      </div>
+
+      {/* Backdrop with blurred card image - fades in on top of black base */}
       <div
         onClick={onClose}
-        className="fixed inset-0 z-50 overflow-hidden animate-[fadeIn_0.3s_ease-out]"
+        className={`fixed inset-0 z-50 overflow-hidden transition-opacity duration-300 ${isReady ? 'opacity-100' : 'opacity-0'}`}
       >
         {/* Blurred background image - small size since heavily blurred */}
         <Image
@@ -65,9 +109,9 @@ function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: 
       </div>
 
       {/* Expanded Content */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 pointer-events-none">
+      <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 pointer-events-none transition-opacity duration-300 ${isReady ? 'opacity-100' : 'opacity-0'}`}>
         <div
-          className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/20 bg-[#0d0b08] pointer-events-auto animate-[fadeIn_0.3s_ease-out]"
+          className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/20 bg-[#0d0b08] pointer-events-auto"
         >
           {/* Close button */}
           <button
@@ -86,6 +130,7 @@ function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: 
               className="object-cover"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
               priority
+              onLoad={() => setImageLoaded(true)}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08] via-[#0d0b08]/80 to-[#0d0b08]/50" />
             <div className="absolute inset-0 scanlines opacity-15 pointer-events-none" />
