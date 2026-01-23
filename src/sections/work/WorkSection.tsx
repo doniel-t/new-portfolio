@@ -36,11 +36,12 @@ function WorkSection() {
   return (
     <section id="projects" className="relative bg-[#0d0b08]">
       {/* Animated noise texture background */}
+      <div className="bg-[#3C3A35] h-4"></div>
       <div className="absolute inset-0 work-section-noise pointer-events-none z-0" />
       <div className="relative w-full h-0" aria-hidden>
         <div className="absolute inset-x-0" style={{ top: "0px", height: "180px", zIndex: 5 }}>
           <PixelDivider
-            color="#282520"
+            color="#3C3A35"
             pixelSize={isMobile ? 12 : 24}
             durationSec={8}
             rise="-200%"

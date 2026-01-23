@@ -191,6 +191,9 @@ export default function TechStack() {
       )}
       <div className="absolute inset-0 scanlines -z-10 opacity-30 pointer-events-none" style={{ maskImage: "linear-gradient(to bottom, transparent 0%, black 150px)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 150px)" }} />
 
+      {/* Bottom fade overlay - on top of dither */}
+      <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[#3C3A35] to-transparent z-0 pointer-events-none" />
+
       {/* Header */}
       <div className="max-w-7xl mx-auto px-8 mb-16">
          <motion.div 
