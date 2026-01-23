@@ -15,15 +15,21 @@ export default function FooterSection() {
   return (
     <footer ref={footerRef} id="contact" className="relative w-full bg-[#0d0b08] overflow-hidden">
       {/* PixelDivider at very top of footer - white, going down */}
-      <div className="absolute top-0 left-0 right-0 h-40 z-10 overflow-hidden pointer-events-none" aria-hidden>
-        <PixelDivider
-          color="#ffffff"
-          pixelSize={isMobile ? 8 : 16}
-          durationSec={6}
-          rise="200%"
-          streamsPerCol={3}
-          direction="down"
-        />
+{/* White PixelDivider at the top - going down */}
+<div className="relative w-full h-0" aria-hidden>
+        <div
+          className="absolute inset-x-0"
+          style={{ top: "0px", height: "180px", zIndex: 5 }}
+        >
+          <PixelDivider
+            color="#ffffff"
+            pixelSize={isMobile ? 12 : 24}
+            durationSec={8}
+            rise="-200%"
+            streamsPerCol={4}
+            direction="down"
+          />
+        </div>
       </div>
 
       {/* Floating geometric shapes - decorative */}

@@ -12,7 +12,7 @@ const NAV_ITEMS = [
 ];
 
 // Dark section IDs where navbar should invert colors
-const DARK_SECTIONS = ["work", "installed_chips", "contact"];
+const DARK_SECTIONS = ["work", "installed_chips", "contact", "projects"];
 
 // Pixel grid configuration
 const PIXEL_SIZE = 6; // px - fixed square size
@@ -179,7 +179,7 @@ export default function Navbar() {
 
   // Track active section and visibility on scroll
   React.useEffect(() => {
-    const sections = ["contact", "hobbies", "work", "installed_chips"];
+    const sections = ["contact", "hobbies", "work", "installed_chips", "projects"];
 
     const handleScroll = () => {
       const scrollY = window.scrollY;

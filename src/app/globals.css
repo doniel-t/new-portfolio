@@ -463,3 +463,373 @@ body::after {
   -webkit-mask-image: radial-gradient(circle 800px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, black 40%, transparent 100%);
   mask-image: radial-gradient(circle 800px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, black 40%, transparent 100%);
 }
+
+/* ============================================
+   NieR: Automata Terminal + CCTV Effects
+   ============================================ */
+
+/* Terminal scan line effect - enhanced for NieR feel */
+.terminal-scanline {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  animation: terminal-scan 8s linear infinite;
+}
+
+/* Terminal scan line effect - dark mode */
+.terminal-scanline-dark {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(212, 205, 196, 0.02) 2px,
+    rgba(212, 205, 196, 0.02) 4px
+  );
+  animation: terminal-scan 8s linear infinite;
+}
+
+@keyframes terminal-scan {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100px;
+  }
+}
+
+/* CCTV static noise overlay */
+.cctv-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  animation: cctv-noise-flicker 0.15s steps(5) infinite;
+}
+
+/* CCTV static noise overlay - dark mode */
+.cctv-noise-dark {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  mix-blend-mode: soft-light;
+  animation: cctv-noise-flicker-dark 0.15s steps(5) infinite;
+}
+
+@keyframes cctv-noise-flicker {
+  0%, 100% { opacity: 0.04; }
+  50% { opacity: 0.06; }
+}
+
+@keyframes cctv-noise-flicker-dark {
+  0%, 100% { opacity: 0.06; }
+  50% { opacity: 0.08; }
+}
+
+/* Chromatic aberration - constant red/cyan fringing effect */
+.cctv-chromatic-r {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.015) 0%,
+    transparent 3%,
+    transparent 97%,
+    rgba(255, 0, 0, 0.015) 100%
+  );
+  mix-blend-mode: screen;
+  animation: chromatic-shift-r 8s ease-in-out infinite;
+}
+
+.cctv-chromatic-c {
+  background: linear-gradient(
+    -90deg,
+    rgba(0, 255, 255, 0.015) 0%,
+    transparent 3%,
+    transparent 97%,
+    rgba(0, 255, 255, 0.015) 100%
+  );
+  mix-blend-mode: screen;
+  animation: chromatic-shift-c 8s ease-in-out infinite;
+}
+
+@keyframes chromatic-shift-r {
+  0%, 100% {
+    transform: translateX(-1px);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translateX(-2px);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateX(-1px);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translateX(-3px);
+    opacity: 0.9;
+  }
+}
+
+@keyframes chromatic-shift-c {
+  0%, 100% {
+    transform: translateX(1px);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translateX(3px);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(1px);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translateX(2px);
+    opacity: 0.8;
+  }
+}
+
+/* CCTV recording indicator pulse */
+.cctv-rec-dot {
+  animation: rec-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes rec-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* NieR-style horizontal glitch lines */
+.nier-glitch-lines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 3px,
+    rgba(87, 84, 74, 0.1) 3px,
+    rgba(87, 84, 74, 0.1) 4px
+  );
+  animation: nier-line-shift 10s linear infinite;
+}
+
+@keyframes nier-line-shift {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 40px; }
+}
+
+/* NieR-style random glitch effect */
+.nier-glitch {
+  animation: nier-glitch-anim 4s steps(1) infinite;
+}
+
+@keyframes nier-glitch-anim {
+  0%, 95%, 100% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(0);
+  }
+  96% {
+    clip-path: inset(10% 0 80% 0);
+    transform: translate(-3px, 0);
+  }
+  97% {
+    clip-path: inset(50% 0 30% 0);
+    transform: translate(3px, 0);
+  }
+  98% {
+    clip-path: inset(70% 0 10% 0);
+    transform: translate(-2px, 0);
+  }
+  99% {
+    clip-path: inset(30% 0 50% 0);
+    transform: translate(2px, 0);
+  }
+}
+
+/* Terminal glitch effect on selection - enhanced */
+.terminal-glitch {
+  animation: terminal-glitch-anim 0.15s ease-out;
+}
+
+@keyframes terminal-glitch-anim {
+  0% {
+    transform: translateX(0) skewX(0);
+    filter: none;
+    opacity: 1;
+  }
+  20% {
+    transform: translateX(-3px) skewX(-2deg);
+    filter: hue-rotate(90deg) saturate(1.5);
+    opacity: 0.8;
+  }
+  40% {
+    transform: translateX(3px) skewX(2deg);
+    filter: hue-rotate(-90deg) saturate(1.5);
+    opacity: 0.9;
+  }
+  60% {
+    transform: translateX(-2px) skewX(-1deg);
+    filter: saturate(2) brightness(1.1);
+    opacity: 0.85;
+  }
+  80% {
+    transform: translateX(1px) skewX(0);
+    filter: none;
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateX(0) skewX(0);
+    filter: none;
+    opacity: 1;
+  }
+}
+
+/* NieR-style data corruption effect */
+.nier-corrupt {
+  position: relative;
+}
+
+.nier-corrupt::before {
+  content: attr(data-text);
+  position: absolute;
+  left: 2px;
+  text-shadow: -1px 0 rgba(255, 0, 0, 0.3);
+  clip-path: inset(0 0 0 0);
+  animation: nier-corrupt-1 3s infinite linear alternate-reverse;
+}
+
+.nier-corrupt::after {
+  content: attr(data-text);
+  position: absolute;
+  left: -2px;
+  text-shadow: 1px 0 rgba(0, 255, 255, 0.3);
+  clip-path: inset(0 0 0 0);
+  animation: nier-corrupt-2 2s infinite linear alternate-reverse;
+}
+
+@keyframes nier-corrupt-1 {
+  0%, 90%, 100% { clip-path: inset(0 0 100% 0); }
+  92% { clip-path: inset(20% 0 60% 0); }
+  94% { clip-path: inset(60% 0 20% 0); }
+}
+
+@keyframes nier-corrupt-2 {
+  0%, 85%, 100% { clip-path: inset(0 0 100% 0); }
+  87% { clip-path: inset(40% 0 40% 0); }
+  89% { clip-path: inset(70% 0 10% 0); }
+}
+
+/* CCTV timestamp flicker */
+.cctv-timestamp {
+  animation: timestamp-flicker 0.1s steps(2) infinite;
+}
+
+@keyframes timestamp-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
+}
+
+/* NieR-style border decoration */
+.nier-border {
+  position: relative;
+}
+
+.nier-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(87, 84, 74, 0.5) 10%,
+    rgba(87, 84, 74, 0.8) 50%,
+    rgba(87, 84, 74, 0.5) 90%,
+    transparent 100%
+  );
+}
+
+.nier-border::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(87, 84, 74, 0.5) 10%,
+    rgba(87, 84, 74, 0.8) 50%,
+    rgba(87, 84, 74, 0.5) 90%,
+    transparent 100%
+  );
+}
+
+/* Interlaced effect for CCTV */
+.cctv-interlace {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.03) 0px,
+    rgba(0, 0, 0, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+}
+
+/* Interlaced effect for CCTV - dark mode */
+.cctv-interlace-dark {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(212, 205, 196, 0.02) 0px,
+    rgba(212, 205, 196, 0.02) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+}
+
+/* Work section animated static noise background */
+.work-section-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  animation: work-noise-static 0.1s steps(8) infinite;
+}
+
+@keyframes work-noise-static {
+  0% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-5%, -5%);
+  }
+  20% {
+    transform: translate(5%, 5%);
+  }
+  30% {
+    transform: translate(-5%, 5%);
+  }
+  40% {
+    transform: translate(5%, -5%);
+  }
+  50% {
+    transform: translate(-2%, 2%);
+  }
+  60% {
+    transform: translate(2%, -2%);
+  }
+  70% {
+    transform: translate(-3%, -3%);
+  }
+  80% {
+    transform: translate(3%, 3%);
+  }
+  90% {
+    transform: translate(-1%, 1%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}

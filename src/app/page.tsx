@@ -1,7 +1,7 @@
 "use client";
 
-import { HeroSection, AboutSection, HobbiesSection, FooterSection } from "@/sections";
 import TechStack from "@/components/TechStack";
+import { HeroSection, AboutSection, HobbiesSection, WorkSection, FooterSection } from "@/sections";
 import Navbar from "@/components/Navbar";
 
 export default function Home() {
@@ -11,6 +11,7 @@ export default function Home() {
       <HeroSection />
       <AboutSection />
       <TechStack />
+      <WorkSection />
       <HobbiesSection />
       <FooterSection />
     </>
