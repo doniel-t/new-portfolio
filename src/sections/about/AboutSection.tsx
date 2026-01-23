@@ -84,7 +84,7 @@ function InViewAboutBlock() {
           className="relative col-span-1 md:col-span-2 md:row-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/40 shadow-2xl min-h-[300px] md:min-h-[400px]"
         >
           <div className="absolute inset-0 z-0">
-            <Image alt="Daniel Theil pixel portait" src="/me crop pixel.png" className="w-full h-full absolute inset-0 grayscale-50 brightness-110 saturate-50"/>
+            <Image alt="Daniel Theil pixel portait" src="/me crop pixel.png" objectFit="cover" width={1000} height={1000} className="w-full h-full absolute object-fill inset-0 grayscale-50 brightness-110 saturate-50"/>
           </div>
           <div className="absolute inset-0 pointer-events-none z-10 ring-1 ring-inset ring-white/10 rounded-2xl" />
           <div className="absolute top-4 left-4 w-2 h-2 border-t border-l border-white/40" />
