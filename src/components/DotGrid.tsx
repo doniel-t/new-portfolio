@@ -1,5 +1,5 @@
 'use client';
-import React, { useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react';
 import { gsap } from 'gsap';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
 import { usePageVisibility } from '@/hooks/useGPUDetection';
@@ -45,9 +45,23 @@ const DotGrid: React.FC<DotGridProps> = ({
 
   const isPageVisible = usePageVisibility();
   const isMobile = useIsMobile();
+  const [isInViewport, setIsInViewport] = useState(false);
+  const lastDrawTime = useRef(0);
 
-  // Always render on desktop, disable only on mobile for performance
-  const shouldRunAnimation = isPageVisible && !isMobile;
+  // Only animate when visible, page active, and not mobile
+  const shouldRunAnimation = isPageVisible && !isMobile && isInViewport;
+
+  // Observe visibility
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInViewport(entry.isIntersecting),
+      { threshold: 0, rootMargin: '100px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const circlePath = useMemo(() => {
     if (typeof window === 'undefined' || !window.Path2D) return null;
@@ -105,8 +119,15 @@ const DotGrid: React.FC<DotGridProps> = ({
     let rafId: number;
     let isRunning = true;
 
-    const draw = () => {
+    const draw = (timestamp: number) => {
       if (!isRunning) return;
+
+      // Cap to 24fps
+      if (timestamp - lastDrawTime.current < 1000 / 60) {
+        rafId = requestAnimationFrame(draw);
+        return;
+      }
+      lastDrawTime.current = timestamp;
 
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -130,7 +151,7 @@ const DotGrid: React.FC<DotGridProps> = ({
       rafId = requestAnimationFrame(draw);
     };
 
-    draw();
+    rafId = requestAnimationFrame(draw);
     return () => {
       isRunning = false;
       cancelAnimationFrame(rafId);
