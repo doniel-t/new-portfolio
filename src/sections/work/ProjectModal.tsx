@@ -37,7 +37,8 @@ function ProjectModal({
   isMobile,
   onClose,
 }: ProjectModalProps) {
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const isPlaceholder = project.image === "/placeholder-project.jpg";
+  const [imageLoaded, setImageLoaded] = useState(isPlaceholder);
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
 
   const isReady = imageLoaded && minTimeElapsed;
@@ -92,14 +93,16 @@ function ProjectModal({
           isReady ? "opacity-100" : "opacity-0"
         }`}
       >
-        <Image
-          src={project.image}
-          alt=""
-          fill
-          className="object-cover scale-110 blur-3xl"
-          sizes="384px"
-          quality={25}
-        />
+        {project.image !== "/placeholder-project.jpg" && (
+          <Image
+            src={project.image}
+            alt=""
+            fill
+            className="object-cover scale-110 blur-3xl sepia"
+            sizes="384px"
+            quality={25}
+          />
+        )}
         <div className="absolute inset-0 bg-[#0d0b08]/70" />
         {!isMobile && (
           <div className="absolute inset-0 opacity-0 pointer-events-none animate-[fadeInDither_0.5s_ease-out_0.3s_forwards]">
@@ -133,15 +136,23 @@ function ProjectModal({
 
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
-            <Image
-              src={project.image}
-              alt={project.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
-              priority
-              onLoad={() => setImageLoaded(true)}
-            />
+            {project.image === "/placeholder-project.jpg" ? (
+              <div className="absolute inset-0 flex items-center justify-center bg-[#0d0b08]">
+                <span className="font-mono text-6xl sm:text-8xl lg:text-9xl tracking-[0.3em] text-white/10 font-bold select-none">
+                  [REDACTED]
+                </span>
+              </div>
+            ) : (
+              <Image
+                src={project.image}
+                alt={project.title}
+                fill
+                className="object-cover sepia"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
+                priority
+                onLoad={() => setImageLoaded(true)}
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08] via-[#0d0b08]/80 to-[#0d0b08]/50" />
             <div className="absolute inset-0 scanlines opacity-15 pointer-events-none" />
           </div>

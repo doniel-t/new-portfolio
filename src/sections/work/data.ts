@@ -28,7 +28,7 @@ export const PROJECTS: Project[] = [
   {
     id: "project-dnd",
     title: "PROJECT_DND",
-    image: "/placeholder-project.jpg",
+    image: "/dnd-voting.png",
     repoUrl: "https://github.com/username/project-gamma",
     liveUrl: "https://dnd-voting.vercel.app",
     techStack: ["Three.js", "GLSL", "WebGL", "React Three Fiber"],
@@ -41,7 +41,7 @@ export const PROJECTS: Project[] = [
   {
     id: "project-delta",
     title: "PROJECT_UWU_BOT",
-    image: "/placeholder-project.jpg",
+    image: "/uwu-bot.png",
     repoUrl: "https://github.com/username/project-delta",
     liveUrl: "https://project-delta.demo",
     techStack: ["Node.js", "Express", "Redis", "Docker"],

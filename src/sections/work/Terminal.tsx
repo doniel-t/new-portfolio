@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { Github, ExternalLink } from "lucide-react";
 import type { Project } from "./types";
+import { COMMANDS, executeCommand } from "./commands";
 
 // ASCII spinner frames - NieR style
 const SPINNER_FRAMES = ["◇", "◈", "◆", "◈"];
@@ -47,29 +48,69 @@ function Terminal({
   const [glitchIndex, setGlitchIndex] = useState<number | null>(null);
   const [spinnerFrame, setSpinnerFrame] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [showGlitchOverlay, setShowGlitchOverlay] = useState(false);
   const bootStartedRef = useRef(false);
-  
+
   // Track when terminal is in view
   const terminalRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(terminalRef, { once: true, margin: "-100px" });
 
-  // Random glitch overlay effect
-  useEffect(() => {
-    if (isMobile) return;
-    
-    const triggerGlitchOverlay = () => {
-      if (Math.random() > 0.7) {
-        setShowGlitchOverlay(true);
-        setTimeout(() => setShowGlitchOverlay(false), 100 + Math.random() * 150);
-      }
-    };
-
-    const interval = setInterval(triggerGlitchOverlay, 3000 + Math.random() * 4000);
-    return () => clearInterval(interval);
-  }, [isMobile]);
-
   const selectedProject = projects[selectedIndex] || null;
+
+  // Command input state
+  const [inputValue, setInputValue] = useState("");
+  const [commandHistory, setCommandHistory] = useState<{ input: string; output: string }[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const inputFocusedRef = useRef(false);
+  const outputRef = useRef<HTMLDivElement>(null);
+
+  const filteredCommands = inputValue.startsWith("/")
+    ? COMMANDS.filter((c) => c.name.startsWith(inputValue.slice(1).toLowerCase()) && c.name !== inputValue.slice(1).toLowerCase())
+    : [];
+
+  const handleCommandSubmit = useCallback(() => {
+    if (!inputValue.trim()) return;
+    const result = executeCommand(inputValue);
+    if (!result) {
+      setCommandHistory((prev) => [
+        ...prev,
+        { input: inputValue, output: "[ERROR] Unknown command. Type /help for available commands." },
+      ]);
+    } else if (result.clear) {
+      setCommandHistory([]);
+    } else {
+      setCommandHistory((prev) => [...prev, { input: inputValue, output: result.output }]);
+    }
+    setInputValue("");
+    setShowSuggestions(false);
+  }, [inputValue]);
+
+  const handleInputKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        handleCommandSubmit();
+      } else if (e.key === "Tab") {
+        e.preventDefault();
+        if (filteredCommands.length > 0) {
+          setInputValue(`/${filteredCommands[0].name}`);
+          setShowSuggestions(false);
+        }
+      } else if (e.key === "Escape") {
+        setShowSuggestions(false);
+        inputRef.current?.blur();
+      }
+    },
+    [handleCommandSubmit, filteredCommands]
+  );
+
+  // Auto-scroll output area
+  useEffect(() => {
+    if (outputRef.current) {
+      outputRef.current.scrollTop = outputRef.current.scrollHeight;
+    }
+  }, [commandHistory]);
 
   // Spinner animation
   useEffect(() => {
@@ -127,6 +168,7 @@ function Terminal({
     if (!showProjects || isMobile) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (inputFocusedRef.current) return;
       switch (e.key) {
         case "ArrowUp":
           e.preventDefault();
@@ -168,9 +210,6 @@ function Terminal({
       ref={terminalRef}
       className="relative w-full min-h-[500px] lg:min-h-[600px] bg-[#0d0b08] overflow-hidden"
     >
-      {/* Chromatic aberration layers */}
-      <div className="absolute inset-0 cctv-chromatic-r pointer-events-none z-[25]" />
-      <div className="absolute inset-0 cctv-chromatic-c pointer-events-none z-[25]" />
       
       {/* CCTV Noise overlay */}
       <div className="absolute inset-0 cctv-noise-dark pointer-events-none z-20" />
@@ -180,20 +219,6 @@ function Terminal({
       
       {/* CCTV Interlace effect */}
       <div className="absolute inset-0 cctv-interlace-dark pointer-events-none z-20" />
-
-      {/* Random glitch overlay */}
-      {showGlitchOverlay && (
-        <div className="absolute inset-0 z-30 pointer-events-none">
-          <div 
-            className="absolute w-full h-[3px] bg-[#d4cdc4]/10"
-            style={{ top: `${Math.random() * 100}%` }}
-          />
-          <div 
-            className="absolute w-full h-[2px] bg-[#d4cdc4]/20"
-            style={{ top: `${Math.random() * 100}%` }}
-          />
-        </div>
-      )}
 
       {/* NieR-style corner brackets */}
       <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-[#d4cdc4]/20 z-10" />
@@ -222,7 +247,7 @@ function Terminal({
       {/* Main content area */}
       <div className="relative z-0 flex flex-col lg:flex-row h-[calc(100%-40px)]">
         {/* Left panel: Terminal/Project list */}
-        <div className="flex-1 lg:flex-none lg:w-[55%] p-4 sm:p-6 font-mono text-sm lg:border-r border-[#d4cdc4]/10 overflow-y-auto">
+        <div className="flex-1 lg:flex-none lg:w-[55%] p-4 sm:p-6 font-mono text-sm lg:border-r border-[#d4cdc4]/10 overflow-y-auto terminal-scrollbar">
           {/* Boot sequence */}
           {!isMobile && (
             <div className="space-y-1.5 mb-6">
@@ -378,11 +403,85 @@ function Terminal({
                 })}
               </div>
 
-              {/* NieR-style cursor/prompt */}
-              <div className="mt-6 flex items-center gap-2 text-[#d4cdc4]/50 text-xs">
-                <span className="text-[#d4cdc4]/30">◇</span>
-                <span className="tracking-wider">AWAITING INPUT</span>
-                <span className="inline-block w-2 h-3 bg-[#d4cdc4]/40 animate-pulse" />
+              {/* Command output history */}
+              <AnimatePresence initial={false}>
+                {commandHistory.length > 0 && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ height: { duration: 0.3, ease: "easeInOut" }, opacity: { duration: 0.2 } }}
+                    className="overflow-hidden"
+                  >
+                    <div
+                      ref={outputRef}
+                      className="mt-4 max-h-40 overflow-y-auto space-y-2 border-t border-dashed border-[#d4cdc4]/10 pt-3 terminal-scrollbar"
+                    >
+                      {commandHistory.map((entry, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="text-xs font-mono space-y-0.5"
+                        >
+                          <div className="text-[#d4cdc4]/70 tracking-wider">
+                            <span className="text-[#d4cdc4]/50">◆</span> {entry.input}
+                          </div>
+                          <div className="text-[#d4cdc4]/50 tracking-wider whitespace-pre-wrap pl-4">
+                            <span className="text-[#d4cdc4]/30">◇</span> {entry.output}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Command input */}
+              <div className="mt-6 relative">
+                {/* Suggestions dropdown */}
+                {showSuggestions && filteredCommands.length > 0 && (
+                  <div className="absolute bottom-full mb-1 left-0 w-full bg-[#1a1714] border border-[#d4cdc4]/15 z-10">
+                    {filteredCommands.map((cmd) => (
+                      <button
+                        key={cmd.name}
+                        className="w-full text-left px-3 py-1.5 text-xs font-mono tracking-wider text-[#d4cdc4]/60 hover:bg-[#d4cdc4]/10 hover:text-[#d4cdc4]/90 flex items-center justify-between"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setInputValue(`/${cmd.name}`);
+                          setShowSuggestions(false);
+                          inputRef.current?.focus();
+                        }}
+                      >
+                        <span>/{cmd.name}</span>
+                        <span className="text-[#d4cdc4]/30 text-[10px]">{cmd.description}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="flex items-center gap-2 border-b border-[#d4cdc4]/20">
+                  <span className="text-[#d4cdc4]/70 text-sm font-mono select-none">{">"}</span>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => {
+                      setInputValue(e.target.value);
+                      setShowSuggestions(e.target.value.startsWith("/") && e.target.value.length > 1);
+                    }}
+                    onKeyDown={handleInputKeyDown}
+                    onFocus={() => { inputFocusedRef.current = true; }}
+                    onBlur={() => {
+                      inputFocusedRef.current = false;
+                      setTimeout(() => setShowSuggestions(false), 150);
+                    }}
+                    placeholder="Type /help for available commands..."
+                    className="flex-1 bg-transparent text-[#d4cdc4]/90 text-xs font-mono tracking-wider outline-none placeholder:text-[#d4cdc4]/30 caret-[#d4cdc4]/60 py-1.5"
+                    spellCheck={false}
+                    autoComplete="off"
+                  />
+                </div>
               </div>
               
               {/* Status footer */}
@@ -420,13 +519,21 @@ function Terminal({
                 >
                   {/* Preview image with CCTV overlay */}
                   <div className="relative h-40 overflow-hidden border-b border-[#d4cdc4]/10">
-                    <Image
-                      src={selectedProject.image}
-                      alt={selectedProject.title}
-                      fill
-                      className="object-cover opacity-80"
-                      sizes="45vw"
-                    />
+                    {selectedProject.image === "/placeholder-project.jpg" ? (
+                      <div className="absolute inset-0 flex items-center justify-center bg-[#0d0b08]">
+                        <span className="font-mono text-4xl tracking-[0.3em] text-[#d4cdc4]/25 font-bold select-none">
+                          [REDACTED]
+                        </span>
+                      </div>
+                    ) : (
+                      <Image
+                        src={selectedProject.image}
+                        alt={selectedProject.title}
+                        fill
+                        className="object-cover opacity-80 sepia"
+                        sizes="45vw"
+                      />
+                    )}
                     {/* Image overlay effects */}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08] via-transparent to-transparent" />
                     <div className="absolute inset-0 cctv-interlace-dark opacity-50" />
@@ -529,7 +636,6 @@ function Terminal({
           </div>
         )}
       </div>
-
 
     </div>
   );

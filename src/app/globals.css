@@ -527,67 +527,47 @@ body::after {
   50% { opacity: 0.08; }
 }
 
-/* Chromatic aberration - constant red/cyan fringing effect */
+/* Chromatic aberration - red/cyan fringing outside terminal edges */
 .cctv-chromatic-r {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 0, 0, 0.015) 0%,
-    transparent 3%,
-    transparent 97%,
-    rgba(255, 0, 0, 0.015) 100%
-  );
-  mix-blend-mode: screen;
-  animation: chromatic-shift-r 8s ease-in-out infinite;
+  background: #ff0000;
+  opacity: 0;
+  animation: chromatic-shift-r 12s linear infinite;
 }
 
 .cctv-chromatic-c {
-  background: linear-gradient(
-    -90deg,
-    rgba(0, 255, 255, 0.015) 0%,
-    transparent 3%,
-    transparent 97%,
-    rgba(0, 255, 255, 0.015) 100%
-  );
-  mix-blend-mode: screen;
-  animation: chromatic-shift-c 8s ease-in-out infinite;
+  background: #00ffff;
+  opacity: 0;
+  animation: chromatic-shift-c 12s linear infinite;
 }
 
 @keyframes chromatic-shift-r {
-  0%, 100% {
-    transform: translateX(-1px);
-    opacity: 0.6;
-  }
-  25% {
-    transform: translateX(-2px);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translateX(-1px);
-    opacity: 0.5;
-  }
-  75% {
-    transform: translateX(-3px);
-    opacity: 0.9;
-  }
+  0%, 100% { transform: translate(0, 0); opacity: 0; }
+  12% { transform: translate(0, 0); opacity: 0; }
+  12.3% { transform: translate(-6px, 2px); opacity: 0.35; }
+  13% { transform: translate(-4px, 1px); opacity: 0.25; }
+  13.3% { transform: translate(0, 0); opacity: 0; }
+  45% { transform: translate(0, 0); opacity: 0; }
+  45.2% { transform: translate(-8px, 3px); opacity: 0.4; }
+  45.8% { transform: translate(-5px, 2px); opacity: 0.3; }
+  46.1% { transform: translate(0, 0); opacity: 0; }
+  78% { transform: translate(0, 0); opacity: 0; }
+  78.3% { transform: translate(-5px, 1px); opacity: 0.3; }
+  78.6% { transform: translate(0, 0); opacity: 0; }
 }
 
 @keyframes chromatic-shift-c {
-  0%, 100% {
-    transform: translateX(1px);
-    opacity: 0.6;
-  }
-  25% {
-    transform: translateX(3px);
-    opacity: 0.9;
-  }
-  50% {
-    transform: translateX(1px);
-    opacity: 0.5;
-  }
-  75% {
-    transform: translateX(2px);
-    opacity: 0.8;
-  }
+  0%, 100% { transform: translate(0, 0); opacity: 0; }
+  12% { transform: translate(0, 0); opacity: 0; }
+  12.3% { transform: translate(6px, -2px); opacity: 0.35; }
+  13% { transform: translate(4px, -1px); opacity: 0.25; }
+  13.3% { transform: translate(0, 0); opacity: 0; }
+  45% { transform: translate(0, 0); opacity: 0; }
+  45.2% { transform: translate(8px, -3px); opacity: 0.4; }
+  45.8% { transform: translate(5px, -2px); opacity: 0.3; }
+  46.1% { transform: translate(0, 0); opacity: 0; }
+  78% { transform: translate(0, 0); opacity: 0; }
+  78.3% { transform: translate(5px, -1px); opacity: 0.3; }
+  78.6% { transform: translate(0, 0); opacity: 0; }
 }
 
 /* CCTV recording indicator pulse */
@@ -615,6 +595,82 @@ body::after {
 @keyframes nier-line-shift {
   0% { background-position: 0 0; }
   100% { background-position: 0 40px; }
+}
+
+/* Chromatic glitch slices - thin bands that shift with color */
+.chromatic-slice-r,
+.chromatic-slice-r2 {
+  background: rgba(255, 0, 0, 0.12);
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+
+.chromatic-slice-c,
+.chromatic-slice-c2 {
+  background: rgba(0, 255, 255, 0.12);
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+
+.chromatic-slice-r {
+  animation: glitch-slice-r 12s linear infinite;
+}
+.chromatic-slice-c {
+  animation: glitch-slice-c 12s linear infinite;
+}
+.chromatic-slice-r2 {
+  animation: glitch-slice-r2 12s linear infinite;
+}
+.chromatic-slice-c2 {
+  animation: glitch-slice-c2 12s linear infinite;
+}
+
+@keyframes glitch-slice-r {
+  0%, 100% { transform: translateX(0); opacity: 0; }
+  8% { transform: translateX(0); opacity: 0; }
+  8.2% { transform: translateX(-12px); opacity: 1; }
+  8.8% { transform: translateX(-8px); opacity: 0.7; }
+  9% { transform: translateX(0); opacity: 0; }
+  42% { transform: translateX(0); opacity: 0; }
+  42.15% { transform: translateX(-15px); opacity: 1; }
+  42.6% { transform: translateX(-10px); opacity: 0.8; }
+  42.8% { transform: translateX(0); opacity: 0; }
+}
+
+@keyframes glitch-slice-c {
+  0%, 100% { transform: translateX(0); opacity: 0; }
+  8% { transform: translateX(0); opacity: 0; }
+  8.2% { transform: translateX(12px); opacity: 1; }
+  8.8% { transform: translateX(8px); opacity: 0.7; }
+  9% { transform: translateX(0); opacity: 0; }
+  42% { transform: translateX(0); opacity: 0; }
+  42.15% { transform: translateX(15px); opacity: 1; }
+  42.6% { transform: translateX(10px); opacity: 0.8; }
+  42.8% { transform: translateX(0); opacity: 0; }
+}
+
+@keyframes glitch-slice-r2 {
+  0%, 100% { transform: translateX(0); opacity: 0; }
+  25% { transform: translateX(0); opacity: 0; }
+  25.2% { transform: translateX(-10px); opacity: 0.9; }
+  25.5% { transform: translateX(-6px); opacity: 0.6; }
+  25.7% { transform: translateX(0); opacity: 0; }
+  71% { transform: translateX(0); opacity: 0; }
+  71.1% { transform: translateX(-18px); opacity: 1; }
+  71.5% { transform: translateX(-12px); opacity: 0.7; }
+  71.7% { transform: translateX(0); opacity: 0; }
+}
+
+@keyframes glitch-slice-c2 {
+  0%, 100% { transform: translateX(0); opacity: 0; }
+  25% { transform: translateX(0); opacity: 0; }
+  25.2% { transform: translateX(10px); opacity: 0.9; }
+  25.5% { transform: translateX(6px); opacity: 0.6; }
+  25.7% { transform: translateX(0); opacity: 0; }
+  71% { transform: translateX(0); opacity: 0; }
+  71.1% { transform: translateX(18px); opacity: 1; }
+  71.5% { transform: translateX(12px); opacity: 0.7; }
+  71.7% { transform: translateX(0); opacity: 0; }
 }
 
 /* NieR-style random glitch effect */
@@ -787,6 +843,26 @@ body::after {
     transparent 1px,
     transparent 2px
   );
+}
+
+/* Terminal scrollbar - NieR theme */
+.terminal-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.terminal-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.terminal-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(212, 205, 196, 0.15);
+  border-radius: 0;
+}
+.terminal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 205, 196, 0.3);
+}
+/* Firefox */
+.terminal-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 205, 196, 0.15) transparent;
 }
 
 /* Work section animated static noise background */
