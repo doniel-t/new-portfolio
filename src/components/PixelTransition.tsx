@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { gsap } from "gsap";
 
 type PixelTransitionProps = {
@@ -31,35 +31,95 @@ export default function PixelTransition({
   autoplayDelayMs = 60,
 }: PixelTransitionProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const pixelGridRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const activeRef = useRef<HTMLDivElement | null>(null);
-  const delayedCallRef = useRef<gsap.core.Tween | null>(null);
+  const animFrameRef = useRef<number>(0);
 
   const [, setIsActive] = useState<boolean>(startActive);
 
-  useEffect(() => {
-    const pixelGridEl = pixelGridRef.current;
-    if (!pixelGridEl) return;
+  const animatePixels = useCallback((activate: boolean) => {
+    setIsActive(activate);
 
-    pixelGridEl.innerHTML = "";
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    const activeEl = activeRef.current;
+    if (!canvas || !container || !activeEl) return;
 
-    for (let row = 0; row < gridSize; row++) {
-      for (let col = 0; col < gridSize; col++) {
-        const pixel = document.createElement("div");
-        pixel.classList.add("pixelated-image-card__pixel");
-        pixel.classList.add("absolute", "hidden");
-        pixel.style.backgroundColor = pixelColor;
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
 
-        const size = 100 / gridSize;
-        pixel.style.width = `${size}%`;
-        pixel.style.height = `${size}%`;
-        pixel.style.left = `${col * size}%`;
-        pixel.style.top = `${row * size}%`;
+    const rect = container.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
 
-        pixelGridEl.appendChild(pixel);
-      }
+    const totalPixels = gridSize * gridSize;
+    const pixelW = rect.width / gridSize;
+    const pixelH = rect.height / gridSize;
+
+    // Create shuffled indices
+    const indices: number[] = Array.from({ length: totalPixels }, (_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
     }
-  }, [gridSize, pixelColor]);
+
+    const pixelState = new Uint8Array(totalPixels);
+    if (!activate) {
+      pixelState.fill(1); // Start all visible if hiding
+    }
+
+    const startTime = performance.now();
+    const duration = animationStepDuration * 1000;
+
+    // Phase 1: reveal pixels, Phase 2: hide pixels
+    const totalDuration = duration * 2;
+
+    const animLoop = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / totalDuration, 1);
+
+      ctx.clearRect(0, 0, rect.width, rect.height);
+
+      if (progress <= 0.5) {
+        // Phase 1: show pixels
+        const phaseProgress = progress / 0.5;
+        const targetCount = Math.floor(phaseProgress * totalPixels);
+        for (let i = 0; i < targetCount; i++) {
+          pixelState[indices[i]] = 1;
+        }
+      } else {
+        // Switch content at midpoint
+        if (progress > 0.5) {
+          activeEl.style.display = activate ? "block" : "none";
+          activeEl.style.pointerEvents = activate ? "none" : "";
+        }
+        // Phase 2: hide pixels
+        const phaseProgress = (progress - 0.5) / 0.5;
+        const targetCount = Math.floor(phaseProgress * totalPixels);
+        for (let i = 0; i < targetCount; i++) {
+          pixelState[indices[i]] = 0;
+        }
+      }
+
+      ctx.fillStyle = pixelColor;
+      for (let i = 0; i < totalPixels; i++) {
+        if (pixelState[i]) {
+          const col = i % gridSize;
+          const row = Math.floor(i / gridSize);
+          ctx.fillRect(col * pixelW, row * pixelH, pixelW, pixelH);
+        }
+      }
+
+      if (progress < 1) {
+        animFrameRef.current = requestAnimationFrame(animLoop);
+      }
+    };
+
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    animFrameRef.current = requestAnimationFrame(animLoop);
+  }, [gridSize, pixelColor, animationStepDuration]);
 
   useEffect(() => {
     const activeEl = activeRef.current;
@@ -72,52 +132,13 @@ export default function PixelTransition({
       }, autoplayDelayMs);
       return () => window.clearTimeout(id);
     }
-  }, [autoplayReveal, autoplayDelayMs, startActive]);
+  }, [autoplayReveal, autoplayDelayMs, startActive, animatePixels]);
 
-  const animatePixels = (activate: boolean) => {
-    setIsActive(activate);
-
-    const pixelGridEl = pixelGridRef.current;
-    const activeEl = activeRef.current;
-    if (!pixelGridEl || !activeEl) return;
-
-    const pixels = pixelGridEl.querySelectorAll<HTMLDivElement>(".pixelated-image-card__pixel");
-    if (!pixels.length) return;
-
-    gsap.killTweensOf(pixels);
-    if (delayedCallRef.current && "kill" in delayedCallRef.current) {
-      delayedCallRef.current.kill();
-    }
-
-    gsap.set(pixels, { display: "none" });
-
-    const totalPixels = pixels.length;
-    const staggerDuration = animationStepDuration / totalPixels;
-
-    gsap.to(pixels, {
-      display: "block",
-      duration: 0,
-      stagger: {
-        each: staggerDuration,
-        from: "random",
-      },
-    });
-
-    delayedCallRef.current = gsap.delayedCall(animationStepDuration, () => {
-      activeEl.style.display = activate ? "block" : "none";
-      activeEl.style.pointerEvents = activate ? "none" : "";
-    });
-
-    gsap.to(pixels, {
-      display: "none",
-      duration: 0,
-      delay: animationStepDuration,
-      stagger: {
-        each: staggerDuration,
-        from: "random",
-      },
-    });
-  };
+  useEffect(() => {
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    };
+  }, []);
 
   return (
     <div
@@ -133,9 +154,7 @@ export default function PixelTransition({
         {secondContent ?? null}
       </div>
 
-      <div ref={pixelGridRef} className="absolute inset-0 w-full h-full pointer-events-none z-[3]" />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none z-[3]" />
     </div>
   );
 }
-
-

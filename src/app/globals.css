@@ -795,7 +795,7 @@ body::after {
   background-size: 200px 200px;
   opacity: 0.08;
   mix-blend-mode: overlay;
-  animation: work-noise-static 0.1s steps(8) infinite;
+  animation: work-noise-static 0.4s steps(8) infinite;
 }
 
 @keyframes work-noise-static {

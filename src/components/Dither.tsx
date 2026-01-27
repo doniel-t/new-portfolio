@@ -252,11 +252,17 @@ function DitheredWaves({
   }, [size, gl]);
 
   const prevColor = useRef([...waveColor]);
-  useFrame(({ clock }) => {
+  const lastRealTime = useRef(0);
+  useFrame(() => {
     const u = waveUniformsRef.current;
 
+    // Cap to ~30fps using real time (performance.now) so pause/resume works correctly
+    const now = performance.now();
+    if (now - lastRealTime.current < 1000 / 30) return;
+    lastRealTime.current = now;
+
     if (!disableAnimation) {
-      u.time.value = clock.getElapsedTime();
+      u.time.value += 1 / 30;
     }
 
     if (u.waveSpeed.value !== waveSpeed) u.waveSpeed.value = waveSpeed;

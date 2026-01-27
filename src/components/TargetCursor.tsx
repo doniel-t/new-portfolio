@@ -35,6 +35,11 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
   const quickToRef = useRef<{ x: gsap.QuickToFunc | null; y: gsap.QuickToFunc | null }>({ x: null, y: null });
   // Cache cursor position to avoid repeated getProperty calls
   const cursorPosRef = useRef({ x: 0, y: 0 });
+  // RAF gating for mousemove
+  const moveRafRef = useRef<number>(0);
+  const pendingMoveRef = useRef<MouseEvent | null>(null);
+  // Cached parent bounding rect (updated on resize only)
+  const parentRectRef = useRef<DOMRect | null>(null);
 
   const [isMobile, setIsMobile] = React.useState(false);
 
@@ -140,7 +145,17 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
 
     tickerFnRef.current = tickerFn;
 
-    const moveHandler = (e: MouseEvent) => {
+    // Cache parent rect and update on resize + scroll
+    const updateParentRect = () => {
+      if (cursorRef.current && cursorRef.current.parentElement) {
+        parentRectRef.current = cursorRef.current.parentElement.getBoundingClientRect();
+      }
+    };
+    updateParentRect();
+    window.addEventListener('resize', updateParentRect, { passive: true });
+    window.addEventListener('scroll', updateParentRect, { passive: true });
+
+    const processMoveEvent = (e: MouseEvent) => {
       // Update cached position
       cursorPosRef.current.x = e.clientX;
       cursorPosRef.current.y = e.clientY;
@@ -150,14 +165,14 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
         quickToRef.current.x(e.clientX);
         quickToRef.current.y(e.clientY);
       }
-      
-      // Check if mouse is inside a section containing this component
-      if (cursorRef.current && cursorRef.current.parentElement) {
-        const parentRect = cursorRef.current.parentElement.getBoundingClientRect();
-        const isOver = 
-          e.clientX >= parentRect.left && 
-          e.clientX <= parentRect.right && 
-          e.clientY >= parentRect.top && 
+
+      // Check if mouse is inside a section using cached rect
+      const parentRect = parentRectRef.current;
+      if (cursorRef.current && parentRect) {
+        const isOver =
+          e.clientX >= parentRect.left &&
+          e.clientX <= parentRect.right &&
+          e.clientY >= parentRect.top &&
           e.clientY <= parentRect.bottom;
 
         if (isOver && !isInsideSection) {
@@ -170,8 +185,21 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
            document.body.style.cursor = originalCursor;
         }
       }
+      moveRafRef.current = 0;
     };
-    
+
+    const moveHandler = (e: MouseEvent) => {
+      pendingMoveRef.current = e;
+      if (!moveRafRef.current) {
+        moveRafRef.current = requestAnimationFrame(() => {
+          if (pendingMoveRef.current) {
+            processMoveEvent(pendingMoveRef.current);
+            pendingMoveRef.current = null;
+          }
+        });
+      }
+    };
+
     window.addEventListener('mousemove', moveHandler);
 
     const scrollHandler = () => {
@@ -311,7 +339,12 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
       if (tickerFnRef.current) {
         gsap.ticker.remove(tickerFnRef.current);
       }
+      if (moveRafRef.current) {
+        cancelAnimationFrame(moveRafRef.current);
+      }
       window.removeEventListener('mousemove', moveHandler);
+      window.removeEventListener('resize', updateParentRect);
+      window.removeEventListener('scroll', updateParentRect);
       window.removeEventListener('mouseover', enterHandler as EventListener);
       window.removeEventListener('scroll', scrollHandler);
       window.removeEventListener('mousedown', mouseDownHandler);

@@ -166,20 +166,30 @@ function DitherScene({ src, active, hasAnimated, onAnimationComplete, skipAnimat
     }
   }, [shouldSkip]);
   
+  const { invalidate } = useThree();
+
+  // Invalidate once on mount so the static image renders in demand mode
+  useEffect(() => {
+    invalidate();
+  }, [invalidate]);
+
   useFrame((state, delta) => {
     // Only animate if active, not skipping, and not yet completed
     if (active && effectRef.current && !shouldSkip) {
       elapsedRef.current += delta;
       const progress = Math.min(elapsedRef.current / duration, 1);
-      
+
       // Non-linear interpolation for better effect (starts fast, slows down)
       const current = 128 - (128 - targetPixelSize) * Math.pow(progress, 0.5);
-      
+
       const newPixelSize = Math.max(current, targetPixelSize);
       effectRef.current.uniforms.get('pixelSize')!.value = newPixelSize;
-      
-      // Mark as complete when animation finishes
-      if (progress >= 1) {
+
+      // Request next frame while animating
+      if (progress < 1) {
+        invalidate();
+      } else {
+        // Mark as complete when animation finishes
         onAnimationComplete();
       }
     }
@@ -253,11 +263,10 @@ export default function DitherImage({ src, active = false, className, skipAnimat
     }
   }, [canUseCanvas, isVisible, hasRenderedOnce]);
   
-  // Control frameloop based on visibility
-  // On mobile with skipAnimation, use "demand" to render once then stop (better performance)
-  const frameloop = skipAnimation && isMobile 
-    ? "demand" 
-    : (isPageVisible && isVisible ? "always" : "never");
+  // Use "demand" mode — only render when invalidated (during animation or first render)
+  // "always" wastes GPU on every frame even when nothing changes
+  const shouldAnimate = isPageVisible && isVisible;
+  const frameloop = shouldAnimate ? "demand" : "never";
 
   return (
     <div ref={containerRef} className={`${className} relative`}>

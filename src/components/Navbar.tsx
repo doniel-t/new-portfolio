@@ -177,47 +177,83 @@ export default function Navbar() {
   // Desktop menu is expanded when hovered or clicked open
   const isExpanded = isHovered || isOpen;
 
-  // Track active section and visibility on scroll
+  // Track navbar show/hide based on scroll position
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setShouldShow(window.scrollY > 100);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Track active section and dark background via IntersectionObserver (no layout thrashing)
   React.useEffect(() => {
     const sections = ["contact", "hobbies", "work", "installed_chips", "projects"];
+    const activeSections = new Set<string>();
+    const darkSections = new Set<string>();
 
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-
-      // Determine if navbar should be shown
-      const newShouldShow = scrollY > 100;
-      setShouldShow(newShouldShow);
-
-      // Check if at top
-      if (scrollY < 100) {
-        setActiveSection("home");
-        setIsOnDarkBg(false);
-        return;
-      }
-
-      // Check each section for active state and dark background
-      let foundDark = false;
-      for (const sectionId of sections) {
-        const element = document.getElementById(sectionId);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= 150 && rect.bottom > 150) {
-            setActiveSection(sectionId === "installed_chips" ? "work" : sectionId);
+    // Observer for active section detection (which section is at y=150)
+    const activeObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = entry.target.id;
+          if (entry.isIntersecting) {
+            activeSections.add(id);
+          } else {
+            activeSections.delete(id);
           }
-          // Check if navbar overlaps with this section (navbar is at top)
-          if (rect.top <= 50 && rect.bottom > 0) {
-            if (DARK_SECTIONS.includes(sectionId)) {
-              foundDark = true;
+        }
+        // Pick the first visible section in priority order
+        if (activeSections.size === 0) {
+          setActiveSection("home");
+        } else {
+          for (const sectionId of sections) {
+            if (activeSections.has(sectionId)) {
+              setActiveSection(sectionId === "installed_chips" ? "work" : sectionId);
+              break;
             }
           }
         }
-      }
-      setIsOnDarkBg(foundDark);
-    };
+      },
+      { rootMargin: "-150px 0px 0px 0px", threshold: 0 }
+    );
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // Initial check
-    return () => window.removeEventListener("scroll", handleScroll);
+    // Observer for dark background detection (which section overlaps navbar at top)
+    const darkObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = entry.target.id;
+          if (entry.isIntersecting) {
+            darkSections.add(id);
+          } else {
+            darkSections.delete(id);
+          }
+        }
+        let foundDark = false;
+        for (const id of darkSections) {
+          if (DARK_SECTIONS.includes(id)) {
+            foundDark = true;
+            break;
+          }
+        }
+        setIsOnDarkBg(foundDark);
+      },
+      { rootMargin: "0px 0px -95% 0px", threshold: 0 }
+    );
+
+    for (const sectionId of sections) {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        activeObserver.observe(el);
+        darkObserver.observe(el);
+      }
+    }
+
+    return () => {
+      activeObserver.disconnect();
+      darkObserver.disconnect();
+    };
   }, []);
 
   // Handle pixel transition animation

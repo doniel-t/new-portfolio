@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type PixelDividerProps = {
   color?: string;
@@ -18,6 +18,14 @@ type Particle = {
   progress: number; // 0-1, represents animation time progress
 };
 
+function parseRise(riseStr: string): number {
+  const match = riseStr.match(/^(-?\d+(?:\.\d+)?)%$/);
+  if (match) {
+    return Math.abs(parseFloat(match[1])) / 100;
+  }
+  return 1.8;
+}
+
 export default function PixelDivider({
   color = "#0d0b08",
   pixelSize = 28,
@@ -34,104 +42,13 @@ export default function PixelDivider({
   const animationRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
   const dimensionsRef = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
-  // Parse the rise percentage
-  const parseRise = useCallback((riseStr: string): number => {
-    const match = riseStr.match(/^(-?\d+(?:\.\d+)?)%$/);
-    if (match) {
-      return Math.abs(parseFloat(match[1])) / 100;
-    }
-    return 1.8;
-  }, []);
-
-  // Initialize particles for given dimensions
-  const initParticles = useCallback((columns: number) => {
-    const particles: Particle[] = [];
-    for (let c = 0; c < columns; c++) {
-      for (let s = 0; s < streamsPerCol; s++) {
-        particles.push({
-          x: c * pixelSize,
-          progress: Math.random(), // Random initial progress for staggering
-        });
-      }
-    }
-    particlesRef.current = particles;
-  }, [pixelSize, streamsPerCol]);
-
-  // Animation loop
-  const animate = useCallback((timestamp: number) => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) {
-      animationRef.current = requestAnimationFrame(animate);
-      return;
-    }
-
-    // Calculate delta time
-    if (lastTimeRef.current === 0) {
-      lastTimeRef.current = timestamp;
-    }
-    const deltaTime = (timestamp - lastTimeRef.current) / 1000; // Convert to seconds
-    lastTimeRef.current = timestamp;
-
-    const { height } = dimensionsRef.current;
-    const dpr = window.devicePixelRatio || 1;
-    const riseMultiplier = parseRise(rise);
-    
-    // Travel distance: interpret rise as percentage of container height
-    // This gives the expected visual behavior where squares spread across the container
-    const travelDistance = pixelSize * riseMultiplier;
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Update and draw particles
-    const particles = particlesRef.current;
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i];
-
-      // Update progress (this is linear time progress, matching CSS animation)
-      p.progress += deltaTime / durationSec;
-      if (p.progress >= 1) {
-        p.progress = p.progress % 1;
-      }
-
-      // Calculate Y position based on direction
-      // Squares start at the spawn edge and travel inward
-      let y: number;
-      if (direction === "up") {
-        // Start at bottom, travel upward
-        // startY = bottom of container + pixelSize (just below visible)
-        const startY = height;
-        y = startY - p.progress * travelDistance;
-      } else {
-        // Start at top, travel downward
-        const startY = -pixelSize;
-        y = startY + p.progress * travelDistance;
-      }
-
-      // Calculate opacity matching the CSS keyframes:
-      // 0% -> opacity: 1
-      // 70% -> opacity: 0.85
-      // 100% -> opacity: 0
-      let opacity: number;
-      if (p.progress <= 0.7) {
-        // Linear interpolation from 1 to 0.85 over 0-70%
-        opacity = 1 - (p.progress / 0.7) * 0.15;
-      } else {
-        // Linear interpolation from 0.85 to 0 over 70-100%
-        opacity = 0.85 * (1 - (p.progress - 0.7) / 0.3);
-      }
-
-      // Draw the pixel
-      ctx.fillStyle = color;
-      ctx.globalAlpha = opacity;
-      ctx.fillRect(p.x * dpr, y * dpr, pixelSize * dpr, pixelSize * dpr);
-    }
-
-    ctx.globalAlpha = 1;
-    animationRef.current = requestAnimationFrame(animate);
-  }, [color, pixelSize, durationSec, rise, direction, parseRise]);
+  // Pre-compute constants that don't change per frame
+  const riseMultiplier = parseRise(rise);
+  const travelDistance = pixelSize * riseMultiplier;
+  const invDuration = 1 / durationSec;
 
   // Setup canvas and handle resize
   useEffect(() => {
@@ -144,7 +61,6 @@ export default function PixelDivider({
       const height = container.clientHeight || 0;
       const dpr = window.devicePixelRatio || 1;
 
-      // Set canvas dimensions
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
@@ -152,9 +68,21 @@ export default function PixelDivider({
 
       dimensionsRef.current = { width, height };
 
+      // Cache the context
+      ctxRef.current = canvas.getContext("2d");
+
       // Calculate columns and reinitialize particles
       const columns = Math.max(1, Math.ceil(width / pixelSize) + 2);
-      initParticles(columns);
+      const particles: Particle[] = [];
+      for (let c = 0; c < columns; c++) {
+        for (let s = 0; s < streamsPerCol; s++) {
+          particles.push({
+            x: c * pixelSize,
+            progress: Math.random(),
+          });
+        }
+      }
+      particlesRef.current = particles;
     };
 
     updateSize();
@@ -163,11 +91,113 @@ export default function PixelDivider({
     ro.observe(container);
 
     return () => ro.disconnect();
-  }, [pixelSize, initParticles]);
+  }, [pixelSize, streamsPerCol]);
 
-  // Start/stop animation loop
+  // Observe visibility to pause/resume animation
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0, rootMargin: '100px' }
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  // Start/stop animation loop based on visibility
+  useEffect(() => {
+    if (!isVisible) return;
+
     lastTimeRef.current = 0;
+
+    const animate = (timestamp: number) => {
+      const ctx = ctxRef.current;
+      const canvas = canvasRef.current;
+      if (!canvas || !ctx) {
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      if (lastTimeRef.current === 0) {
+        lastTimeRef.current = timestamp;
+      }
+      const deltaTime = (timestamp - lastTimeRef.current) / 1000;
+
+      // Cap to 24fps
+      if (deltaTime < 1 / 24) {
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      lastTimeRef.current = timestamp;
+
+      const { height } = dimensionsRef.current;
+      const dpr = window.devicePixelRatio || 1;
+      const scaledPixel = pixelSize * dpr;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const particles = particlesRef.current;
+      const progressDelta = deltaTime * invDuration;
+      const isUp = direction === "up";
+
+      // Set fill color once
+      ctx.fillStyle = color;
+
+      // Update all particles and draw, batching by quantized opacity
+      // Quantize opacity to 10 levels to reduce globalAlpha state changes
+      const buckets: number[][] = [];
+      for (let b = 0; b <= 10; b++) buckets.push([]);
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+
+        p.progress += progressDelta;
+        if (p.progress >= 1) {
+          p.progress = p.progress % 1;
+        }
+
+        // Calculate Y
+        let y: number;
+        if (isUp) {
+          y = height - p.progress * travelDistance;
+        } else {
+          y = -pixelSize + p.progress * travelDistance;
+        }
+
+        // Skip offscreen particles
+        const yScaled = y * dpr;
+        if (yScaled + scaledPixel < 0 || yScaled > canvas.height) continue;
+
+        // Calculate opacity
+        let opacity: number;
+        if (p.progress <= 0.7) {
+          opacity = 1 - (p.progress / 0.7) * 0.15;
+        } else {
+          opacity = 0.85 * (1 - (p.progress - 0.7) / 0.3);
+        }
+
+        // Quantize to bucket (0-10)
+        const bucket = Math.round(opacity * 10);
+        // Store particle index and pre-computed y
+        buckets[bucket].push(p.x * dpr, yScaled);
+      }
+
+      // Draw each opacity bucket
+      for (let b = 10; b >= 0; b--) {
+        const items = buckets[b];
+        if (items.length === 0) continue;
+        ctx.globalAlpha = b / 10;
+        for (let j = 0; j < items.length; j += 2) {
+          ctx.fillRect(items[j], items[j + 1], scaledPixel, scaledPixel);
+        }
+      }
+
+      ctx.globalAlpha = 1;
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
     animationRef.current = requestAnimationFrame(animate);
 
     return () => {
@@ -175,7 +205,7 @@ export default function PixelDivider({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [animate]);
+  }, [isVisible, color, pixelSize, travelDistance, invDuration, direction]);
 
   // Mask gradient direction based on animation direction
   const maskStyle: React.CSSProperties = direction === "up"
