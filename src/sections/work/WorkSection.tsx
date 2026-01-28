@@ -19,7 +19,12 @@ function WorkSection() {
   const router = useRouter();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [isBooted, setIsBooted] = useState(false);
+  const [isBooted, setIsBooted] = useState(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("terminal-booted") === "true";
+    }
+    return false;
+  });
 
   const handleSelectProject = useCallback((index: number) => {
     setSelectedIndex(index);
@@ -39,6 +44,7 @@ function WorkSection() {
 
   const handleBootComplete = useCallback(() => {
     setIsBooted(true);
+    sessionStorage.setItem("terminal-booted", "true");
   }, []);
 
   return (
