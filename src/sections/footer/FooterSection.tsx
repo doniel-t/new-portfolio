@@ -75,7 +75,14 @@ export default function FooterSection() {
                   className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
                 >
                   <div className="w-4 h-px bg-white/20 group-hover:bg-white/50 group-hover:w-6 transition-all duration-300" />
-                  <span className="font-mono text-sm">About</span>
+                  <span className="font-mono text-sm">About me</span>
+                </a>
+                <a
+                  href="#projects"
+                  className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
+                >
+                  <div className="w-4 h-px bg-white/20 group-hover:bg-white/50 group-hover:w-6 transition-all duration-300" />
+                  <span className="font-mono text-sm">Projects</span>
                 </a>
                 <a
                   href="#hobbies"
@@ -83,13 +90,6 @@ export default function FooterSection() {
                 >
                   <div className="w-4 h-px bg-white/20 group-hover:bg-white/50 group-hover:w-6 transition-all duration-300" />
                   <span className="font-mono text-sm">Hobbies</span>
-                </a>
-                <a
-                  href="#contact"
-                  className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
-                >
-                  <div className="w-4 h-px bg-white/20 group-hover:bg-white/50 group-hover:w-6 transition-all duration-300" />
-                  <span className="font-mono text-sm">Contact</span>
                 </a>
               </nav>
             </div>

@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { motion, useInView } from "framer-motion";
 import DecodingWord from "@/components/DecodingWord";
 import PixelDivider from "@/components/PixelDivider";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import Terminal from "./Terminal";
-import ProjectModal from "./ProjectModal";
 import { PROJECTS } from "./data";
 
 function WorkSection() {
@@ -16,9 +16,9 @@ function WorkSection() {
     margin: "-10% 0px -10% 0px",
   });
   const isMobile = useIsMobile();
+  const router = useRouter();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [openedProject, setOpenedProject] = useState<number | null>(null);
   const [isBooted, setIsBooted] = useState(false);
 
   const handleSelectProject = useCallback((index: number) => {
@@ -26,8 +26,16 @@ function WorkSection() {
   }, []);
 
   const handleOpenProject = useCallback((index: number) => {
-    setOpenedProject(index);
-  }, []);
+    const project = PROJECTS[index];
+    const url = `/blog/${project.slug}`;
+    if (document.startViewTransition) {
+      document.startViewTransition(() => {
+        router.push(url);
+      });
+    } else {
+      router.push(url);
+    }
+  }, [router]);
 
   const handleBootComplete = useCallback(() => {
     setIsBooted(true);
@@ -50,7 +58,7 @@ function WorkSection() {
           />
         </div>
       </div>
-      
+
 
       <div ref={containerRef} className="relative pt-32 pb-20 z-[1]">
         {/* Section header */}
@@ -161,17 +169,6 @@ function WorkSection() {
           </motion.div>
         </div>
       </div>
-
-      {/* Project Modal */}
-      {openedProject !== null && (
-        <ProjectModal
-          project={PROJECTS[openedProject]}
-          projectIndex={openedProject}
-          totalProjects={PROJECTS.length}
-          isMobile={isMobile}
-          onClose={() => setOpenedProject(null)}
-        />
-      )}
     </section>
   );
 }

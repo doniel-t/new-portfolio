@@ -149,7 +149,7 @@ function InViewAboutBlock() {
             </div>
 
             <div className="mt-4 pt-3 border-t border-foreground/20 flex items-center justify-between">
-              <span className="font-mono text-[8px] text-foreground/30 tracking-wider">MOOD_CYCLE: {VIBE_EMOJIS.length} STATES</span>
+              <span className="font-mono font-bold text-[9px] text-foreground/40 tracking-wider">MOOD_CYCLE: {VIBE_EMOJIS.length} STATES</span>
               <div className="flex gap-[2px]">
                 {VIBE_EMOJIS.map((_, i) => (
                   <span
@@ -207,7 +207,7 @@ function InViewAboutBlock() {
 
             {/* Bottom hex decoration */}
             <div className="mt-4 pt-3 border-t border-foreground/20 flex items-center justify-between">
-              <span className="font-mono text-[8px] text-foreground/30 tracking-wider">0xDEV_PROFILE_v2.4</span>
+              <span className="font-mono font-bold text-[9px] text-foreground/40 tracking-wider">0xDEV_PROFILE_v2.4</span>
               <span className="font-mono text-[8px] text-foreground/20">■■□</span>
             </div>
           </div>
@@ -255,7 +255,7 @@ function InViewAboutBlock() {
               ))}
             </div>
             <div className="mt-4 pt-3 border-t border-foreground/20 flex items-center justify-between">
-              <span className="font-mono text-[8px] text-foreground/30 tracking-wider">TECH_STACK_ARRAY[{STACK_ITEMS.length}]</span>
+              <span className="font-mono font-bold text-[9px] text-foreground/40 tracking-wider">TECH_STACK_ARRAY[{STACK_ITEMS.length}]</span>
               <div className="flex gap-1">
                 {[...Array(5)].map((_, i) => (
                   <span key={i} className="w-[6px] h-[2px] bg-foreground/40" />
@@ -319,7 +319,7 @@ function InViewAboutBlock() {
               </div>
               <div className="relative pl-4 border-l-[3px] border-foreground/50">
                 <div className="absolute left-[-6px] top-0 w-[9px] h-[9px] bg-foreground/60 border-2 border-muted" />
-                <p className="font-mono text-[12px] text-foreground font-bold tracking-wide mb-1.5">Intern Software Engineer <span className="text-foreground/70 text-[11px]">(0.5 years)</span></p>
+                <p className="font-mono text-[12px] text-foreground font-bold tracking-wide mb-1.5">Intern Software Engineer <span className="text-foreground/70 text-[11px]"></span></p>
                 <p className="font-mono text-[11px] text-foreground/70 mb-1">ASAP <span className="text-foreground/70 text-[11px]">(0.5 years)</span></p>
                 <p className="font-mono text-[10px] text-foreground/60 tracking-wide mt-2 mb-1">
                   <span className="text-foreground/40 mr-1">→</span>
@@ -327,12 +327,12 @@ function InViewAboutBlock() {
                 </p>
                 <div className="flex items-center gap-2 mt-1.5">
                   <p className="font-mono text-[8px] text-foreground/40 tracking-wider">STATUS: COMPLETED</p>
-                  <span className="font-mono text-[8px] text-foreground/30">✓</span>
+                  <span className="font-mono font-bold text-[9px] text-[#3d6514]">✓</span>
                 </div>
               </div>
               <div className="relative pl-4 border-l-[3px] border-foreground/50">
                 <div className="absolute left-[-6px] top-0 w-[9px] h-[9px] bg-foreground/60 border-2 border-muted" />
-                <p className="font-mono text-[12px] text-foreground font-bold tracking-wide mb-1.5">Working Student Software Engineer <span className="text-foreground/70 text-[11px]">(0.5 years)</span></p>
+                <p className="font-mono text-[12px] text-foreground font-bold tracking-wide mb-1.5">Working Student Software Engineer <span className="text-foreground/70 text-[11px]"></span></p>
                 <p className="font-mono text-[11px] text-foreground/70 mb-1">eSolutions <span className="text-foreground/70 text-[11px]">(0.5 years)</span></p>
                 <p className="font-mono text-[10px] text-foreground/60 tracking-wide mt-2 mb-1">
                   <span className="text-foreground/40 mr-1">→</span>
@@ -340,12 +340,12 @@ function InViewAboutBlock() {
                 </p>
                 <div className="flex items-center gap-2 mt-1.5">
                   <p className="font-mono text-[8px] text-foreground/40 tracking-wider">STATUS: COMPLETED</p>
-                  <span className="font-mono text-[8px] text-foreground/30">✓</span>
+                  <span className="font-mono font-bold text-[9px] text-[#3d6514]">✓</span>
                 </div>
               </div>
             </div>
             <div className="mt-4 pt-3 border-t border-foreground/20 flex items-center justify-between">
-              <span className="font-mono text-[8px] text-foreground/30 tracking-wider">EXPERIENCE_LOG_COUNT: 03</span>
+              <span className="font-mono font-bold text-[9px] text-foreground/40 tracking-wider">EXPERIENCE_LOG_COUNT: 03</span>
               <span className="font-mono text-[8px] text-foreground/20">▓▓░</span>
             </div>
           </div>
@@ -397,7 +397,7 @@ function InViewAboutBlock() {
               </div>
             </div>
             <div className="mt-4 pt-3 border-t border-foreground/20 flex items-center justify-between">
-              <span className="font-mono text-[8px] text-foreground/30 tracking-wider">COORD_SYS: EU_CENTRAL</span>
+              <span className="font-mono font-bold text-[9px] text-foreground/40 tracking-wider">COORD_SYS: EU_CENTRAL</span>
               <div className="flex gap-[1px]">
                 <span className="w-[2px] h-[8px] bg-foreground/30" />
                 <span className="w-[2px] h-[6px] bg-foreground/20 mt-[2px]" />
@@ -470,7 +470,7 @@ function InViewAboutBlock() {
               </div>
             </div>
             <div className="mt-4 pt-3 border-t border-foreground/20 flex items-center justify-between">
-              <span className="font-mono text-[8px] text-foreground/30 tracking-wider">DATA_FIELDS: 04 | INTEGRITY: 100%</span>
+              <span className="font-mono font-bold text-[9px] text-foreground/40 tracking-wider">DATA_FIELDS: 04 | INTEGRITY: 100%</span>
               <div className="flex items-center gap-1">
                 <span className="w-[6px] h-[6px] border border-foreground/30" />
                 <span className="w-[6px] h-[6px] bg-foreground/60" />

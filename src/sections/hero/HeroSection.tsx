@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import PixelTransition from "@/components/PixelTransition";
 import DecodingWord from "@/components/DecodingWord";
@@ -63,21 +63,53 @@ export default function HeroSection() {
             I design and build performant, accessible interfaces with Next.js and a thoughtful component system.
           </motion.p>
           <motion.div variants={childItem} className="flex flex-wrap gap-3">
+            
             <motion.a
-              className="inline-flex items-center gap-2 rounded-md px-5 py-3 bg-foreground text-background hover:opacity-90 transition-colors"
-              href="#work"
-              whileHover={isMobile ? {} : { y: -2, scale: 1.02 }}
+              className="group inline-flex items-center gap-2 rounded-md px-5 py-3 bg-[#0d0b08] text-background hover:opacity-90 transition-colors z-99"
+              href="#projects"
+              whileHover={isMobile ? {} : { x: 4, scale: 1.01 }}
               whileTap={isMobile ? {} : { scale: 0.98 }}
             >
-              View Work <ArrowRight size={18} />
+              View Work
+              <span
+                className="
+                  inline-flex
+                  overflow-hidden
+                  max-w-0
+                  opacity-0
+                  transition-all
+                  duration-300
+                  ease-out
+                  group-hover:max-w-[20px]
+                  group-hover:opacity-100
+                "
+              >
+                <ArrowRight size={18} />
+              </span>
             </motion.a>
             <motion.a
-              className="inline-flex items-center gap-2 rounded-md px-5 py-3 border border-muted/40 text-foreground hover:bg-accent/10 transition-colors"
+              className="group inline-flex items-center gap-2 rounded-md px-5 py-3 border border-muted/40 text-foreground hover:bg-[#0d0b08] hover:text-white transition-colors duration-300 z-99"
               href="#contact"
-              whileHover={isMobile ? {} : { y: -2, scale: 1.02 }}
+              whileHover={isMobile ? {} : { x: 4, scale: 1.01 }}
               whileTap={isMobile ? {} : { scale: 0.98 }}
             >
               Contact
+
+              <span
+                className="
+                  inline-flex
+                  overflow-hidden
+                  max-w-0
+                  opacity-0
+                  transition-all
+                  duration-300
+                  ease-out
+                  group-hover:max-w-[20px]
+                  group-hover:opacity-100
+                "
+              >
+                <ArrowRight size={18} />
+              </span>
             </motion.a>
           </motion.div>
         </motion.div>

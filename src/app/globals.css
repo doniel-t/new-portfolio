@@ -91,6 +91,7 @@
 }
 
 /* Remove dark mode overrides to keep text always dark */
+html { scroll-behavior: smooth; }
 
 body {
   /* Base color */
@@ -151,6 +152,65 @@ body {
   }
 }
 
+/* View Transitions — black fade */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-group(root) {
+  background: #0d0b08;
+}
+
+::view-transition-old(root) {
+  animation: vt-black-out 0.3s ease-out both;
+}
+
+::view-transition-new(root) {
+  animation: vt-black-in 0.4s ease-in 0.2s both;
+}
+
+::view-transition-old(blog-title) {
+  animation: vt-black-out 0.25s ease-out both;
+}
+
+::view-transition-new(blog-title) {
+  animation: vt-black-in 0.5s ease-in 0.15s both;
+}
+
+::view-transition-old(blog-hero) {
+  animation: vt-black-out 0.3s ease-out both;
+}
+
+::view-transition-new(blog-hero) {
+  animation: vt-black-in 0.5s ease-out 0.1s both;
+}
+
+::view-transition-old(blog-content) {
+  animation: vt-black-out 0.2s ease-out both;
+}
+
+::view-transition-new(blog-content) {
+  animation: vt-content-in 0.5s ease-out 0.2s both;
+}
+
+@keyframes vt-black-out {
+  to { opacity: 0; }
+}
+
+@keyframes vt-black-in {
+  from { opacity: 0; }
+}
+
+@keyframes vt-content-in {
+  from { opacity: 0; transform: translateY(20px); }
+}
+
+/* Marching dashed line */
+@keyframes march {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 /* Pause most CSS animations on mobile for performance (keep pixel dividers running) */
 @media (max-width: 768px), (hover: none) {
   .line-art-animate,
@@ -158,6 +218,14 @@ body {
   .glitch-lines {
     animation-play-state: paused !important;
     animation: none !important;
+  }
+}
+
+/* Hide decorative side rails on mobile */
+@media (max-width: 768px) {
+  body::before,
+  body::after {
+    display: none !important;
   }
 }
 

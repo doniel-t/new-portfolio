@@ -1,5 +1,6 @@
 export type Project = {
   id: string;
+  slug: string;
   title: string;
   image: string;
   repoUrl?: string;
@@ -7,5 +8,6 @@ export type Project = {
   techStack: string[];
   description: string;
   challenges: string;
+  blogContent: string;
   year: string;
 };
