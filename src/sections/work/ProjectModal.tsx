@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { X, Github, ExternalLink } from "lucide-react";
 import PixelDivider from "@/components/PixelDivider";
+import Dither from "@/components/Dither";
 import type { Project } from "./types";
 
 function LoadingSpinner() {
@@ -54,12 +55,20 @@ function ProjectModal({
       if (e.key === "Escape") onClose();
     };
 
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+    };
+
     document.addEventListener("keydown", handleEscape);
     document.body.style.overflow = "hidden";
+    document.addEventListener("wheel", preventScroll, { passive: false });
+    document.addEventListener("touchmove", preventScroll, { passive: false });
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "";
+      document.removeEventListener("wheel", preventScroll);
+      document.removeEventListener("touchmove", preventScroll);
     };
   }, [onClose]);
 
@@ -95,6 +104,19 @@ function ProjectModal({
           />
         )}
         <div className="absolute inset-0 bg-[#0d0b08]/70" />
+        {!isMobile && (
+          <div className="absolute inset-0 opacity-0 pointer-events-none animate-[fadeInDither_0.5s_ease-out_0.3s_forwards]">
+            <Dither
+              waveColor={[165 / 100, 158 / 100, 141 / 100]}
+              disableAnimation={false}
+              enableMouseInteraction={false}
+              colorNum={2}
+              waveAmplitude={0.002}
+              waveFrequency={1.5}
+              waveSpeed={0.05}
+            />
+          </div>
+        )}
       </div>
 
       {/* Modal Content */}
@@ -103,7 +125,7 @@ function ProjectModal({
           isReady ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/20 bg-[#0d0b08] pointer-events-auto" style={{ overscrollBehavior: "contain" }}>
+        <div className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/20 bg-[#0d0b08] pointer-events-auto">
           {/* Close button */}
           <button
             onClick={onClose}

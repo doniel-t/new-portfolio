@@ -75,16 +75,8 @@ export default function PixelTransition({
 
     // Phase 1: reveal pixels, Phase 2: hide pixels
     const totalDuration = duration * 2;
-    const FRAME_INTERVAL = 1000 / 60; // Cap at 60fps
-    let lastFrameTime = 0;
 
     const animLoop = (currentTime: number) => {
-      if (currentTime - lastFrameTime < FRAME_INTERVAL) {
-        animFrameRef.current = requestAnimationFrame(animLoop);
-        return;
-      }
-      lastFrameTime = currentTime;
-
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / totalDuration, 1);
 
