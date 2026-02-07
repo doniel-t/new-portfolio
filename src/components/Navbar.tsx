@@ -103,9 +103,17 @@ function PixelTransitionOverlay({
     }
 
     const startTime = performance.now();
+    const FRAME_INTERVAL = 1000 / 60; // Cap at 60fps
+    let lastFrameTime = 0;
 
     // Single animation loop using requestAnimationFrame
     const animate = (currentTime: number) => {
+      if (currentTime - lastFrameTime < FRAME_INTERVAL) {
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      lastFrameTime = currentTime;
+
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / PIXEL_ANIMATION_DURATION, 1);
 

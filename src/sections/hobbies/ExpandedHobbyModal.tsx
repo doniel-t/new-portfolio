@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
 import PixelDivider from "@/components/PixelDivider";
-import Dither from "@/components/Dither";
 import type { HobbyCard } from "./types";
 
 function LoadingSpinner() {
@@ -48,21 +47,12 @@ function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: 
       if (e.key === "Escape") onClose();
     };
 
-    // Prevent all scroll events on the document
-    const preventScroll = (e: Event) => {
-      e.preventDefault();
-    };
-
     document.addEventListener("keydown", handleEscape);
     document.body.style.overflow = "hidden";
-    document.addEventListener("wheel", preventScroll, { passive: false });
-    document.addEventListener("touchmove", preventScroll, { passive: false });
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "";
-      document.removeEventListener("wheel", preventScroll);
-      document.removeEventListener("touchmove", preventScroll);
     };
   }, [onClose]);
 
@@ -92,26 +82,13 @@ function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: 
         />
         {/* Dark overlay */}
         <div className="absolute inset-0 bg-[#0d0b08]/70" />
-        {/* Dither wave overlay - disabled on mobile */}
-        {!isMobile && (
-          <div className="absolute inset-0 opacity-0 pointer-events-none animate-[fadeInDither_0.5s_ease-out_0.3s_forwards]">
-            <Dither
-              waveColor={[165 / 100, 158 / 100, 141 / 100]}
-              disableAnimation={false}
-              enableMouseInteraction={false}
-              colorNum={2}
-              waveAmplitude={0.002}
-              waveFrequency={1.5}
-              waveSpeed={0.05}
-            />
-          </div>
-        )}
       </div>
 
       {/* Expanded Content */}
       <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 pointer-events-none transition-opacity duration-300 ${isReady ? 'opacity-100' : 'opacity-0'}`}>
         <div
           className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/20 bg-[#0d0b08] pointer-events-auto"
+          style={{ overscrollBehavior: "contain" }}
         >
           {/* Close button */}
           <button

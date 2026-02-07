@@ -128,10 +128,10 @@ export default function TechStack() {
     const handlePositionChange = () => updateActiveRect();
     handlePositionChange();
     window.addEventListener("resize", handlePositionChange);
-    window.addEventListener("scroll", handlePositionChange, true);
+    window.addEventListener("scroll", handlePositionChange, { passive: true });
     return () => {
       window.removeEventListener("resize", handlePositionChange);
-      window.removeEventListener("scroll", handlePositionChange, true);
+      window.removeEventListener("scroll", handlePositionChange);
     };
   }, [enableHoverParticles, hoveredIndex, updateActiveRect]);
 
