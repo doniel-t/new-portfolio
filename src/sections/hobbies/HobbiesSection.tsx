@@ -92,158 +92,248 @@ function ScrollSpy({ activeIndex, isVisible }: { activeIndex: number; isVisible:
   );
 }
 
+type HobbyRefs = React.MutableRefObject<(HTMLDivElement | null)[]>;
+
+const HobbiesScrollSpyLayer = React.memo(function HobbiesScrollSpyLayer({
+  sectionRef,
+  hobbyRefs,
+  isMobile,
+}: {
+  sectionRef: React.RefObject<HTMLElement | null>;
+  hobbyRefs: HobbyRefs;
+  isMobile: boolean;
+}) {
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const [isScrollSpyVisible, setIsScrollSpyVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const nextVisibility = entry.isIntersecting;
+        setIsScrollSpyVisible((current) => (current === nextVisibility ? current : nextVisibility));
+      },
+      { threshold: 0.3, rootMargin: "-15% 0px -15% 0px" },
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [sectionRef]);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let nextIndex = -1;
+        let maxRatio = -1;
+
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+
+          const indexAttr = (entry.target as HTMLElement).dataset.hobbyIndex;
+          const parsedIndex = indexAttr ? Number.parseInt(indexAttr, 10) : Number.NaN;
+          if (Number.isNaN(parsedIndex) || parsedIndex < 0) continue;
+
+          if (entry.intersectionRatio > maxRatio) {
+            maxRatio = entry.intersectionRatio;
+            nextIndex = parsedIndex;
+          }
+        }
+
+        if (nextIndex >= 0) {
+          setActiveIndex((current) => (current === nextIndex ? current : nextIndex));
+        }
+      },
+      { threshold: 0.3, rootMargin: "-20% 0px -20% 0px" },
+    );
+
+    const elements = hobbyRefs.current.filter((element): element is HTMLDivElement => element !== null);
+    elements.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
+  }, [hobbyRefs]);
+
+  return (
+    
+      <ScrollSpy activeIndex={activeIndex} isVisible={isScrollSpyVisible && !isMobile} />
+    
+  );
+});
+
+const HobbiesHeader = React.memo(function HobbiesHeader({
+  isInViewOnce,
+  isMobile,
+}: {
+  isInViewOnce: boolean;
+  isMobile: boolean;
+}) {
+  return (
+    
+      <motion.div
+        initial="hidden"
+        animate={isInViewOnce ? "show" : "hidden"}
+        variants={{
+          hidden: {},
+          show: {
+            transition: { staggerChildren: isMobile ? 0 : 0.15, delayChildren: isMobile ? 0 : 0.05 },
+          },
+        }}
+      >
+        <motion.p
+          variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.5, ease: [0.16, 1, 0.3, 1] } } }}
+          className="text-sm tracking-widest text-muted font-bold mb-3"
+        >
+          BEYOND THE CODE
+        </motion.p>
+        <motion.h2
+          variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1] } } }}
+          className="font-display text-5xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight text-foreground drop-shadow-md mb-6"
+        >
+          {"Hobbies & Interests".split(" ").map((word, i, arr) => (
+            <span key={`hobby-title-${i}`} className="inline-block" style={{ display: "inline-block" }}>
+              <DecodingWord word={word} startDelayMs={isMobile ? 0 : i * 180} active={isInViewOnce} />
+              {i < arr.length - 1 ? "\u00A0" : ""}
+            </span>
+          ))}
+        </motion.h2>
+        <motion.p
+          variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1], delay: isMobile ? 0 : 0.1 } } }}
+          className="text-lg sm:text-xl text-foreground/80 font-medium max-w-prose"
+        >
+          When I&apos;m not coding, you&apos;ll find me immersed in stories, exploring virtual worlds, or out on my bike.
+        </motion.p>
+      </motion.div>
+    
+  );
+});
+
+const HobbiesRows = React.memo(function HobbiesRows({
+  isInViewOnce,
+  isMobile,
+  hobbyRefs,
+  onExpandCard,
+}: {
+  isInViewOnce: boolean;
+  isMobile: boolean;
+  hobbyRefs: HobbyRefs;
+  onExpandCard: (index: number) => void;
+}) {
+  const setHobbyRef = React.useCallback(
+    (index: number, element: HTMLDivElement | null) => {
+      hobbyRefs.current[index] = element;
+    },
+    [hobbyRefs],
+  );
+
+  const expandHandlers = React.useMemo(
+    () => HOBBIES.map((_, index) => () => onExpandCard(index)),
+    [onExpandCard],
+  );
+
+  return (
+    
+      <motion.div
+        initial="hidden"
+        animate={isInViewOnce ? "show" : "hidden"}
+        variants={{
+          hidden: {},
+          show: {
+            transition: { staggerChildren: isMobile ? 0 : 0.15, delayChildren: isMobile ? 0 : 0.05 },
+          },
+        }}
+      >
+        <div className="space-y-16 lg:space-y-24">
+          {HOBBIES.map((card, cardIndex) => (
+            <div
+              key={card.title}
+              id={`hobby-${cardIndex}`}
+              data-hobby-index={cardIndex}
+              ref={(element) => {
+                setHobbyRef(cardIndex, element);
+              }}
+            >
+              
+                <HobbyCardRow
+                  card={card}
+                  cardIndex={cardIndex}
+                  isMobile={isMobile}
+                  onExpand={expandHandlers[cardIndex]}
+                />
+              
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    
+  );
+});
+
 function HobbiesSection() {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const sectionRef = React.useRef<HTMLElement | null>(null);
   const isInViewOnce = useInView(containerRef, { once: true, margin: "-10% 0px -10% 0px" });
   const isMobile = useIsMobile();
   const [expandedCard, setExpandedCard] = React.useState<number | null>(null);
-  const [activeIndex, setActiveIndex] = React.useState(0);
-  const [isScrollSpyVisible, setIsScrollSpyVisible] = React.useState(false);
-  
-  // Track which hobby card is in view for the scroll spy
   const hobbyRefs = React.useRef<(HTMLDivElement | null)[]>([]);
 
-  // Track if the hobbies section covers enough of the viewport via IntersectionObserver
-  React.useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    // threshold 0.7 means the section must cover ~70% of its own height in the viewport
-    // Using rootMargin to approximate viewport coverage detection
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsScrollSpyVisible(entry.isIntersecting);
-      },
-      { threshold: 0.3, rootMargin: "-15% 0px -15% 0px" }
-    );
-    observer.observe(section);
-    return () => observer.disconnect();
+  const handleExpandCard = React.useCallback((index: number) => {
+    setExpandedCard(index);
   }, []);
 
-  // Track which hobby card is in view for the active indicator
-  React.useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-    
-    hobbyRefs.current.forEach((ref, index) => {
-      if (ref) {
-        const observer = new IntersectionObserver(
-          ([entry]) => {
-            if (entry.isIntersecting) {
-              setActiveIndex(index);
-            }
-          },
-          { threshold: 0.3, rootMargin: "-20% 0px -20% 0px" }
-        );
-        observer.observe(ref);
-        observers.push(observer);
-      }
-    });
-
-    return () => {
-      observers.forEach((observer) => observer.disconnect());
-    };
+  const handleCloseModal = React.useCallback(() => {
+    setExpandedCard(null);
   }, []);
 
   return (
     <section id="hobbies" ref={sectionRef} className="relative">
       {/* Fixed Scroll Spy - shows when section is in view */}
-      <ScrollSpy activeIndex={activeIndex} isVisible={isScrollSpyVisible && !isMobile} />
+      <HobbiesScrollSpyLayer sectionRef={sectionRef} hobbyRefs={hobbyRefs} isMobile={isMobile} />
 
       {/* Downward-facing PixelDivider at the start */}
       <div className="relative w-full h-0" aria-hidden>
         <div className="absolute inset-x-0" style={{ top: "0px", height: "180px", zIndex: 5 }}>
-          <PixelDivider
-            color="#0d0b08"
-            pixelSize={isMobile ? 12 : 24}
-            durationSec={8}
-            rise="-200%"
-            streamsPerCol={4}
-            direction="down"
-          />
+          
+            <PixelDivider
+              color="#0d0b08"
+              pixelSize={isMobile ? 12 : 24}
+              durationSec={8}
+              rise="-200%"
+              streamsPerCol={4}
+              direction="down"
+            />
+          
         </div>
       </div>
 
       <div ref={containerRef} className="relative pt-32 pb-20">
         {/* Section header with left padding - more right on desktop */}
         <div className="pl-[5%] pr-[5%] lg:pl-[10%] mb-16">
-          <motion.div
-            initial="hidden"
-            animate={isInViewOnce ? "show" : "hidden"}
-            variants={{
-              hidden: {},
-              show: {
-                transition: { staggerChildren: isMobile ? 0 : 0.15, delayChildren: isMobile ? 0 : 0.05 },
-              },
-            }}
-          >
-            <motion.p
-              variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.5, ease: [0.16, 1, 0.3, 1] } } }}
-              className="text-sm tracking-widest text-muted font-bold mb-3"
-            >
-              BEYOND THE CODE
-            </motion.p>
-            <motion.h2
-              variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1] } } }}
-              className="font-display text-5xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight text-foreground drop-shadow-md mb-6"
-            >
-              {"Hobbies & Interests".split(" ").map((word, i, arr) => (
-                <span key={`hobby-title-${i}`} className="inline-block" style={{ display: "inline-block" }}>
-                  <DecodingWord word={word} startDelayMs={isMobile ? 0 : i * 180} active={isInViewOnce} />{i < arr.length - 1 ? "\u00A0" : ""}
-                </span>
-              ))}
-            </motion.h2>
-            <motion.p
-              variants={{ hidden: { opacity: 0, y: isMobile ? 0 : 12 }, show: { opacity: 1, y: 0, transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1], delay: isMobile ? 0 : 0.1 } } }}
-              className="text-lg sm:text-xl text-foreground/80 font-medium max-w-prose"
-            >
-              When I&apos;m not coding, you&apos;ll find me immersed in stories, exploring virtual worlds, or out on my bike.
-            </motion.p>
-          </motion.div>
+          <HobbiesHeader isInViewOnce={isInViewOnce} isMobile={isMobile} />
         </div>
 
         {/* Hobby Cards - aligned with title */}
         <div className="pl-[5%] pr-[5%] lg:pl-[10%]">
-          <motion.div
-            initial="hidden"
-            animate={isInViewOnce ? "show" : "hidden"}
-            variants={{
-              hidden: {},
-              show: {
-                transition: { staggerChildren: isMobile ? 0 : 0.15, delayChildren: isMobile ? 0 : 0.05 },
-              },
-            }}
-          >
-            {/* Hobby Cards - Alternating Layout */}
-            <div className="space-y-16 lg:space-y-24">
-              {HOBBIES.map((card, cardIndex) => (
-                <div
-                  key={card.title}
-                  id={`hobby-${cardIndex}`}
-                  ref={(el) => { hobbyRefs.current[cardIndex] = el; }}
-                >
-                  <HobbyCardRow
-                      card={card}
-                      cardIndex={cardIndex}
-                      isMobile={isMobile}
-                      onExpand={() => setExpandedCard(cardIndex)}
-                    />
-                </div>
-              ))}
-            </div>
-          </motion.div>
+          <HobbiesRows
+            isInViewOnce={isInViewOnce}
+            isMobile={isMobile}
+            hobbyRefs={hobbyRefs}
+            onExpandCard={handleExpandCard}
+          />
         </div>
       </div>
 
       {/* Expanded Card Modal */}
       {expandedCard !== null && (
-        <ExpandedHobbyModal
-          card={HOBBIES[expandedCard]}
-          cardIndex={expandedCard}
-          totalCards={HOBBIES.length}
-          isMobile={isMobile}
-          onClose={() => setExpandedCard(null)}
-        />
+        
+          <ExpandedHobbyModal
+            card={HOBBIES[expandedCard]}
+            cardIndex={expandedCard}
+            totalCards={HOBBIES.length}
+            isMobile={isMobile}
+            onClose={handleCloseModal}
+          />
+        
       )}
     </section>
   );

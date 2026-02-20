@@ -7,13 +7,27 @@ import Navbar from "@/components/Navbar";
 export default function Home() {
   return (
     <>
-      <Navbar />
-      <HeroSection />
-      <AboutSection />
-      <TechStack />
-      <WorkSection />
-      <HobbiesSection />
-      <FooterSection />
+      
+        <Navbar />
+      
+      
+        <HeroSection />
+      
+      
+        <AboutSection />
+      
+      
+        <TechStack />
+      
+      
+        <WorkSection />
+      
+      
+        <HobbiesSection />
+      
+      
+        <FooterSection />
+      
     </>
   );
 }

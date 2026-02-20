@@ -247,7 +247,8 @@ function Terminal({
       {/* Main content area */}
       <div className="relative z-0 flex flex-col lg:flex-row h-[calc(100%-40px)]">
         {/* Left panel: Terminal/Project list */}
-        <div className="flex-1 lg:flex-none lg:w-[55%] p-4 sm:p-6 font-mono text-sm lg:border-r border-[#d4cdc4]/10 overflow-y-auto terminal-scrollbar">
+        
+          <div className="flex-1 lg:flex-none lg:w-[55%] p-4 sm:p-6 font-mono text-sm lg:border-r border-[#d4cdc4]/10 overflow-y-auto terminal-scrollbar">
           {/* Boot sequence */}
           {!isMobile && (
             <div className="space-y-1.5 mb-6">
@@ -352,137 +353,143 @@ function Terminal({
               </div>
 
               {/* Project list */}
-              <div className="space-y-0.5">
-                {projects.map((project, index) => {
-                  const isSelected = selectedIndex === index;
-                  const isGlitching = glitchIndex === index;
-                  const techPreview = project.techStack.slice(0, 2).join(" · ");
+              
+                <div className="space-y-0.5">
+                  {projects.map((project, index) => {
+                    const isSelected = selectedIndex === index;
+                    const isGlitching = glitchIndex === index;
+                    const techPreview = project.techStack.slice(0, 2).join(" · ");
 
-                  return (
-                    <motion.button
-                      key={project.id}
-                      onClick={() => handleProjectClick(index)}
-                      onMouseEnter={() => !isMobile && onSelectProject(index)}
-                      className={`w-full text-left px-3 py-2 transition-all duration-100 flex items-center gap-2 group border-l-2 ${
-                        isSelected
-                          ? "bg-[#d4cdc4]/10 text-[#d4cdc4] border-l-[#d4cdc4]/50"
-                          : "text-[#d4cdc4]/60 hover:bg-[#d4cdc4]/5 hover:text-[#d4cdc4]/80 border-l-transparent hover:border-l-[#d4cdc4]/20"
-                      } ${isGlitching ? "terminal-glitch" : ""}`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      aria-selected={isSelected}
-                      role="option"
-                    >
-                      {/* NieR-style index */}
-                      <span className={`text-[10px] tracking-wider ${isSelected ? "text-[#d4cdc4]/70" : "text-[#d4cdc4]/40"}`}>
-                        {isSelected ? "◆" : "◇"} {String(index + 1).padStart(2, "0")}
-                      </span>
-                      
-                      {/* Project title */}
-                      <span className="flex-1 truncate text-xs tracking-wide">{project.title}</span>
-                      
-                      {/* Dotted separator */}
-                      <span className={`hidden sm:inline text-[10px] ${isSelected ? "text-[#d4cdc4]/40" : "text-[#d4cdc4]/20"}`}>
-                        {"·".repeat(Math.max(0, Math.min(12, 18 - project.title.length)))}
-                      </span>
-                      
-                      {/* Tech preview */}
-                      <span className={`text-[10px] tracking-wider ${isSelected ? "text-[#d4cdc4]/50" : "text-[#d4cdc4]/30"}`}>
-                        [{techPreview}]
-                      </span>
-                      
-                      {/* Selection indicator */}
-                      {isSelected && (
-                        <span className="text-[#d4cdc4]/50 ml-1 text-xs">
-                          {"◁"}
+                    return (
+                      <motion.button
+                        key={project.id}
+                        onClick={() => handleProjectClick(index)}
+                        onMouseEnter={() => !isMobile && onSelectProject(index)}
+                        className={`w-full text-left px-3 py-2 transition-all duration-100 flex items-center gap-2 group border-l-2 ${
+                          isSelected
+                            ? "bg-[#d4cdc4]/10 text-[#d4cdc4] border-l-[#d4cdc4]/50"
+                            : "text-[#d4cdc4]/60 hover:bg-[#d4cdc4]/5 hover:text-[#d4cdc4]/80 border-l-transparent hover:border-l-[#d4cdc4]/20"
+                        } ${isGlitching ? "terminal-glitch" : ""}`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        aria-selected={isSelected}
+                        role="option"
+                      >
+                        {/* NieR-style index */}
+                        <span className={`text-[10px] tracking-wider ${isSelected ? "text-[#d4cdc4]/70" : "text-[#d4cdc4]/40"}`}>
+                          {isSelected ? "◆" : "◇"} {String(index + 1).padStart(2, "0")}
                         </span>
-                      )}
-                    </motion.button>
-                  );
-                })}
-              </div>
+
+                        {/* Project title */}
+                        <span className="flex-1 truncate text-xs tracking-wide">{project.title}</span>
+
+                        {/* Dotted separator */}
+                        <span className={`hidden sm:inline text-[10px] ${isSelected ? "text-[#d4cdc4]/40" : "text-[#d4cdc4]/20"}`}>
+                          {"·".repeat(Math.max(0, Math.min(12, 18 - project.title.length)))}
+                        </span>
+
+                        {/* Tech preview */}
+                        <span className={`text-[10px] tracking-wider ${isSelected ? "text-[#d4cdc4]/50" : "text-[#d4cdc4]/30"}`}>
+                          [{techPreview}]
+                        </span>
+
+                        {/* Selection indicator */}
+                        {isSelected && (
+                          <span className="text-[#d4cdc4]/50 ml-1 text-xs">
+                            {"◁"}
+                          </span>
+                        )}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              
 
               {/* Command output history */}
-              <AnimatePresence initial={false}>
-                {commandHistory.length > 0 && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ height: { duration: 0.3, ease: "easeInOut" }, opacity: { duration: 0.2 } }}
-                    className="overflow-hidden"
-                  >
-                    <div
-                      ref={outputRef}
-                      className="mt-4 max-h-40 overflow-y-auto space-y-2 border-t border-dashed border-[#d4cdc4]/10 pt-3 terminal-scrollbar"
+              
+                <AnimatePresence initial={false}>
+                  {commandHistory.length > 0 && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ height: { duration: 0.3, ease: "easeInOut" }, opacity: { duration: 0.2 } }}
+                      className="overflow-hidden"
                     >
-                      {commandHistory.map((entry, i) => (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, y: 6 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="text-xs font-mono space-y-0.5"
-                        >
-                          <div className="text-[#d4cdc4]/70 tracking-wider">
-                            <span className="text-[#d4cdc4]/50">◆</span> {entry.input}
-                          </div>
-                          <div className="text-[#d4cdc4]/50 tracking-wider whitespace-pre-wrap pl-4">
-                            <span className="text-[#d4cdc4]/30">◇</span> {entry.output}
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                      <div
+                        ref={outputRef}
+                        className="mt-4 max-h-40 overflow-y-auto space-y-2 border-t border-dashed border-[#d4cdc4]/10 pt-3 terminal-scrollbar"
+                      >
+                        {commandHistory.map((entry, i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="text-xs font-mono space-y-0.5"
+                          >
+                            <div className="text-[#d4cdc4]/70 tracking-wider">
+                              <span className="text-[#d4cdc4]/50">◆</span> {entry.input}
+                            </div>
+                            <div className="text-[#d4cdc4]/50 tracking-wider whitespace-pre-wrap pl-4">
+                              <span className="text-[#d4cdc4]/30">◇</span> {entry.output}
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              
 
               {/* Command input */}
-              <div className="mt-6 relative">
-                {/* Suggestions dropdown */}
-                {showSuggestions && filteredCommands.length > 0 && (
-                  <div className="absolute bottom-full mb-1 left-0 w-full bg-[#1a1714] border border-[#d4cdc4]/15 z-10">
-                    {filteredCommands.map((cmd) => (
-                      <button
-                        key={cmd.name}
-                        className="w-full text-left px-3 py-1.5 text-xs font-mono tracking-wider text-[#d4cdc4]/60 hover:bg-[#d4cdc4]/10 hover:text-[#d4cdc4]/90 flex items-center justify-between"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          setInputValue(`/${cmd.name}`);
-                          setShowSuggestions(false);
-                          inputRef.current?.focus();
-                        }}
-                      >
-                        <span>/{cmd.name}</span>
-                        <span className="text-[#d4cdc4]/30 text-[10px]">{cmd.description}</span>
-                      </button>
-                    ))}
+              
+                <div className="mt-6 relative">
+                  {/* Suggestions dropdown */}
+                  {showSuggestions && filteredCommands.length > 0 && (
+                    <div className="absolute bottom-full mb-1 left-0 w-full bg-[#1a1714] border border-[#d4cdc4]/15 z-10">
+                      {filteredCommands.map((cmd) => (
+                        <button
+                          key={cmd.name}
+                          className="w-full text-left px-3 py-1.5 text-xs font-mono tracking-wider text-[#d4cdc4]/60 hover:bg-[#d4cdc4]/10 hover:text-[#d4cdc4]/90 flex items-center justify-between"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            setInputValue(`/${cmd.name}`);
+                            setShowSuggestions(false);
+                            inputRef.current?.focus();
+                          }}
+                        >
+                          <span>/{cmd.name}</span>
+                          <span className="text-[#d4cdc4]/30 text-[10px]">{cmd.description}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 border-b border-[#d4cdc4]/20">
+                    <span className="text-[#d4cdc4]/70 text-sm font-mono select-none">{">"}</span>
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={inputValue}
+                      onChange={(e) => {
+                        setInputValue(e.target.value);
+                        setShowSuggestions(e.target.value.startsWith("/") && e.target.value.length > 1);
+                      }}
+                      onKeyDown={handleInputKeyDown}
+                      onFocus={() => { inputFocusedRef.current = true; }}
+                      onBlur={() => {
+                        inputFocusedRef.current = false;
+                        setTimeout(() => setShowSuggestions(false), 150);
+                      }}
+                      placeholder="Type /help for available commands..."
+                      className="flex-1 bg-transparent text-[#d4cdc4]/90 text-xs font-mono tracking-wider outline-none placeholder:text-[#d4cdc4]/30 caret-[#d4cdc4]/60 py-1.5"
+                      spellCheck={false}
+                      autoComplete="off"
+                    />
                   </div>
-                )}
-                <div className="flex items-center gap-2 border-b border-[#d4cdc4]/20">
-                  <span className="text-[#d4cdc4]/70 text-sm font-mono select-none">{">"}</span>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => {
-                      setInputValue(e.target.value);
-                      setShowSuggestions(e.target.value.startsWith("/") && e.target.value.length > 1);
-                    }}
-                    onKeyDown={handleInputKeyDown}
-                    onFocus={() => { inputFocusedRef.current = true; }}
-                    onBlur={() => {
-                      inputFocusedRef.current = false;
-                      setTimeout(() => setShowSuggestions(false), 150);
-                    }}
-                    placeholder="Type /help for available commands..."
-                    className="flex-1 bg-transparent text-[#d4cdc4]/90 text-xs font-mono tracking-wider outline-none placeholder:text-[#d4cdc4]/30 caret-[#d4cdc4]/60 py-1.5"
-                    spellCheck={false}
-                    autoComplete="off"
-                  />
                 </div>
-              </div>
+              
               
               {/* Status footer */}
               <div className="mt-4 pt-3 border-t border-dashed border-[#d4cdc4]/10 flex items-center justify-between text-[10px] text-[#d4cdc4]/40 tracking-widest">
@@ -491,32 +498,35 @@ function Terminal({
               </div>
             </motion.div>
           )}
-        </div>
+          </div>
+        
 
         {/* Right panel: Preview (desktop only) */}
         {!isMobile && showProjects && (
-          <div className="hidden lg:flex lg:flex-1 flex-col bg-[#0d0b08] relative">
-            {/* NieR-style panel header */}
-            <div className="px-4 py-2 border-b border-[#d4cdc4]/10 flex items-center justify-between">
-              <span className="text-[10px] text-[#d4cdc4]/40 tracking-widest flex items-center gap-2">
-                <span>◇</span>
-                <span>DATA PREVIEW</span>
-              </span>
-              <span className="text-[10px] text-[#d4cdc4]/40 tracking-widest">
-                {selectedProject ? `ID: ${String(selectedIndex + 1).padStart(3, "0")}` : "---"}
-              </span>
-            </div>
-            
-            <AnimatePresence mode="wait">
-              {selectedProject ? (
-                <motion.div
-                  key={selectedProject.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="h-full flex flex-col"
-                >
+          
+            <div className="hidden lg:flex lg:flex-1 flex-col bg-[#0d0b08] relative">
+              {/* NieR-style panel header */}
+              <div className="px-4 py-2 border-b border-[#d4cdc4]/10 flex items-center justify-between">
+                <span className="text-[10px] text-[#d4cdc4]/40 tracking-widest flex items-center gap-2">
+                  <span>◇</span>
+                  <span>DATA PREVIEW</span>
+                </span>
+                <span className="text-[10px] text-[#d4cdc4]/40 tracking-widest">
+                  {selectedProject ? `ID: ${String(selectedIndex + 1).padStart(3, "0")}` : "---"}
+                </span>
+              </div>
+
+              
+                <AnimatePresence mode="wait">
+                  {selectedProject ? (
+                    <motion.div
+                      key={selectedProject.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className="h-full flex flex-col"
+                    >
                   {/* Preview image with CCTV overlay */}
                   <div className="relative h-40 overflow-hidden border-b border-[#d4cdc4]/10">
                     {selectedProject.image === "/placeholder-project.jpg" ? (
@@ -616,24 +626,26 @@ function Terminal({
                       )}
                     </div>
                   </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="empty"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="h-full flex items-center justify-center"
-                >
-                  <div className="text-center text-[#d4cdc4]/40 font-mono">
-                    <div className="text-2xl mb-2">◇</div>
-                    <div className="text-[10px] tracking-widest mb-1">[NO DATA SELECTED]</div>
-                    <div className="text-[10px] tracking-wider text-[#d4cdc4]/30">Navigate to access project files</div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="empty"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="h-full flex items-center justify-center"
+                    >
+                      <div className="text-center text-[#d4cdc4]/40 font-mono">
+                        <div className="text-2xl mb-2">◇</div>
+                        <div className="text-[10px] tracking-widest mb-1">[NO DATA SELECTED]</div>
+                        <div className="text-[10px] tracking-wider text-[#d4cdc4]/30">Navigate to access project files</div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              
+            </div>
+          
         )}
       </div>
 

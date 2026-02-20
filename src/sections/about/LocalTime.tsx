@@ -4,19 +4,17 @@ import { useEffect, useState } from "react";
 
 export default function LocalTimeClient() {
   const [time, setTime] = useState<string | null>(null);
-  const [triggerRerender, setTriggerRerender] = useState(0);
-
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTriggerRerender((prev) => prev + 1);
-    }, 1000);
+    const updateTime = () => {
+      setTime(new Date().toLocaleString("de-DE", { timeZone: "Europe/Berlin" }));
+    };
 
-    setTime(
-      new Date().toLocaleString("de-DE", { timeZone: "Europe/Berlin" })
-    );
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+
     return () => clearInterval(interval);
-  }, [triggerRerender]);
+  }, []);
 
   if (!time) return null;
 
