@@ -19,7 +19,7 @@ const staatliches = Staatliches({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://danieltheils.dev";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://daniel-theil.dev";
 const metadataBase = siteUrl.startsWith("http")
   ? new URL(siteUrl)
   : new URL(`https://${siteUrl}`);
