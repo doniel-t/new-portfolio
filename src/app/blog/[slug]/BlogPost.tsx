@@ -8,16 +8,6 @@ import Dither from "@/components/Dither";
 import { PROJECTS } from "@/sections/work/data";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
-function navigateWithTransition(router: ReturnType<typeof useRouter>, url: string) {
-  if (document.startViewTransition) {
-    document.startViewTransition(() => {
-      router.push(url);
-    });
-  } else {
-    router.push(url);
-  }
-}
-
 export default function BlogPost({ slug }: { slug: string }) {
   const router = useRouter();
   const isMobile = useIsMobile();
@@ -32,7 +22,7 @@ export default function BlogPost({ slug }: { slug: string }) {
           <div className="text-4xl mb-4">◇</div>
           <div className="text-sm tracking-widest mb-2">[DATA NOT FOUND]</div>
           <button
-            onClick={() => navigateWithTransition(router, "/#projects")}
+            onClick={() => router.push("/#projects")}
             className="text-xs tracking-widest text-[#d4cdc4]/60 hover:text-[#d4cdc4] transition-colors"
           >
             ◆ RETURN TO ARCHIVE
@@ -78,7 +68,7 @@ export default function BlogPost({ slug }: { slug: string }) {
         <header className="sticky top-0 z-30 bg-[#0d0b08]/80 backdrop-blur-md border-b border-[#d4cdc4]/10">
           <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
             <button
-              onClick={() => navigateWithTransition(router, "/#projects")}
+              onClick={() => router.push("/#projects")}
               className="flex items-center gap-2 text-[#d4cdc4]/60 hover:text-[#d4cdc4] transition-colors font-mono text-xs tracking-widest"
             >
               <ArrowLeft size={16} />
@@ -92,7 +82,7 @@ export default function BlogPost({ slug }: { slug: string }) {
 
         {/* Hero */}
         <div className="relative">
-          <div className="relative h-60 sm:h-92" style={{ viewTransitionName: "blog-hero" }}>
+          <div className="relative h-60 sm:h-92">
             {project.image === "/placeholder-project.jpg" ? (
               <div className="absolute inset-0 flex items-center justify-center bg-[#0d0b08]">
                 <span className="font-mono text-6xl sm:text-8xl tracking-[0.3em] text-[#d4cdc4]/10 font-bold select-none">
@@ -128,7 +118,7 @@ export default function BlogPost({ slug }: { slug: string }) {
               <span>DEPLOYED: {project.year}</span>
             </div>
 
-            <h1 className="font-display text-5xl sm:text-7xl tracking-tight text-[#d4cdc4] mb-6 drop-shadow-lg" style={{ viewTransitionName: "blog-title" }}>
+            <h1 className="font-display text-5xl sm:text-7xl tracking-tight text-[#d4cdc4] mb-6 drop-shadow-lg">
               {project.title}
             </h1>
 
@@ -173,7 +163,7 @@ export default function BlogPost({ slug }: { slug: string }) {
         </div>
 
         {/* Blog content */}
-        <div className="max-w-4xl mx-auto px-6 pb-24" style={{ viewTransitionName: "blog-content" }}>
+        <div className="max-w-4xl mx-auto px-6 pb-24">
           <div className="border-t border-[#d4cdc4]/10 pt-10">
             <div className="font-mono text-[10px] tracking-widest text-[#d4cdc4]/40 mb-8 flex items-center gap-2">
               <span>◇</span>
@@ -204,7 +194,7 @@ export default function BlogPost({ slug }: { slug: string }) {
           <div className="mt-8 flex justify-between items-center">
             {projectIndex > 0 ? (
               <button
-                onClick={() => navigateWithTransition(router, `/blog/${PROJECTS[projectIndex - 1].slug}`)}
+                onClick={() => router.push(`/blog/${PROJECTS[projectIndex - 1].slug}`)}
                 className="font-mono text-xs tracking-widest text-[#d4cdc4]/50 hover:text-[#d4cdc4] transition-colors"
               >
                 ◁ {PROJECTS[projectIndex - 1].title}
@@ -214,7 +204,7 @@ export default function BlogPost({ slug }: { slug: string }) {
             )}
             {projectIndex < PROJECTS.length - 1 ? (
               <button
-                onClick={() => navigateWithTransition(router, `/blog/${PROJECTS[projectIndex + 1].slug}`)}
+                onClick={() => router.push(`/blog/${PROJECTS[projectIndex + 1].slug}`)}
                 className="font-mono text-xs tracking-widest text-[#d4cdc4]/50 hover:text-[#d4cdc4] transition-colors"
               >
                 {PROJECTS[projectIndex + 1].title} ▷

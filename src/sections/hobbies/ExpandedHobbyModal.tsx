@@ -2,21 +2,24 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { X } from "lucide-react";
-import PixelDivider from "@/components/PixelDivider";
 import Dither from "@/components/Dither";
+import PixelDivider from "@/components/PixelDivider";
 import type { HobbyCard } from "./types";
+
+const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 function LoadingSpinner() {
   return (
     <div className="relative w-10 h-10">
       <div
         className="absolute inset-0 border-2 border-muted/30 border-t-muted/80 rounded-full animate-spin"
-        style={{ animationDuration: '0.8s' }}
+        style={{ animationDuration: "0.8s" }}
       />
       <div
         className="absolute inset-1 border-2 border-muted/20 border-b-muted/60 rounded-full animate-spin"
-        style={{ animationDuration: '1.2s', animationDirection: 'reverse' }}
+        style={{ animationDuration: "1.2s", animationDirection: "reverse" }}
       />
     </div>
   );
@@ -36,52 +39,45 @@ function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: 
 
   const isReady = imageLoaded && minTimeElapsed;
 
-  // Minimum loading time of 0.5 seconds
   React.useEffect(() => {
     const timer = setTimeout(() => setMinTimeElapsed(true), 500);
     return () => clearTimeout(timer);
   }, []);
 
-  // Close on escape key and prevent scroll
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
 
-    // Prevent all scroll events on the document
-    const preventScroll = (e: Event) => {
-      e.preventDefault();
-    };
+    const previousOverflow = document.body.style.overflow;
 
     document.addEventListener("keydown", handleEscape);
     document.body.style.overflow = "hidden";
-    document.addEventListener("wheel", preventScroll, { passive: false });
-    document.addEventListener("touchmove", preventScroll, { passive: false });
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
-      document.removeEventListener("wheel", preventScroll);
-      document.removeEventListener("touchmove", preventScroll);
+      document.body.style.overflow = previousOverflow;
     };
   }, [onClose]);
 
   return (
     <>
-      {/* Solid black base - prevents white flicker */}
       <div className="fixed inset-0 z-50 bg-[#0d0b08] animate-[fadeIn_0.2s_ease-out]" />
 
-      {/* Loading spinner - fades out when ready */}
-      <div className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 ${isReady ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 ${
+          isReady ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+      >
         <LoadingSpinner />
       </div>
 
-      {/* Backdrop with blurred card image - fades in on top of black base */}
       <div
         onClick={onClose}
-        className={`fixed inset-0 z-50 overflow-hidden transition-opacity duration-300 ${isReady ? 'opacity-100' : 'opacity-0'}`}
+        className={`fixed inset-0 z-50 overflow-hidden transition-opacity duration-300 ${
+          isReady ? "opacity-100" : "opacity-0"
+        }`}
       >
-        {/* Blurred background image - small size since heavily blurred */}
         <Image
           src={card.image}
           alt=""
@@ -90,9 +86,7 @@ function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: 
           sizes="384px"
           quality={25}
         />
-        {/* Dark overlay */}
         <div className="absolute inset-0 bg-[#0d0b08]/70" />
-        {/* Dither wave overlay - disabled on mobile */}
         {!isMobile && (
           <div className="absolute inset-0 opacity-0 pointer-events-none animate-[fadeInDither_0.5s_ease-out_0.3s_forwards]">
             <Dither
@@ -108,118 +102,143 @@ function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: 
         )}
       </div>
 
-      {/* Expanded Content */}
-      <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 pointer-events-none transition-opacity duration-300 ${isReady ? 'opacity-100' : 'opacity-0'}`}>
-        <div
-          className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/20 bg-[#0d0b08] pointer-events-auto"
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 pointer-events-none transition-opacity duration-300 ${
+          isReady ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <motion.div
+          initial={{ clipPath: "inset(0 100% 0 0)", opacity: 0.85 }}
+          animate={isReady ? { clipPath: "inset(0 0 0 0)", opacity: 1 } : { clipPath: "inset(0 100% 0 0)", opacity: 0.85 }}
+          transition={{ duration: isMobile ? 0.42 : 0.6, ease: EASE_OUT }}
+          className="relative w-full max-w-5xl h-[78vh] sm:h-[82vh] overflow-hidden border border-white/20 bg-[#0d0b08]/95 text-[#d4cdc4] pointer-events-auto"
         >
-          {/* Close button */}
+          <motion.div
+            aria-hidden
+            initial={{ scaleX: 0 }}
+            animate={isReady ? { scaleX: 1 } : { scaleX: 0 }}
+            transition={{ duration: isMobile ? 0.42 : 0.62, ease: EASE_OUT, delay: 0.06 }}
+            className="absolute top-0 left-0 right-0 h-[2px] bg-[#d4cdc4]/80 origin-left z-20"
+          />
+
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 z-30 w-10 h-10 flex items-center justify-center  bg-white/10 hover:bg-white/20 transition-colors border border-white/20"
+            className="absolute top-4 right-4 z-30 w-10 h-10 flex items-center justify-center bg-[#d4cdc4]/10 hover:bg-[#d4cdc4]/18 text-[#d4cdc4] transition-colors border border-[#d4cdc4]/30"
           >
-            <X size={20} className="text-white" />
+            <X size={18} />
           </button>
 
-          {/* Background Image */}
-          <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 z-0 pointer-events-none">
             <Image
               src={card.image}
               alt={card.title}
               fill
-              className="object-cover"
+              className="object-cover opacity-[0.14]"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
               priority
               onLoad={() => setImageLoaded(true)}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08] via-[#0d0b08]/80 to-[#0d0b08]/50" />
-            <div className="absolute inset-0 scanlines opacity-15 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0d0b08]/55 via-[#0d0b08]/82 to-[#0d0b08]/96" />
+            <div className="absolute inset-0 scanlines opacity-15" />
           </div>
 
-          {/* Corner brackets */}
-          <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-white/40 z-20" />
-          <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-white/40 z-20" />
-          <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-white/40 z-20" />
-          <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-white/40 z-20" />
-
-          {/* Pixel animation at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 z-10 overflow-hidden pointer-events-none opacity-40">
-            <PixelDivider
-              color="#444"
-              pixelSize={isMobile ? 12 : 48}
-              durationSec={7}
-              rise="-160%"
-              streamsPerCol={3}
-              direction="up"
-            />
-          </div>
-
-          {/* Content */}
-          <div className="relative z-10 p-8 sm:p-12 lg:p-16">
-            {/* Index tag */}
-            <div className="font-mono text-sm tracking-widest text-white/50 uppercase mb-4">
-              [{String(cardIndex + 1).padStart(2, "0")}] / {totalCards.toString().padStart(2, "0")}
+          <div className="relative z-10 h-full flex flex-col">
+            <div className="relative h-[130px] sm:h-[170px] lg:h-[195px] w-full overflow-hidden border-b border-[#d4cdc4]/20 bg-black">
+              <Image
+                src={card.image}
+                alt={card.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 920px"
+                priority
+                onLoad={() => setImageLoaded(true)}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08]/90 via-[#0d0b08]/45 to-[#0d0b08]/15" />
+              <div className="absolute inset-0 scanlines opacity-20" />
             </div>
 
-            <h2 className="font-display text-5xl sm:text-6xl lg:text-8xl tracking-tight text-white mb-6 drop-shadow-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+            transition={{ duration: isMobile ? 0.3 : 0.42, ease: EASE_OUT, delay: 0.16 }}
+            className="relative flex-1 overflow-y-auto px-5 sm:px-8 lg:px-10 pt-6 pb-20"
+          >
+            <div className="mb-5 flex items-center gap-3">
+              <span className="font-mono text-[11px] tracking-[0.18em] text-[#d4cdc4]/55 uppercase">
+                [NODE_{String(cardIndex + 1).padStart(2, "0")}] / {String(totalCards).padStart(2, "0")}
+              </span>
+              <span className="h-px flex-1 bg-gradient-to-r from-[#d4cdc4]/35 to-transparent" />
+              <span className="hidden sm:inline font-mono text-[10px] tracking-[0.18em] uppercase text-[#7a9a5a]/70">
+                Expanded Feed
+              </span>
+            </div>
+
+            <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl leading-[0.95] tracking-tight text-[#d4cdc4] mb-4">
               {card.title}
             </h2>
 
-            {/* Items list */}
-            <div className="flex flex-wrap gap-3 mb-10">
+            <p className="text-base sm:text-lg text-[#d4cdc4]/78 leading-relaxed max-w-3xl">
+              {card.description}
+            </p>
+
+            <div className="mt-5 border-l border-[#d4cdc4]/35 pl-4 max-w-3xl">
+              <p className="font-mono text-[10px] tracking-[0.16em] uppercase text-[#d4cdc4]/48 mb-2">
+                Expanded Notes
+              </p>
+              <p className="text-sm sm:text-base leading-relaxed text-[#d4cdc4]/72">
+                {card.expandedText}
+              </p>
+            </div>
+
+            <div className="mt-6 flex flex-wrap gap-1.5 sm:gap-2">
               {card.items.map((item) => (
                 <span
                   key={item}
-                  className="inline-block text-sm font-mono text-white/90 bg-white/5 backdrop-blur-xl px-4 py-2 rounded border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]"
+                  className="inline-flex items-center border border-white/80 bg-white/95 px-2.5 py-[3px] font-mono font-semibold text-[9px] tracking-[0.1em] uppercase text-[#0d0b08]"
                 >
                   {item}
                 </span>
               ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-              {/* Description */}
-              <div>
-                <p className="text-xl lg:text-2xl text-white/80 leading-relaxed mb-8">
-                  {card.description}
-                </p>
-
-                {/* Quote (if exists) */}
-                {card.quote && (
-                  <blockquote className="text-white/50 italic font-mono text-lg border-l-2 border-white/30 pl-6">
-                    {card.quote}
-                  </blockquote>
-                )}
-              </div>
-
-              {/* Stats */}
-              <div className="space-y-6">
-                <div className="font-mono text-xs tracking-widest text-white/40 uppercase">
-                  Stats & Info
-                </div>
-                <div className="grid grid-cols-1 gap-6">
-                  {card.stats.map((stat) => (
-                    <div key={stat.label} className="flex justify-between items-center py-4 border-b border-white/10">
-                      <span className="font-mono text-sm tracking-widest text-white/50 uppercase">
-                        {stat.label}
-                      </span>
-                      <span className="font-display text-2xl lg:text-3xl text-white">
-                        {stat.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+            <div className="mt-8 max-w-2xl">
+              <p className="font-mono font-semibold text-[10px] tracking-[0.18em] uppercase text-[#d4cdc4]/50 mb-3">
+                Stats + Signals
+              </p>
+              <div className="space-y-3">
+                {card.stats.map((stat) => (
+                  <div key={stat.label} className="flex items-end gap-3 sm:gap-4">
+                    <span className="min-w-[120px] sm:min-w-[150px] font-mono text-[10px] sm:text-xs tracking-[0.14em] uppercase text-[#d4cdc4]/58">
+                      {stat.label}
+                    </span>
+                    <span className="h-px w-24 sm:w-32 bg-[#d4cdc4]/22 mb-[6px]" />
+                    <span className="font-display text-lg sm:text-xl text-[#d4cdc4] leading-none">
+                      {stat.value}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Bottom decorative line */}
-            <div className="mt-12 flex items-center gap-4">
-              <div className="w-12 h-px bg-white/30" />
-              <div className="w-3 h-3 rotate-45 border border-white/30" />
-              <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent" />
-            </div>
+            {card.quote ? (
+              <blockquote className="mt-8 border-l border-[#d4cdc4]/45 pl-4 font-mono text-sm sm:text-base italic text-[#d4cdc4]/65">
+                {card.quote}
+              </blockquote>
+            ) : null}
+          </motion.div>
           </div>
-        </div>
+
+          <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-20 z-10 overflow-hidden pointer-events-none opacity-45">
+            <PixelDivider
+              color="#d4cdc4"
+              pixelSize={isMobile ? 10 : 16}
+              durationSec={7.2}
+              rise="-170%"
+              streamsPerCol={2}
+              direction="up"
+            />
+          </div>
+        </motion.div>
       </div>
     </>
   );

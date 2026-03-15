@@ -24,6 +24,9 @@ const BOOT_SEQUENCE: BootLine[] = [
   { text: "SYSTEM READY", duration: 400, isComplete: true },
 ];
 
+const OPEN_FILL_MS = 240;
+const OPEN_DELAY_MS = OPEN_FILL_MS;
+
 type TerminalProps = {
   projects: Project[];
   selectedIndex: number;
@@ -45,10 +48,11 @@ function Terminal({
 }: TerminalProps) {
   const [bootStep, setBootStep] = useState(0);
   const [showProjects, setShowProjects] = useState(false);
-  const [glitchIndex, setGlitchIndex] = useState<number | null>(null);
+  const [openingIndex, setOpeningIndex] = useState<number | null>(null);
   const [spinnerFrame, setSpinnerFrame] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const bootStartedRef = useRef(false);
+  const openTimeoutRef = useRef<number | null>(null);
 
   // Track when terminal is in view
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -163,6 +167,22 @@ function Terminal({
     }
   }, [bootStep, isBooted, isMobile, onBootComplete, isInView]);
 
+  const triggerOpenProject = useCallback(
+    (index: number) => {
+      if (openTimeoutRef.current !== null) {
+        window.clearTimeout(openTimeoutRef.current);
+      }
+
+      setOpeningIndex(index);
+      openTimeoutRef.current = window.setTimeout(() => {
+        setOpeningIndex(null);
+        openTimeoutRef.current = null;
+        onOpenProject(index);
+      }, OPEN_DELAY_MS);
+    },
+    [onOpenProject]
+  );
+
   // Keyboard navigation
   useEffect(() => {
     if (!showProjects || isMobile) return;
@@ -180,29 +200,26 @@ function Terminal({
           break;
         case "Enter":
           e.preventDefault();
-          triggerGlitch(selectedIndex);
+          triggerOpenProject(selectedIndex);
           break;
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showProjects, selectedIndex, projects.length, onSelectProject, isMobile]);
+  }, [showProjects, selectedIndex, projects.length, onSelectProject, isMobile, triggerOpenProject]);
 
-  const triggerGlitch = useCallback(
-    (index: number) => {
-      setGlitchIndex(index);
-      setTimeout(() => {
-        setGlitchIndex(null);
-        onOpenProject(index);
-      }, 150);
-    },
-    [onOpenProject]
-  );
+  useEffect(() => {
+    return () => {
+      if (openTimeoutRef.current !== null) {
+        window.clearTimeout(openTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleProjectClick = (index: number) => {
     onSelectProject(index);
-    triggerGlitch(index);
+    triggerOpenProject(index);
   };
 
   return (
@@ -357,7 +374,7 @@ function Terminal({
                 <div className="space-y-0.5">
                   {projects.map((project, index) => {
                     const isSelected = selectedIndex === index;
-                    const isGlitching = glitchIndex === index;
+                    const isOpening = openingIndex === index;
                     const techPreview = project.techStack.slice(0, 2).join(" · ");
 
                     return (
@@ -365,41 +382,55 @@ function Terminal({
                         key={project.id}
                         onClick={() => handleProjectClick(index)}
                         onMouseEnter={() => !isMobile && onSelectProject(index)}
-                        className={`w-full text-left px-3 py-2 transition-all duration-100 flex items-center gap-2 group border-l-2 ${
-                          isSelected
+                        className={`relative overflow-hidden w-full text-left px-3 py-2 transition-all duration-100 flex items-center gap-2 group border-l-2 ${
+                          isOpening
+                            ? "text-[#0d0b08] border-l-[#f6f4ef]"
+                            : isSelected
                             ? "bg-[#d4cdc4]/10 text-[#d4cdc4] border-l-[#d4cdc4]/50"
                             : "text-[#d4cdc4]/60 hover:bg-[#d4cdc4]/5 hover:text-[#d4cdc4]/80 border-l-transparent hover:border-l-[#d4cdc4]/20"
-                        } ${isGlitching ? "terminal-glitch" : ""}`}
+                        }`}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
                         aria-selected={isSelected}
                         role="option"
                       >
-                        {/* NieR-style index */}
-                        <span className={`text-[10px] tracking-wider ${isSelected ? "text-[#d4cdc4]/70" : "text-[#d4cdc4]/40"}`}>
-                          {isSelected ? "◆" : "◇"} {String(index + 1).padStart(2, "0")}
-                        </span>
-
-                        {/* Project title */}
-                        <span className="flex-1 truncate text-xs tracking-wide">{project.title}</span>
-
-                        {/* Dotted separator */}
-                        <span className={`hidden sm:inline text-[10px] ${isSelected ? "text-[#d4cdc4]/40" : "text-[#d4cdc4]/20"}`}>
-                          {"·".repeat(Math.max(0, Math.min(12, 18 - project.title.length)))}
-                        </span>
-
-                        {/* Tech preview */}
-                        <span className={`text-[10px] tracking-wider ${isSelected ? "text-[#d4cdc4]/50" : "text-[#d4cdc4]/30"}`}>
-                          [{techPreview}]
-                        </span>
-
-                        {/* Selection indicator */}
-                        {isSelected && (
-                          <span className="text-[#d4cdc4]/50 ml-1 text-xs">
-                            {"◁"}
-                          </span>
+                        {isOpening && (
+                          <motion.span
+                            aria-hidden
+                            className="absolute inset-0 bg-[#f6f4ef] origin-left z-0"
+                            initial={{ scaleX: 0 }}
+                            animate={{ scaleX: 1 }}
+                            transition={{ duration: OPEN_FILL_MS / 1000, ease: [0.16, 1, 0.3, 1] }}
+                          />
                         )}
+
+                        <span className="relative z-10 flex items-center gap-2 w-full">
+                          {/* NieR-style index */}
+                          <span className={`text-[10px] tracking-wider ${isOpening ? "text-[#0d0b08]/70" : isSelected ? "text-[#d4cdc4]/70" : "text-[#d4cdc4]/40"}`}>
+                            {isSelected ? "◆" : "◇"} {String(index + 1).padStart(2, "0")}
+                          </span>
+
+                          {/* Project title */}
+                          <span className="flex-1 truncate text-xs tracking-wide">{project.title}</span>
+
+                          {/* Dotted separator */}
+                          <span className={`hidden sm:inline text-[10px] ${isOpening ? "text-[#0d0b08]/35" : isSelected ? "text-[#d4cdc4]/40" : "text-[#d4cdc4]/20"}`}>
+                            {"·".repeat(Math.max(0, Math.min(12, 18 - project.title.length)))}
+                          </span>
+
+                          {/* Tech preview */}
+                          <span className={`text-[10px] tracking-wider ${isOpening ? "text-[#0d0b08]/65" : isSelected ? "text-[#d4cdc4]/50" : "text-[#d4cdc4]/30"}`}>
+                            [{techPreview}]
+                          </span>
+
+                          {/* Selection indicator */}
+                          {isSelected && (
+                            <span className={`${isOpening ? "text-[#0d0b08]/60" : "text-[#d4cdc4]/50"} ml-1 text-xs`}>
+                              {"◁"}
+                            </span>
+                          )}
+                        </span>
                       </motion.button>
                     );
                   })}

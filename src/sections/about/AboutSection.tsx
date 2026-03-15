@@ -1,11 +1,9 @@
 "use client";
 
 import React from "react";
-import { motion, useInView, type Variants } from "framer-motion";
 import BackgroundLineArt from "@/components/BackgroundLineArt";
 import PixelDivider from "@/components/PixelDivider";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { getAboutVariants } from "./variants";
 import LocalTimeClient from "./LocalTime";
 import Image from "next/image";
 
@@ -58,15 +56,12 @@ function useTypewriter(texts: string[], typeSpeed = 80, pauseDuration = 1500) {
   return { displayedText, isTyping };
 }
 
-const AboutVibeCard = React.memo(function AboutVibeCard({ bentoItemVariants }: { bentoItemVariants: Variants }) {
+const AboutVibeCard = React.memo(function AboutVibeCard() {
   const { displayedText, isTyping } = useTypewriter(VIBE_EMOJIS, 100, 2000);
 
   return (
     
-      <motion.div
-        variants={bentoItemVariants}
-        className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]"
-      >
+      <div className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]">
         <div
           className="absolute inset-0 pointer-events-none opacity-20"
           style={{
@@ -116,34 +111,21 @@ const AboutVibeCard = React.memo(function AboutVibeCard({ bentoItemVariants }: {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     
   );
 });
 
 function InViewAboutBlock() {
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const isInViewOnce = useInView(containerRef, { once: true, margin: "-10% 0px -10% 0px" });
-  const isMobile = useIsMobile();
-  const { bentoItemVariants, containerVariants } = getAboutVariants(isMobile);
-
   return (
-    <div ref={containerRef} className="mb-12 sm:mb-16">
+    <div className="mb-12 sm:mb-16">
 
             
       
-        <motion.div
-          initial="hidden"
-          animate={isInViewOnce ? "show" : "hidden"}
-          variants={containerVariants}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7 lg:gap-8 auto-rows-[minmax(160px,auto)]"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7 lg:gap-8 auto-rows-[minmax(160px,auto)]">
         {/* Main Image - Large cell spanning 2 cols and 2 rows */}
         
-          <motion.div
-            variants={bentoItemVariants}
-            className="relative col-span-1 md:col-span-2 md:row-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/40 shadow-2xl min-h-[300px] md:min-h-[400px]"
-          >
+          <div className="relative col-span-1 md:col-span-2 md:row-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/40 shadow-2xl min-h-[300px] md:min-h-[400px]">
             <div className="absolute inset-0 z-0">
               <Image alt="Daniel Theil pixel portait" src="/me crop pixel.png" objectFit="cover" width={1000} height={1000} className="w-full h-full absolute object-fill inset-0 grayscale-50 brightness-110 saturate-50"/>
             </div>
@@ -152,15 +134,12 @@ function InViewAboutBlock() {
             <div className="absolute top-4 right-4 w-2 h-2 border-t border-r border-white/40" />
             <div className="absolute bottom-4 left-4 w-2 h-2 border-b border-l border-white/40" />
             <div className="absolute bottom-4 right-4 w-2 h-2 border-b border-r border-white/40" />
-          </motion.div>
+          </div>
         
 
         {/* Title Cell */}
         
-          <motion.div
-            variants={bentoItemVariants}
-            className="relative col-span-1 md:col-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/20 p-6 flex flex-col justify-center"
-          >
+          <div className="relative col-span-1 md:col-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/20 p-6 flex flex-col justify-center">
             <div className="absolute top-3 left-3 w-2 h-2 border-t border-l border-muted/30" />
             <div className="absolute top-3 right-3 w-2 h-2 border-t border-r border-muted/30" />
             <div className="absolute bottom-3 left-3 w-2 h-2 border-b border-l border-muted/30" />
@@ -172,18 +151,15 @@ function InViewAboutBlock() {
                 Hi, im Daniel Theil
               </span>
             </h2>
-          </motion.div>
+          </div>
         
 
         {/* Vibe Card */}
-        <AboutVibeCard bentoItemVariants={bentoItemVariants} />
+        <AboutVibeCard />
 
         {/* Profile Card */}
         
-          <motion.div
-            variants={bentoItemVariants}
-            className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] group"
-          >
+          <div className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] group">
             {/* Scanline overlay */}
             <div className="absolute inset-0 pointer-events-none opacity-20"
               style={{
@@ -228,15 +204,12 @@ function InViewAboutBlock() {
                 <span className="font-mono text-[8px] text-foreground/20">■■□</span>
               </div>
             </div>
-          </motion.div>
+          </div>
         
 
         {/* Stack Card */}
         
-          <motion.div
-            variants={bentoItemVariants}
-            className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]"
-          >
+          <div className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]">
             {/* Scanline overlay */}
             <div className="absolute inset-0 pointer-events-none opacity-20"
               style={{
@@ -282,15 +255,12 @@ function InViewAboutBlock() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         
 
         {/* Work Experience Card - 2 rows tall */}
         
-          <motion.div
-            variants={bentoItemVariants}
-            className="relative col-span-1 md:col-span-2 md:row-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]"
-          >
+          <div className="relative col-span-1 md:col-span-2 md:row-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]">
             {/* Scanline overlay */}
             <div className="absolute inset-0 pointer-events-none opacity-20"
               style={{
@@ -370,15 +340,12 @@ function InViewAboutBlock() {
                 <span className="font-mono text-[8px] text-foreground/20">▓▓░</span>
               </div>
             </div>
-          </motion.div>
+          </div>
         
 
         {/* Location Card */}
         
-          <motion.div
-            variants={bentoItemVariants}
-            className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]"
-          >
+          <div className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]">
             {/* Scanline overlay */}
             <div className="absolute inset-0 pointer-events-none opacity-20"
               style={{
@@ -428,15 +395,12 @@ function InViewAboutBlock() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         
 
         {/* Stats Card */}
         
-          <motion.div
-            variants={bentoItemVariants}
-            className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]"
-          >
+          <div className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]">
             {/* Scanline overlay */}
             <div className="absolute inset-0 pointer-events-none opacity-20"
               style={{
@@ -502,9 +466,9 @@ function InViewAboutBlock() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         
-        </motion.div>
+        </div>
       
     </div>
   );

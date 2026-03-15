@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { motion, useInView } from "framer-motion";
 import DecodingWord from "@/components/DecodingWord";
 import PixelDivider from "@/components/PixelDivider";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import Terminal from "./Terminal";
+import ExpandedProjectModal from "./ExpandedProjectModal";
 import { PROJECTS } from "./data";
 
 function WorkSection() {
@@ -16,9 +16,9 @@ function WorkSection() {
     margin: "-10% 0px -10% 0px",
   });
   const isMobile = useIsMobile();
-  const router = useRouter();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [expandedProject, setExpandedProject] = useState<number | null>(null);
   const [isBooted, setIsBooted] = useState(() => {
     if (typeof window !== "undefined") {
       return sessionStorage.getItem("terminal-booted") === "true";
@@ -31,16 +31,18 @@ function WorkSection() {
   }, []);
 
   const handleOpenProject = useCallback((index: number) => {
-    const project = PROJECTS[index];
-    const url = `/blog/${project.slug}`;
-    if (document.startViewTransition) {
-      document.startViewTransition(() => {
-        router.push(url);
-      });
-    } else {
-      router.push(url);
-    }
-  }, [router]);
+    setSelectedIndex(index);
+    setExpandedProject(index);
+  }, []);
+
+  const handleCloseProject = useCallback(() => {
+    setExpandedProject(null);
+  }, []);
+
+  const handleNavigateProject = useCallback((index: number) => {
+    setSelectedIndex(index);
+    setExpandedProject(index);
+  }, []);
 
   const handleBootComplete = useCallback(() => {
     setIsBooted(true);
@@ -181,6 +183,16 @@ function WorkSection() {
           </motion.div>
         </div>
       </div>
+
+      {expandedProject !== null && (
+        <ExpandedProjectModal
+          projects={PROJECTS}
+          projectIndex={expandedProject}
+          isMobile={isMobile}
+          onClose={handleCloseProject}
+          onNavigate={handleNavigateProject}
+        />
+      )}
     </section>
   );
 }
