@@ -571,6 +571,27 @@ function HobbiesSection() {
   const isMobile = useIsMobile();
   const [expandedCard, setExpandedCard] = React.useState<number | null>(null);
   const hobbyRefs = React.useRef<(HTMLDivElement | null)[]>([]);
+  const auroraRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    const section = sectionRef.current;
+    const aurora = auroraRef.current;
+    if (!section || !aurora) return;
+
+    const onScroll = () => {
+      const rect = section.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // rect.top = vh → section at bottom of screen (100%)
+      // rect.top = 0  → section at top of screen (10%)
+      const t = Math.min(Math.max(rect.top / vh, 0), 1);
+      const opacity = 0.6 - t * 0.35; // 0.25 → 0.6 (low at bottom, high at top)
+      aurora.style.opacity = String(opacity);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const handleExpandCard = React.useCallback((index: number) => {
     setExpandedCard(index);
@@ -583,7 +604,8 @@ function HobbiesSection() {
   return (
     <section id="hobbies" ref={sectionRef} className="relative bg-[#f6f4ef]">
       <div
-        className="absolute inset-x-0 top-0 h-[100vh] z-[1] pointer-events-none overflow-hidden opacity-60"
+        ref={auroraRef}
+        className="absolute inset-x-0 top-0 h-[100vh] z-[1] pointer-events-none overflow-hidden"
       >
         <Aurora colorStops={['#f7dd88', '#7147fc', '#ff0d96']} amplitude={isMobile ? 0.3 : 0.8} speed={0.4} blend={0.7} grainAmount={0.09}/>
       </div>
