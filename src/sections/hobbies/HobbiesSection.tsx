@@ -174,9 +174,7 @@ const HobbiesHeader = React.memo(function HobbiesHeader({
         className="flex flex-wrap items-center gap-3 mb-3"
       >
         <span className="font-mono text-sm tracking-widest text-foreground/55">[LIFE_LOGS]</span>
-        <span className="font-mono text-xs sm:text-sm tracking-[0.14em] uppercase text-[#7a9a5a]/80">
-          Subsystem: Leisure Online
-        </span>
+
       </motion.div>
 
       <motion.h2
