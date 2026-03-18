@@ -583,7 +583,7 @@ function HobbiesSection() {
   return (
     <section id="hobbies" ref={sectionRef} className="relative bg-[#f6f4ef]">
       <div
-        className="absolute inset-x-0 top-0 h-[100vh] z-[1] pointer-events-none overflow-hidden opacity-95"
+        className="absolute inset-x-0 top-0 h-[100vh] z-[1] pointer-events-none overflow-hidden opacity-60"
       >
         <Aurora colorStops={['#f7dd88', '#7147fc', '#ff0d96']} amplitude={isMobile ? 0.3 : 0.8} speed={0.4} blend={0.7} grainAmount={0.09}/>
       </div>
