@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import DecodingWord from "@/components/DecodingWord";
+import Aurora from "@/components/Aurora";
 import HorizontalPixelDivider from "@/components/HorizontalPixelDivider";
 import PixelDivider from "@/components/PixelDivider";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -583,6 +584,11 @@ function HobbiesSection() {
 
   return (
     <section id="hobbies" ref={sectionRef} className="relative bg-[#f6f4ef]">
+      <div
+        className="absolute inset-x-0 top-0 h-[100vh] z-[1] pointer-events-none overflow-hidden opacity-95"
+      >
+        <Aurora colorStops={['#f7dd88', '#7147fc', '#ff0d96']} amplitude={isMobile ? 0.3 : 0.8} speed={0.4} blend={0.7} grainAmount={0.09}/>
+      </div>
       <div className="absolute inset-0 work-section-noise pointer-events-none z-0 opacity-30" />
 
       <HobbiesScrollSpyLayer sectionRef={sectionRef} hobbyRefs={hobbyRefs} isMobile={isMobile} />
