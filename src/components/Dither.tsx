@@ -1,13 +1,52 @@
-/* eslint-disable react/no-unknown-property */
 "use client";
 
-import { useRef, useState, useEffect, forwardRef } from 'react';
+import { useRef, useState, useEffect, forwardRef, useCallback } from 'react';
 import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber';
 import { EffectComposer, wrapEffect } from '@react-three/postprocessing';
 import { Effect } from 'postprocessing';
 import * as THREE from 'three';
 import { useGPUDetection, usePageVisibility } from '@/hooks/useGPUDetection';
 import { useIsMobile } from '@/hooks/useIsMobile';
+
+const TARGET_RENDER_WIDTH = 1920;
+const TARGET_RENDER_HEIGHT = 1080;
+const ANIMATION_FPS = 30;
+
+function useCappedRenderDpr(ref: React.RefObject<HTMLElement | null>) {
+  const [renderDpr, setRenderDpr] = useState(1);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const updateRenderDpr = () => {
+      const rect = element.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
+
+      const nextRenderDpr = Math.min(
+        1,
+        TARGET_RENDER_WIDTH / rect.width,
+        TARGET_RENDER_HEIGHT / rect.height
+      );
+
+      setRenderDpr((current) =>
+        Math.abs(current - nextRenderDpr) < 0.01 ? current : nextRenderDpr
+      );
+    };
+
+    updateRenderDpr();
+    const resizeObserver = new ResizeObserver(updateRenderDpr);
+    resizeObserver.observe(element);
+    window.addEventListener('resize', updateRenderDpr);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateRenderDpr);
+    };
+  }, [ref]);
+
+  return renderDpr;
+}
 
 function useIsVisible(ref: React.RefObject<HTMLElement | null>) {
   const [isVisible, setIsVisible] = useState(false);
@@ -182,9 +221,10 @@ class RetroEffectImpl extends Effect {
   }
 }
 
+const WrappedRetroEffect = wrapEffect(RetroEffectImpl);
+
 const RetroEffect = forwardRef<RetroEffectImpl, { colorNum: number; pixelSize: number }>((props, ref) => {
   const { colorNum, pixelSize } = props;
-  const WrappedRetroEffect = wrapEffect(RetroEffectImpl);
   return <WrappedRetroEffect ref={ref as any} colorNum={colorNum} pixelSize={pixelSize} />;
 });
 
@@ -226,8 +266,8 @@ function DitheredWaves({
   enableMouseInteraction,
   mouseRadius
 }: DitheredWavesProps) {
-  const mesh = useRef<THREE.Mesh>(null);
-  const { viewport, size, gl } = useThree();
+  const mouseRef = useRef(new THREE.Vector2());
+  const { viewport, size, gl, invalidate } = useThree();
 
   const waveUniformsRef = useRef<WaveUniforms>({
     time: new THREE.Uniform(0),
@@ -249,20 +289,66 @@ function DitheredWaves({
     if (currentRes.x !== newWidth || currentRes.y !== newHeight) {
       currentRes.set(newWidth, newHeight);
     }
-  }, [size, gl]);
+    invalidate();
+  }, [size, gl, invalidate]);
 
   const prevColor = useRef([...waveColor]);
-  const lastRealTime = useRef(0);
-  useFrame(() => {
+  useEffect(() => {
+    invalidate();
+  }, [
+    waveSpeed,
+    waveFrequency,
+    waveAmplitude,
+    waveColor,
+    colorNum,
+    pixelSize,
+    enableMouseInteraction,
+    mouseRadius,
+    disableAnimation,
+    invalidate,
+  ]);
+
+  useEffect(() => {
+    invalidate();
+    if (disableAnimation) return;
+
+    let rafId = 0;
+    let lastTick = 0;
+    const frameDuration = 1000 / ANIMATION_FPS;
+
+    const tick = (timestamp: number) => {
+      if (timestamp - lastTick >= frameDuration) {
+        lastTick = timestamp;
+        invalidate();
+      }
+
+      rafId = window.requestAnimationFrame(tick);
+    };
+
+    rafId = window.requestAnimationFrame(tick);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+    };
+  }, [disableAnimation, invalidate]);
+
+  const handlePointerMove = useCallback((e: ThreeEvent<PointerEvent>) => {
+    if (!enableMouseInteraction) return;
+
+    const rect = gl.domElement.getBoundingClientRect();
+    const dpr = gl.getPixelRatio();
+    mouseRef.current.set(
+      (e.clientX - rect.left) * dpr,
+      (e.clientY - rect.top) * dpr
+    );
+    invalidate();
+  }, [enableMouseInteraction, gl, invalidate]);
+
+  useFrame(({ clock }) => {
     const u = waveUniformsRef.current;
 
-    // Cap to ~30fps using real time (performance.now) so pause/resume works correctly
-    const now = performance.now();
-    if (now - lastRealTime.current < 1000 / 30) return;
-    lastRealTime.current = now;
-
     if (!disableAnimation) {
-      u.time.value += 1 / 30;
+      u.time.value = Math.floor(clock.getElapsedTime() * ANIMATION_FPS) / ANIMATION_FPS;
     }
 
     if (u.waveSpeed.value !== waveSpeed) u.waveSpeed.value = waveSpeed;
@@ -276,13 +362,14 @@ function DitheredWaves({
 
     u.enableMouseInteraction.value = enableMouseInteraction ? 1 : 0;
     u.mouseRadius.value = mouseRadius;
+    u.mousePos.value.copy(mouseRef.current);
   });
 
 
 
   return (
     <>
-      <mesh ref={mesh} scale={[viewport.width, viewport.height, 1]}>
+      <mesh scale={[viewport.width, viewport.height, 1]}>
         <planeGeometry args={[1, 1]} />
         <shaderMaterial
           vertexShader={waveVertexShader}
@@ -296,6 +383,7 @@ function DitheredWaves({
       </EffectComposer>
 
       <mesh
+        onPointerMove={handlePointerMove}
         position={[0, 0, 0.01]}
         scale={[viewport.width, viewport.height, 1]}
         visible={false}
@@ -346,6 +434,7 @@ export default function Dither({
   enableOnMobile = false
 }: DitherProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const renderDpr = useCappedRenderDpr(containerRef);
   const isVisible = useIsVisible(containerRef);
   const isPageVisible = usePageVisibility();
   const gpuSupport = useGPUDetection();
@@ -364,9 +453,10 @@ export default function Dither({
         <Canvas
           className="w-full h-full"
           camera={{ position: [0, 0, 6] }}
-          dpr={1}
-          frameloop={shouldAnimate ? "always" : "never"}
-          gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
+          dpr={renderDpr}
+          frameloop={shouldAnimate ? "demand" : "never"}
+          gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+          style={{ imageRendering: renderDpr < 0.999 ? 'pixelated' : 'auto' }}
           onCreated={({ gl }) => {
             gl.setClearColor(0x000000, 0);
           }}
@@ -389,5 +479,3 @@ export default function Dither({
     </div>
   );
 }
-
-

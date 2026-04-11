@@ -3,8 +3,8 @@
 import { useMotionValue, useTransform, useSpring } from "framer-motion";
 import React from "react";
 
-const springCfg = { stiffness: 120, damping: 16, mass: 0.3 } as const;
-const scrollSpringCfg = { stiffness: 110, damping: 22, mass: 0.45 } as const;
+const springCfg = { stiffness: 220, damping: 22, mass: 0.2 } as const;
+const scrollSpringCfg = { stiffness: 280, damping: 30, mass: 0.24 } as const;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
