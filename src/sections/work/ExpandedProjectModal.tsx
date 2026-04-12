@@ -78,9 +78,10 @@ function ExpandedProjectModal({ projects, projectIndex, isMobile, onClose, onNav
 
   return (
     <>
-      <div className="fixed inset-0 z-50 bg-[#0d0b08] animate-[fadeIn_0.2s_ease-out]" />
+      <div data-lenis-prevent className="fixed inset-0 z-50 bg-[#0d0b08] animate-[fadeIn_0.2s_ease-out]" />
 
       <div
+        data-lenis-prevent
         className={`fixed inset-0 z-[60] flex items-center justify-center transition-opacity duration-300 ${
           isReady ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
@@ -90,6 +91,7 @@ function ExpandedProjectModal({ projects, projectIndex, isMobile, onClose, onNav
 
       <div
         ref={scrollContainerRef}
+        data-lenis-prevent
         className={`fixed inset-0 z-[55] overflow-y-auto transition-opacity duration-300 ${
           isReady ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}

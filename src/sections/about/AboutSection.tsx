@@ -6,9 +6,18 @@ import PixelDivider from "@/components/PixelDivider";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import LocalTimeClient from "./LocalTime";
 import Image from "next/image";
+import { motion, useScroll, useTransform } from "framer-motion";
+import type { IconType } from "react-icons";
+import { FaBriefcase, FaChartBar, FaCode, FaMapMarkerAlt, FaRegAddressCard, FaSignal, FaUser } from "react-icons/fa";
+import { SiGo, SiNextdotjs, SiTailwindcss, SiTypescript } from "react-icons/si";
 
 
-const STACK_ITEMS = ["Next.js", "TypeScript", "Tailwind", "Go"];
+const STACK_ITEMS: { label: string; icon: IconType }[] = [
+  { label: "Next.js", icon: SiNextdotjs },
+  { label: "TypeScript", icon: SiTypescript },
+  { label: "Tailwind", icon: SiTailwindcss },
+  { label: "Go", icon: SiGo },
+];
 
 const VIBE_EMOJIS = [
   "=w=",
@@ -20,6 +29,45 @@ const VIBE_EMOJIS = [
   "(⌐■_■)",
   "￣へ￣"
 ];
+
+const EXPERIENCE_ITEMS = [
+  {
+    role: "Fullstack Engineer",
+    company: "Komma-D",
+    duration: "1.5 years",
+    status: "ONGOING",
+    badge: "ACTIVE",
+    focus: ["Multi-tenant NextJS", "DevOps", "LLM-Chatbots"],
+  },
+  {
+    role: "Intern Software Engineer",
+    company: "ASAP",
+    duration: "0.5 years",
+    status: "COMPLETED",
+    badge: "LOGGED",
+    focus: ["Image Detection", "Kotlin App"],
+  },
+  {
+    role: "Working Student Software Engineer",
+    company: "eSolutions",
+    duration: "0.5 years",
+    status: "COMPLETED",
+    badge: "LOGGED",
+    focus: ["Internal Tooling", "Go", "Angular"],
+  },
+] as const;
+
+const STATS_ITEMS = [
+  ["Age", "25"],
+  ["Gender", "Male"],
+  ["Status", "Open"],
+  ["Languages", "🇬🇧\u00A0/\u00A0🇩🇪"],
+] as const;
+
+const SCANLINE_STYLE: React.CSSProperties = {
+  backgroundImage:
+    "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(212,205,196,0.04) 2px, rgba(212,205,196,0.04) 4px)",
+};
 
 function useTypewriter(texts: string[], typeSpeed = 80, pauseDuration = 1500) {
   const [currentIndex, setCurrentIndex] = React.useState(0);
@@ -56,422 +104,274 @@ function useTypewriter(texts: string[], typeSpeed = 80, pauseDuration = 1500) {
   return { displayedText, isTyping };
 }
 
-const AboutVibeCard = React.memo(function AboutVibeCard() {
+function FrameTicks({ className = "border-[#d4cdc4]/50" }: { className?: string }) {
+  return (
+    <>
+      <span className={`absolute left-0 top-0 hidden h-5 w-5 border-l border-t sm:block ${className}`} />
+      <span className={`absolute right-0 top-0 hidden h-5 w-5 border-r border-t sm:block ${className}`} />
+      <span className={`absolute bottom-0 left-0 hidden h-5 w-5 border-b border-l sm:block ${className}`} />
+      <span className={`absolute bottom-0 right-0 hidden h-5 w-5 border-b border-r sm:block ${className}`} />
+    </>
+  );
+}
+
+function SectionLabel({ icon: Icon, children }: { icon: IconType; children: React.ReactNode }) {
+  return (
+    <p className="flex items-center gap-2 font-mono text-[12px] uppercase text-[#d4cdc4]/40 font-semibold">
+      <Icon className="h-3.5 w-3.5 text-[#7a9a5a]" aria-hidden />
+      <span>{children}</span>
+    </p>
+  );
+}
+
+function ScrollFadeBlock({ children, className = "" }: { children?: React.ReactNode; className?: string }) {
+  const ref = React.useRef<HTMLDivElement | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.2, 1, 1, 0.2]);
+
+  return (
+    <motion.div ref={ref} className={className} style={{ opacity }}>
+      {children}
+    </motion.div>
+  );
+}
+
+function PortraitStamp() {
+  return (
+    <figure className="relative w-full max-w-[240px] sm:max-w-[260px] lg:max-w-[300px]">
+      <div className="relative aspect-[3/4] overflow-hidden border border-[#d4cdc4]/25">
+        <Image
+          alt="Daniel Theil pixel portrait"
+          src="/me crop pixel.png"
+          fill
+          priority={false}
+          sizes="(min-width: 1024px) 300px, 260px"
+          className="object-cover object-center grayscale-[30%] saturate-[0.78] contrast-[1.08] brightness-[0.94]"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(13,11,8,0)_35%,rgba(13,11,8,0.68)_100%)]" />
+        <div className="absolute inset-0 opacity-60 mix-blend-overlay" style={SCANLINE_STYLE} />
+        <FrameTicks />
+      </div>
+      <ScrollFadeBlock className="mt-3 flex items-center justify-between gap-3 pb-3 font-mono text-[10px] uppercase text-[#d4cdc4]/60 sm:border-b sm:border-[#d4cdc4]/20">
+        <span>PORTRAIT_FEED</span>
+        <span>2025.01.21</span>
+      </ScrollFadeBlock>
+    </figure>
+  );
+}
+
+function StickyIntroLabel() {
+  return (
+    <ScrollFadeBlock className="pb-5 font-mono text-[11px] uppercase text-[#7a9a5a] sm:border-b sm:border-[#d4cdc4]/50">
+      <p className="flex items-center gap-2 text-[12px] font-bold">
+        <FaRegAddressCard className="h-3.5 w-3.5" aria-hidden />
+        <span>[01] Introduction</span>
+      </p>
+      <p className="mt-2 text-[#d4cdc4]/40 font-semibold">profile_index / about</p>
+    </ScrollFadeBlock>
+  );
+}
+
+function VibeSignal() {
   const { displayedText, isTyping } = useTypewriter(VIBE_EMOJIS, 100, 2000);
 
   return (
-    
-      <div className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]">
-        <div
-          className="absolute inset-0 pointer-events-none opacity-20"
-          style={{
-            backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)",
-          }}
-        />
-        <div className="absolute top-0 left-0 w-3 h-3 border-l-[3px] border-t-[3px] border-foreground" />
-        <div className="absolute top-0 right-0 w-3 h-3 border-r-[3px] border-t-[3px] border-foreground" />
-        <div className="absolute bottom-0 left-0 w-3 h-3 border-l-[3px] border-b-[3px] border-foreground" />
-        <div className="absolute bottom-0 right-0 w-3 h-3 border-r-[3px] border-b-[3px] border-foreground" />
+    <ScrollFadeBlock className="py-4 lg:mt-8">
+      <div className="mb-4 flex items-center justify-between gap-4 font-mono text-[10px] uppercase text-[#d4cdc4]/40">
+        <span className="inline-flex items-center gap-2 font-bold text-[12px]">
+          <FaSignal className={`h-3 w-3 ${isTyping ? "animate-pulse text-[#7a9a5a]" : "text-[#d4cdc4]/25"}`} aria-hidden />
+          VIBE SIGNAL
+        </span>
+        <span>{VIBE_EMOJIS.length} states</span>
+      </div>
+      <div className="font-mono text-3xl font-semibold leading-none text-[#d4cdc4] sm:text-4xl">
+        {displayedText}
+        <span className="ml-1 inline-block h-[1em] w-[3px] translate-y-1 bg-[#7a9a5a] align-baseline" />
+      </div>
+      <div className="mt-5 flex flex-wrap gap-2 font-mono text-[10px] text-[#d4cdc4]/30">
+        {VIBE_EMOJIS.map((emoji) => (
+          <span key={emoji} className={displayedText === emoji ? "text-[#7a9a5a]" : undefined}>
+            {emoji}
+          </span>
+        ))}
+      </div>
+    </ScrollFadeBlock>
+  );
+}
 
-        <div className="absolute top-2 right-2 flex items-center gap-1 font-mono text-[8px] text-foreground/40">
-          <span className={`w-2 h-2 ${isTyping ? "bg-foreground/70 animate-pulse" : "bg-foreground/30"}`} />
-          <span>{isTyping ? "TYPING" : "IDLE"}</span>
-        </div>
+function AboutStatement() {
+  return (
+    <ScrollFadeBlock className="grid gap-5 px-0 py-8 sm:border-b sm:border-[#d4cdc4]/20 sm:px-5 md:grid-cols-[150px_minmax(0,1fr)] lg:px-8">
+      <SectionLabel icon={FaUser}>Profile</SectionLabel>
+      <p className="max-w-3xl text-lg leading-8 text-[#d4cdc4]/80 sm:text-xl">
+        I&apos;m a fullstack engineer creating software for the love of the game.
+        <br />
+        <span className="text-[#d4cdc4]/60">
+          I&apos;ve been coding for 5 years as hobby and 2 years professionally.
+        </span>
+      </p>
+    </ScrollFadeBlock>
+  );
+}
 
-        <div className="relative p-6 bg-gradient-to-br from-muted via-muted to-muted/80">
-          <div className="mb-4 font-mono text-[10px] tracking-[0.2em] uppercase text-foreground/90 flex items-center gap-2 font-bold">
-            <span className="inline-block h-[8px] w-[8px] bg-foreground animate-pulse" />
-            <span className="border border-foreground/40 px-2 py-0.5 bg-foreground/5">VIBE</span>
-            <span className="ml-auto font-mono text-[9px] opacity-40">[0x02]</span>
-          </div>
+function StackLine() {
+  return (
+    <ScrollFadeBlock className="grid gap-5 px-0 py-6 sm:border-b sm:border-[#d4cdc4]/20 sm:px-5 md:grid-cols-[150px_minmax(0,1fr)] lg:px-8">
+      <SectionLabel icon={FaCode}>Core stack</SectionLabel>
+      <div className="flex flex-wrap gap-x-7 gap-y-3">
+        {STACK_ITEMS.map((item, index) => {
+          const StackIcon = item.icon;
 
-          <div className="min-h-[48px] flex items-center justify-center">
-            <span className="font-mono text-2xl sm:text-3xl md:text-4xl text-foreground font-bold tracking-wide whitespace-nowrap">
-              {displayedText}
-              <span className="inline-block w-[3px] h-[1.1em] bg-foreground/80 ml-1 animate-pulse align-middle" />
+          return (
+            <span key={item.label} className="inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase text-[#d4cdc4]">
+              <span className="mr-2 text-[#7a9a5a]">{String(index + 1).padStart(2, "0")}</span>
+              <StackIcon className="h-4 w-4 text-[#d4cdc4]" aria-hidden />
+              {item.label}
             </span>
-          </div>
+          );
+        })}
+      </div>
+    </ScrollFadeBlock>
+  );
+}
 
-          <div className="mt-4 pt-3 border-t border-foreground/20 flex items-center justify-between">
-            <span className="font-mono font-bold text-[9px] text-foreground/40 tracking-wider">
-              MOOD_CYCLE: {VIBE_EMOJIS.length} STATES
-            </span>
-            <div className="flex gap-[2px]">
-              {VIBE_EMOJIS.map((_, i) => (
-                <span
-                  key={i}
-                  className={`w-[4px] h-[4px] ${
-                    displayedText === VIBE_EMOJIS[i] ||
-                    (displayedText.length > 0 && VIBE_EMOJIS[i].startsWith(displayedText))
-                      ? "bg-foreground/80"
-                      : "bg-foreground/20"
-                  }`}
-                />
-              ))}
+function InlineStats() {
+  return (
+    <ScrollFadeBlock className="grid gap-5 py-5 sm:border-b sm:border-[#d4cdc4]/20 sm:py-0 lg:grid-cols-[150px_minmax(0,1fr)] lg:px-8">
+      <SectionLabel icon={FaChartBar}>Stats</SectionLabel>
+      <div className="grid grid-cols-2 gap-y-5 sm:grid-cols-4 sm:gap-y-0">
+        {STATS_ITEMS.map(([label, value]) => (
+          <div key={label} className="px-0 sm:px-5 sm:py-5 sm:last:border-r-0">
+            <p className="mb-2 font-mono text-[10px] uppercase text-[#d4cdc4]/40">{label}</p>
+            {label === "Languages" ? (
+              <p className="font-mono text-base font-semibold text-[#d4cdc4]">
+                <span className="inline whitespace-nowrap text-xl leading-none">{value}</span>
+              </p>
+            ) : (
+              <p className="flex items-center gap-2 font-mono text-base font-semibold text-[#d4cdc4]">
+                {label === "Status" && <span className="h-2 w-2 rounded-full bg-[#7a9a5a]" />}
+                {value}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </ScrollFadeBlock>
+  );
+}
+
+function ExperienceLedger() {
+  return (
+    <div className="grid gap-5 px-0 py-8 sm:border-b sm:border-[#d4cdc4]/20 sm:px-5 md:grid-cols-[150px_minmax(0,1fr)] lg:px-8">
+      <ScrollFadeBlock>
+        <SectionLabel icon={FaBriefcase}>Experience</SectionLabel>
+      </ScrollFadeBlock>
+      <div className="relative pl-7">
+        <span className="absolute bottom-5 left-[4px] top-1 w-px bg-[#d4cdc4]/20" aria-hidden />
+        {EXPERIENCE_ITEMS.map((item, index) => (
+          <ScrollFadeBlock
+            key={`${item.company}-${item.role}`}
+            className="relative grid gap-3 py-5 first:pt-0 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.15fr)_auto]"
+          >
+            <span
+              className={`absolute left-[-27px] top-[1.45rem] h-[9px] w-[9px] border border-[#0d0b08] ${
+                index === 0 ? "bg-[#7a9a5a]" : "bg-[#d4cdc4]/45"
+              }`}
+              aria-hidden
+            />
+            <div>
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <h3 className="font-mono text-sm font-semibold text-[#d4cdc4]">{item.role}</h3>
+                <span className={index === 0 ? "font-mono text-[10px] uppercase text-[#7a9a5a]" : "font-mono text-[10px] uppercase text-[#d4cdc4]/40"}>
+                  {item.badge}
+                </span>
+              </div>
+              <p className="font-mono text-xs text-[#d4cdc4]/60">
+                {item.company} <span className="text-[#d4cdc4]/40">({item.duration})</span>
+              </p>
             </div>
+            <p className="font-mono text-[11px] leading-5 text-[#d4cdc4]/60">
+              {item.focus.join(" / ")}
+            </p>
+            <div className="flex items-center gap-3 font-mono text-[10px] uppercase text-[#d4cdc4]/40 md:justify-end">
+              <span>{item.status}</span>
+              {index === 0 ? (
+                <span className="relative h-1 w-20 overflow-hidden bg-[#d4cdc4]/10">
+                  <span
+                    className="absolute inset-y-0 w-1/2 bg-[#7a9a5a]/75"
+                    style={{ animation: "loading 1.5s ease-in-out infinite" }}
+                  />
+                </span>
+              ) : (
+                <span className="h-1 w-6 bg-[#7a9a5a]/60" />
+              )}
+            </div>
+          </ScrollFadeBlock>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LocationLine() {
+  return (
+    <ScrollFadeBlock className="grid gap-5 px-0 py-6 sm:px-5 md:grid-cols-[150px_minmax(0,1fr)_minmax(0,1fr)] lg:px-8">
+      <SectionLabel icon={FaMapMarkerAlt}>Location</SectionLabel>
+      <div>
+        <p className="mb-2 font-mono text-[10px] uppercase text-[#d4cdc4]/40">Region</p>
+        <p className="font-mono text-sm font-semibold text-[#d4cdc4]">Bavaria, Germany</p>
+      </div>
+      <div>
+        <p className="mb-2 font-mono text-[10px] uppercase text-[#d4cdc4]/40">Local time</p>
+        <LocalTimeClient className="font-mono text-sm font-semibold text-[#d4cdc4]" />
+      </div>
+    </ScrollFadeBlock>
+  );
+}
+
+function ModernAboutLayout() {
+  return (
+    <div className="relative">
+      <div className="grid gap-10 lg:grid-cols-[minmax(240px,0.72fr)_minmax(0,1.28fr)] lg:items-start">
+        <aside className="grid gap-5 sm:grid-cols-[minmax(180px,260px)_minmax(0,1fr)] sm:items-end lg:sticky lg:top-24 lg:block lg:self-start">
+          <div className="sm:col-span-2 lg:mb-6">
+            <StickyIntroLabel />
+          </div>
+          <div className="lg:mb-8">
+            <PortraitStamp />
+          </div>
+          <VibeSignal />
+        </aside>
+
+        <div className="relative lg:pl-10">
+          <ScrollFadeBlock className="pointer-events-none absolute left-0 top-0 hidden h-full w-px bg-[#d4cdc4]/50 lg:block" />
+          <div>
+            <ScrollFadeBlock className="py-8 sm:border-b sm:border-[#d4cdc4]/20 lg:px-8">
+              <h2
+                id="about-heading"
+                className="font-display text-5xl leading-[0.98] text-[#d4cdc4] sm:text-7xl md:text-8xl"
+              >
+                Hi, im <span className="whitespace-nowrap">Daniel Theil</span>
+              </h2>
+            </ScrollFadeBlock>
+
+            <AboutStatement />
+            <StackLine />
+            <InlineStats />
+            <ExperienceLedger />
+            <LocationLine />
           </div>
         </div>
       </div>
-    
-  );
-});
-
-function InViewAboutBlock() {
-  return (
-    <div className="mb-12 sm:mb-16">
-
-            
-      
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7 lg:gap-8 auto-rows-[minmax(160px,auto)]">
-        {/* Main Image - Large cell spanning 2 cols and 2 rows */}
-        
-          <div className="relative col-span-1 md:col-span-2 md:row-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/40 shadow-2xl min-h-[300px] md:min-h-[400px]">
-            <div className="absolute inset-0 z-0">
-              <Image alt="Daniel Theil pixel portait" src="/me crop pixel.png" objectFit="cover" width={1000} height={1000} className="w-full h-full absolute object-fill inset-0 grayscale-50 brightness-110 saturate-50"/>
-            </div>
-            <div className="absolute inset-0 pointer-events-none z-10 ring-1 ring-inset ring-white/10 rounded-2xl" />
-            <div className="absolute top-4 left-4 w-2 h-2 border-t border-l border-white/40" />
-            <div className="absolute top-4 right-4 w-2 h-2 border-t border-r border-white/40" />
-            <div className="absolute bottom-4 left-4 w-2 h-2 border-b border-l border-white/40" />
-            <div className="absolute bottom-4 right-4 w-2 h-2 border-b border-r border-white/40" />
-          </div>
-        
-
-        {/* Title Cell */}
-        
-          <div className="relative col-span-1 md:col-span-2 rounded-2xl overflow-hidden border border-muted/10 bg-black/20 p-6 flex flex-col justify-center">
-            <div className="absolute top-3 left-3 w-2 h-2 border-t border-l border-muted/30" />
-            <div className="absolute top-3 right-3 w-2 h-2 border-t border-r border-muted/30" />
-            <div className="absolute bottom-3 left-3 w-2 h-2 border-b border-l border-muted/30" />
-            <div className="absolute bottom-3 right-3 w-2 h-2 border-b border-r border-muted/30" />
-
-            <p className="text-xs tracking-widest text-muted/60 font-mono uppercase mb-2">[01] Introduction</p>
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight text-muted">
-              <span className="inline-block" style={{ display: "inline-block" }}>
-                Hi, im Daniel Theil
-              </span>
-            </h2>
-          </div>
-        
-
-        {/* Vibe Card */}
-        <AboutVibeCard />
-
-        {/* Profile Card */}
-        
-          <div className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] group">
-            {/* Scanline overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-20"
-              style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)',
-              }}
-            />
-            {/* Glitch corner accents */}
-            <div className="absolute top-0 left-0 w-3 h-3 border-l-[3px] border-t-[3px] border-foreground" />
-            <div className="absolute top-0 right-0 w-3 h-3 border-r-[3px] border-t-[3px] border-foreground" />
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-l-[3px] border-b-[3px] border-foreground" />
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-r-[3px] border-b-[3px] border-foreground" />
-
-            {/* Top right data readout */}
-            <div className="absolute top-2 right-2 flex items-center gap-1 font-mono text-[8px] text-foreground/40">
-              <div className="flex gap-[2px]">
-                <span className="w-[3px] h-[8px] bg-foreground/60" />
-                <span className="w-[3px] h-[6px] bg-foreground/40 mt-[2px]" />
-                <span className="w-[3px] h-[10px] bg-foreground/70" />
-                <span className="w-[3px] h-[5px] bg-foreground/30 mt-[3px]" />
-              </div>
-              <span>87%</span>
-            </div>
-
-            <div className="relative p-6 bg-gradient-to-br from-muted via-muted to-muted/80">
-              <div className="mb-4 font-mono text-[10px] tracking-[0.2em] uppercase text-foreground/90 flex items-center gap-2 font-bold">
-                <span className="inline-block h-[8px] w-[8px] bg-foreground animate-pulse" />
-                <span className="border border-foreground/40 px-2 py-0.5 bg-foreground/5">PROFILE</span>
-                <span className="ml-auto font-mono text-[9px] opacity-40">[0x01]</span>
-              </div>
-              <p className="text-sm leading-relaxed text-foreground font-medium tracking-wide mb-3">
-                I&apos;m a fullstack engineer creating software for the love of the game. <br></br> <span className="font-normal">I&apos;ve been coding for 5 years as hobby and 2 years professionally.</span>
-              </p>
-
-              {/* Progress bar UI element */}
-              <div className="mb-3">
-                
-              </div>
-
-              {/* Bottom hex decoration */}
-              <div className="mt-4 pt-3 border-t border-foreground/20 flex items-center justify-between">
-                <span className="font-mono font-bold text-[9px] text-foreground/40 tracking-wider">0xDEV_PROFILE_v2.4</span>
-                <span className="font-mono text-[8px] text-foreground/20">■■□</span>
-              </div>
-            </div>
-          </div>
-        
-
-        {/* Stack Card */}
-        
-          <div className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]">
-            {/* Scanline overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-20"
-              style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)',
-              }}
-            />
-            {/* Glitch corner accents */}
-            <div className="absolute top-0 left-0 w-3 h-3 border-l-[3px] border-t-[3px] border-foreground" />
-            <div className="absolute top-0 right-0 w-3 h-3 border-r-[3px] border-t-[3px] border-foreground" />
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-l-[3px] border-b-[3px] border-foreground" />
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-r-[3px] border-b-[3px] border-foreground" />
-
-            {/* Top right indicator */}
-            <div className="absolute top-2 right-2 flex items-center gap-1">
-              <span className="w-[4px] h-[4px] bg-foreground/70" />
-              <span className="w-[4px] h-[4px] bg-foreground/70" />
-              <span className="w-[4px] h-[4px] bg-foreground/70" />
-            </div>
-
-            <div className="relative p-6 bg-gradient-to-br from-muted via-muted to-muted/80">
-              <div className="mb-4 font-mono text-[10px] tracking-[0.2em] uppercase text-foreground/90 flex items-center gap-2 font-bold">
-                <span className="inline-block h-[8px] w-[8px] bg-foreground animate-pulse" />
-                <span className="border border-foreground/40 px-2 py-0.5 bg-foreground/5">CORE STACK</span>
-                <span className="ml-auto font-mono text-[9px] opacity-40">[0x02]</span>
-              </div>
-              <div className="flex flex-wrap gap-2.5 mb-4">
-                {STACK_ITEMS.map((t, i) => (
-                  <span
-                    key={t}
-                    className="inline-flex items-center border-2 border-foreground/80 bg-foreground/5 px-3 py-1.5 font-mono text-[11px] tracking-wider text-foreground font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,0.3)] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all"
-                  >
-                    <span className="text-[8px] mr-1.5 opacity-50">{String(i + 1).padStart(2, '0')}</span>
-                    {t}
-                  </span>
-                ))}
-              </div>
-              <div className="mt-4 pt-3 border-t border-foreground/20 flex items-center justify-between">
-                <span className="font-mono font-bold text-[9px] text-foreground/40 tracking-wider">TECH_STACK_ARRAY[{STACK_ITEMS.length}]</span>
-                <div className="flex gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} className="w-[6px] h-[2px] bg-foreground/40" />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        
-
-        {/* Work Experience Card - 2 rows tall */}
-        
-          <div className="relative col-span-1 md:col-span-2 md:row-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]">
-            {/* Scanline overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-20"
-              style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)',
-              }}
-            />
-            {/* Glitch corner accents */}
-            <div className="absolute top-0 left-0 w-3 h-3 border-l-[3px] border-t-[3px] border-foreground" />
-            <div className="absolute top-0 right-0 w-3 h-3 border-r-[3px] border-t-[3px] border-foreground" />
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-l-[3px] border-b-[3px] border-foreground" />
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-r-[3px] border-b-[3px] border-foreground" />
-
-            {/* Top right timestamp */}
-            <div className="absolute top-2 right-2 font-mono text-[8px] text-foreground/30 tracking-wider">
-              2025.01.21
-            </div>
-
-            <div className="relative p-6 bg-gradient-to-br from-muted via-muted to-muted/80 h-full flex flex-col">
-              <div className="mb-5 font-mono text-[10px] tracking-[0.2em] uppercase text-foreground/90 flex items-center gap-2 font-bold">
-                <span className="inline-block h-[8px] w-[8px] bg-foreground animate-pulse" />
-                <span className="border border-foreground/40 px-2 py-0.5 bg-foreground/5">EXPERIENCE</span>
-                <span className="ml-auto font-mono text-[9px] opacity-40">[0x03]</span>
-              </div>
-              <div className="space-y-6 flex-1">
-                <div className="relative pl-4 border-l-[3px] border-foreground/90">
-                  <div className="absolute left-[-6px] top-0 w-[9px] h-[9px] bg-foreground border-2 border-muted animate-pulse" />
-                  <div className="flex items-start gap-2 mb-1.5 flex-wrap">
-                    <span className="font-mono text-[12px] text-foreground font-bold tracking-wide">Fullstack Engineer</span>
-                    <span className="inline-flex items-center border-2 border-foreground bg-foreground/90 text-muted px-2 py-0.5 font-mono text-[9px] tracking-[0.15em] font-bold">
-                      ACTIVE
-                    </span>
-                  </div>
-                  <p className="font-mono text-[11px] text-foreground/70 mb-1">Komma-D  <span className="text-foreground/70 text-[11px]">(1.5 years)</span></p>
-                  <p className="font-mono text-[10px] text-foreground/60 tracking-wide mt-2 mb-1">
-                    <span className="text-foreground/40 mr-1">→</span>
-                    {["Multi-tenant NextJS", "DevOps", "LLM-Chatbots"].join(" / ")}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <p className="font-mono text-[9px] text-foreground/50 tracking-wider">STATUS: ONGOING</p>
-                    <div className="flex-1 h-[4px] bg-foreground/20 relative max-w-[100px] overflow-hidden">
-                      <div
-                        className="absolute inset-y-0 w-1/2 bg-foreground/70"
-                        style={{ animation: 'loading 1.5s ease-in-out infinite' }}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="relative pl-4 border-l-[3px] border-foreground/50">
-                  <div className="absolute left-[-6px] top-0 w-[9px] h-[9px] bg-foreground/60 border-2 border-muted" />
-                  <p className="font-mono text-[12px] text-foreground font-bold tracking-wide mb-1.5">Intern Software Engineer <span className="text-foreground/70 text-[11px]"></span></p>
-                  <p className="font-mono text-[11px] text-foreground/70 mb-1">ASAP <span className="text-foreground/70 text-[11px]">(0.5 years)</span></p>
-                  <p className="font-mono text-[10px] text-foreground/60 tracking-wide mt-2 mb-1">
-                    <span className="text-foreground/40 mr-1">→</span>
-                    {["Image Detection", "Kotlin App"].join(" / ")}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <p className="font-mono text-[8px] text-foreground/40 tracking-wider">STATUS: COMPLETED</p>
-                    <span className="font-mono font-bold text-[9px] text-[#3d6514]">✓</span>
-                  </div>
-                </div>
-                <div className="relative pl-4 border-l-[3px] border-foreground/50">
-                  <div className="absolute left-[-6px] top-0 w-[9px] h-[9px] bg-foreground/60 border-2 border-muted" />
-                  <p className="font-mono text-[12px] text-foreground font-bold tracking-wide mb-1.5">Working Student Software Engineer <span className="text-foreground/70 text-[11px]"></span></p>
-                  <p className="font-mono text-[11px] text-foreground/70 mb-1">eSolutions <span className="text-foreground/70 text-[11px]">(0.5 years)</span></p>
-                  <p className="font-mono text-[10px] text-foreground/60 tracking-wide mt-2 mb-1">
-                    <span className="text-foreground/40 mr-1">→</span>
-                    {["Internal Tooling", "Go", "Angular"].join(" / ")}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <p className="font-mono text-[8px] text-foreground/40 tracking-wider">STATUS: COMPLETED</p>
-                    <span className="font-mono font-bold text-[9px] text-[#3d6514]">✓</span>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4 pt-3 border-t border-foreground/20 flex items-center justify-between">
-                <span className="font-mono font-bold text-[9px] text-foreground/40 tracking-wider">EXPERIENCE_LOG_COUNT: 03</span>
-                <span className="font-mono text-[8px] text-foreground/20">▓▓░</span>
-              </div>
-            </div>
-          </div>
-        
-
-        {/* Location Card */}
-        
-          <div className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]">
-            {/* Scanline overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-20"
-              style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)',
-              }}
-            />
-            {/* Glitch corner accents */}
-            <div className="absolute top-0 left-0 w-3 h-3 border-l-[3px] border-t-[3px] border-foreground" />
-            <div className="absolute top-0 right-0 w-3 h-3 border-r-[3px] border-t-[3px] border-foreground" />
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-l-[3px] border-b-[3px] border-foreground" />
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-r-[3px] border-b-[3px] border-foreground" />
-
-            {/* Top right geo icon */}
-            <div className="absolute top-2 right-2 flex flex-col gap-[2px]">
-              <div className="flex gap-[2px]">
-                <span className="w-[3px] h-[3px] border border-foreground/40" />
-                <span className="w-[3px] h-[3px] bg-foreground/60" />
-              </div>
-              <div className="flex gap-[2px]">
-                <span className="w-[3px] h-[3px] bg-foreground/60" />
-                <span className="w-[3px] h-[3px] border border-foreground/40" />
-              </div>
-            </div>
-
-            <div className="relative p-6 bg-gradient-to-br from-muted via-muted to-muted/80">
-              <div className="mb-4 font-mono text-[10px] tracking-[0.2em] uppercase text-foreground/90 flex items-center gap-2 font-bold">
-                <span className="inline-block h-[8px] w-[8px] bg-foreground animate-pulse" />
-                <span className="border border-foreground/40 px-2 py-0.5 bg-foreground/5">LOCATION</span>
-                <span className="ml-auto font-mono text-[9px] opacity-40">[0x04]</span>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-baseline gap-3">
-                  <span className="font-mono text-[8px] text-foreground/50 tracking-wider">REGION:</span>
-                  <p className="font-mono text-[13px] text-foreground font-bold tracking-wide">Bavaria, Germany</p>
-                </div>
-                <div className="flex items-baseline gap-3">
-                  <span className="font-mono text-[8px] text-foreground/50 tracking-wider">LOCAL TIME:</span>
-                  <LocalTimeClient />
-                </div>
-              </div>
-              <div className="mt-4 pt-3 border-t border-foreground/20 flex items-center justify-between">
-                <span className="font-mono font-bold text-[9px] text-foreground/40 tracking-wider">COORD_SYS: EU_CENTRAL</span>
-                <div className="flex gap-[1px]">
-                  <span className="w-[2px] h-[8px] bg-foreground/30" />
-                  <span className="w-[2px] h-[6px] bg-foreground/20 mt-[2px]" />
-                  <span className="w-[2px] h-[10px] bg-foreground/40" />
-                </div>
-              </div>
-            </div>
-          </div>
-        
-
-        {/* Stats Card */}
-        
-          <div className="relative col-span-1 md:col-span-2 rounded-none overflow-hidden border-2 border-foreground/90 bg-muted shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]">
-            {/* Scanline overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-20"
-              style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)',
-              }}
-            />
-            {/* Glitch corner accents */}
-            <div className="absolute top-0 left-0 w-3 h-3 border-l-[3px] border-t-[3px] border-foreground" />
-            <div className="absolute top-0 right-0 w-3 h-3 border-r-[3px] border-t-[3px] border-foreground" />
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-l-[3px] border-b-[3px] border-foreground" />
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-r-[3px] border-b-[3px] border-foreground" />
-
-            {/* Top right data grid */}
-            <div className="absolute top-2 right-2 grid grid-cols-3 gap-[2px]">
-              {[...Array(6)].map((_, i) => (
-                <span key={i} className="w-[3px] h-[3px] bg-foreground/40" />
-              ))}
-            </div>
-
-            <div className="relative p-6 bg-gradient-to-br from-muted via-muted to-muted/80">
-              <div className="mb-4 font-mono text-[10px] tracking-[0.2em] uppercase text-foreground/90 flex items-center gap-2 font-bold">
-                <span className="inline-block h-[8px] w-[8px] bg-foreground animate-pulse" />
-                <span className="border border-foreground/40 px-2 py-0.5 bg-foreground/5">STATS</span>
-                <span className="ml-auto font-mono text-[9px] opacity-40">[0x05]</span>
-              </div>
-              <div className="grid grid-cols-2 gap-5 text-foreground">
-                <div className="border-l-2 border-foreground/60 pl-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="font-mono text-[9px] text-foreground/50 uppercase tracking-[0.15em]">Age</p>
-                    <span className="font-mono text-[7px] text-foreground/30">●</span>
-                  </div>
-                  <p className="font-mono text-[15px] font-bold">25</p>
-                </div>
-                <div className="border-l-2 border-foreground/60 pl-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="font-mono text-[9px] text-foreground/50 uppercase tracking-[0.15em]">Gender</p>
-                    <span className="font-mono text-[7px] text-foreground/30">●</span>
-                  </div>
-                  <p className="font-mono text-[15px] font-bold">Male</p>
-                </div>
-                <div className="border-l-2 border-foreground/60 pl-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="font-mono text-[9px] text-foreground/50 uppercase tracking-[0.15em]">Status</p>
-                    <span className="font-mono text-[7px] text-foreground/30">●</span>
-                  </div>
-                  <p className="font-mono text-[15px] font-bold flex items-center gap-2">
-                    <span className="dot-led" /> Open
-                  </p>
-                </div>
-                <div className="border-l-2 border-foreground/60 pl-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="font-mono text-[9px] text-foreground/50 uppercase tracking-[0.15em]">Languages</p>
-                    <span className="font-mono text-[7px] text-foreground/30">●</span>
-                  </div>
-                  <p className="font-mono text-[15px] font-bold">EN / DE</p>
-                </div>
-              </div>
-              <div className="mt-4 pt-3 border-t border-foreground/20 flex items-center justify-between">
-                <span className="font-mono font-bold text-[9px] text-foreground/40 tracking-wider">DATA_FIELDS: 04 | INTEGRITY: 100%</span>
-                <div className="flex items-center gap-1">
-                  <span className="w-[6px] h-[6px] border border-foreground/30" />
-                  <span className="w-[6px] h-[6px] bg-foreground/60" />
-                </div>
-              </div>
-            </div>
-          </div>
-        
-        </div>
-      
     </div>
   );
+}
+
+function InViewAboutBlock() {
+  return <ModernAboutLayout />;
 }
 
 export default function AboutSection() {
@@ -482,49 +382,50 @@ export default function AboutSection() {
       {/* Pixelated divider overlay (no extra layout height) */}
       <div className="relative w-full h-0" aria-hidden>
         <div className="absolute inset-x-0" style={{ top: "-180px", height: "180px", zIndex: 5 }}>
-          
-            <PixelDivider
-              color="#0d0b08"
-              pixelSize={isMobile ? 12 : 24}
-              durationSec={8}
-              rise="-200%"
-              streamsPerCol={4}
-            />
-          
+          <PixelDivider
+            color="#0d0b08"
+            pixelSize={isMobile ? 12 : 24}
+            durationSec={8}
+            rise="-200%"
+            streamsPerCol={4}
+          />
         </div>
       </div>
 
-      <section id="work" className="relative w-full py-20 sm:py-28">
-        <div className="absolute inset-0 -z-10" style={{ backgroundColor: "var(--dark)" }} />
-        {/* DotGrid background */}
-        <div className="absolute inset-0 -z-10 opacity-60" aria-hidden>
+      <section
+        id="work"
+        data-snap-section="work"
+        aria-labelledby="about-heading"
+        className="relative w-full overflow-hidden py-24 sm:py-32"
+      >
+        <div className="absolute inset-0 -z-10 bg-[#0d0b08]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(115deg,rgba(212,205,196,0.08),transparent_28%,rgba(122,154,90,0.08)_72%,transparent)]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-56 bg-[linear-gradient(180deg,#0d0b08_0%,rgba(13,11,8,0.94)_26%,rgba(13,11,8,0)_100%)]" aria-hidden />
+        <div className="absolute inset-0 -z-10 opacity-45" style={SCANLINE_STYLE} />
+        <BackgroundLineArt className="opacity-55" />
 
-        </div>
-        {/* Geometric line art background */}
-        
-          <BackgroundLineArt className="-z-0" />
-        
         {/* Blueprint rim lines */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute inset-0 hidden sm:block"
           style={{
             background:
-              "linear-gradient(to right, rgba(166,159,141,0.18), rgba(166,159,141,0.18)) 12px 0 / 1px 100% no-repeat, " +
-              "linear-gradient(to right, rgba(166,159,141,0.18), rgba(166,159,141,0.18)) calc(100% - 12px) 0 / 1px 100% no-repeat, " +
-              "linear-gradient(to bottom, rgba(166,159,141,0.18), rgba(166,159,141,0.18)) 0 12px / 100% 1px no-repeat, " +
-              "linear-gradient(to bottom, rgba(166,159,141,0.18), rgba(166,159,141,0.18)) 0 calc(100% - 12px) / 100% 1px no-repeat, " +
-              "linear-gradient(to right, rgba(166,159,141,0.12), rgba(166,159,141,0.12)) 36px 0 / 1px 100% no-repeat, " +
-              "linear-gradient(to right, rgba(166,159,141,0.12), rgba(166,159,141,0.12)) calc(100% - 36px) 0 / 1px 100% no-repeat, " +
-              "linear-gradient(to bottom, rgba(166,159,141,0.12), rgba(166,159,141,0.12)) 0 36px / 100% 1px no-repeat, " +
-              "linear-gradient(to bottom, rgba(166,159,141,0.12), rgba(166,159,141,0.12)) 0 calc(100% - 36px) / 100% 1px no-repeat",
+              "linear-gradient(to right, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) 12px 0 / 1px 100% no-repeat, " +
+              "linear-gradient(to right, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) calc(100% - 12px) 0 / 1px 100% no-repeat, " +
+              "linear-gradient(to bottom, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) 0 12px / 100% 1px no-repeat, " +
+              "linear-gradient(to bottom, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) 0 calc(100% - 12px) / 100% 1px no-repeat, " +
+              "linear-gradient(to right, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) 36px 0 / 1px 100% no-repeat, " +
+              "linear-gradient(to right, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) calc(100% - 36px) 0 / 1px 100% no-repeat, " +
+              "linear-gradient(to bottom, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) 0 36px / 100% 1px no-repeat, " +
+              "linear-gradient(to bottom, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) 0 calc(100% - 36px) / 100% 1px no-repeat",
           }}
         />
-        <div className="relative mx-auto w-full max-w-6xl px-8">
-          
-            <InViewAboutBlock />
-          
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 sm:px-8">
+          <InViewAboutBlock />
         </div>
+
+        {/* Bottom fade into next section */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-40 bg-[linear-gradient(180deg,rgba(13,11,8,0)_0%,#0d0b08_100%)]" aria-hidden />
       </section>
     </>
   );

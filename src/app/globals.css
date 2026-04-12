@@ -90,9 +90,6 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* Remove dark mode overrides to keep text always dark */
-html { scroll-behavior: smooth; }
-
 body {
   /* Base color */
   background-color: var(--background);

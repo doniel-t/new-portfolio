@@ -62,9 +62,10 @@ function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: 
 
   return (
     <>
-      <div className="fixed inset-0 z-50 bg-[#0d0b08] animate-[fadeIn_0.2s_ease-out]" />
+      <div data-lenis-prevent className="fixed inset-0 z-50 bg-[#0d0b08] animate-[fadeIn_0.2s_ease-out]" />
 
       <div
+        data-lenis-prevent
         className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 ${
           isReady ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
@@ -74,6 +75,7 @@ function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: 
 
       <div
         onClick={onClose}
+        data-lenis-prevent
         className={`fixed inset-0 z-50 overflow-hidden transition-opacity duration-300 ${
           isReady ? "opacity-100" : "opacity-0"
         }`}
@@ -108,6 +110,7 @@ function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: 
         }`}
       >
         <motion.div
+          data-lenis-prevent
           initial={{ clipPath: "inset(0 100% 0 0)", opacity: 0.85 }}
           animate={isReady ? { clipPath: "inset(0 0 0 0)", opacity: 1 } : { clipPath: "inset(0 100% 0 0)", opacity: 0.85 }}
           transition={{ duration: isMobile ? 0.42 : 0.6, ease: EASE_OUT }}
@@ -161,6 +164,7 @@ function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: 
             initial={{ opacity: 0, y: 14 }}
             animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
             transition={{ duration: isMobile ? 0.3 : 0.42, ease: EASE_OUT, delay: 0.16 }}
+            data-lenis-prevent
             className="relative flex-1 overflow-y-auto px-5 sm:px-8 lg:px-10 pt-6 pb-20"
           >
             <div className="mb-5 flex items-center gap-3">

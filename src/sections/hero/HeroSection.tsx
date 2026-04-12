@@ -1,26 +1,26 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { motion, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import PixelTransition from "@/components/PixelTransition";
 import DecodingWord from "@/components/DecodingWord";
 import Dither from "@/components/Dither";
+import { useSectionScroll } from "@/hooks/useSectionScroll";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useParallax } from "./useParallax";
 import { getHeroVariants } from "./variants";
+import HeroArtwork from "./HeroArtwork";
 
 const HEADING_TEXT = "Modern web experiences with a refined, understated aesthetic.";
 
 export default function HeroSection() {
   const isMobile = useIsMobile();
+  const scrollToSection = useSectionScroll();
   const sectionRef = React.useRef<HTMLElement | null>(null);
   const scrollScale = isMobile ? 0.9 : 1.2;
   const headingWords = HEADING_TEXT.split(" ");
   const { gridContainer, leftSection, childItem, rightSection } = getHeroVariants(isMobile);
-  const { rotateX, rotateY, shiftX, shiftY, scrollProgress, handleParallaxMove, resetParallax } =
-    useParallax(isMobile, sectionRef);
+  const { scrollProgress } = useParallax(isMobile, sectionRef);
 
   const portfolioX = useTransform(scrollProgress, [0, 1], [0, -24 * scrollScale]);
   const portfolioY = useTransform(scrollProgress, [0, 1], [0, -34 * scrollScale]);
@@ -32,11 +32,19 @@ export default function HeroSection() {
   const buttonsY = useTransform(scrollProgress, [0, 1], [0, -15 * scrollScale]);
   const imageScrollX = useTransform(scrollProgress, [0, 1], [0, 21 * scrollScale]);
   const imageScrollY = useTransform(scrollProgress, [0, 1], [0, -24 * scrollScale]);
-  const imageX = useTransform(() => shiftX.get() + imageScrollX.get());
-  const imageY = useTransform(() => shiftY.get() + imageScrollY.get());
+
+  const handleSectionLinkClick = React.useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+      event.preventDefault();
+      scrollToSection(href);
+    },
+    [scrollToSection]
+  );
 
   return (
     <main
+      id="home"
+      data-snap-section="home"
       ref={sectionRef}
       className="relative min-h-[100vh] sm:min-h-[100vh] flex items-center justify-center p-8 sm:p-16"
     >
@@ -98,6 +106,7 @@ export default function HeroSection() {
                 <motion.a
                   className="group inline-flex items-center gap-2 rounded-md px-5 py-3 bg-[#0d0b08] text-background hover:opacity-90 transition-colors z-99"
                   href="#projects"
+                  onClick={(event) => handleSectionLinkClick(event, "#projects")}
                   whileHover={isMobile ? {} : { x: 4, scale: 1.01 }}
                   whileTap={isMobile ? {} : { scale: 0.98 }}
                 >
@@ -121,6 +130,7 @@ export default function HeroSection() {
                 <motion.a
                   className="group inline-flex items-center gap-2 rounded-md px-5 py-3 border border-muted/40 text-foreground hover:bg-[#0d0b08] hover:text-white transition-colors duration-300 z-99"
                   href="#contact"
+                  onClick={(event) => handleSectionLinkClick(event, "#contact")}
                   whileHover={isMobile ? {} : { x: 4, scale: 1.01 }}
                   whileTap={isMobile ? {} : { scale: 0.98 }}
                 >
@@ -153,48 +163,9 @@ export default function HeroSection() {
           >
             <motion.div
               className="relative"
-              style={
-                isMobile
-                  ? { x: imageScrollX, y: imageScrollY }
-                  : { rotateX, rotateY, x: imageX, y: imageY, transformPerspective: 800 }
-              }
-              onMouseMove={handleParallaxMove}
-              onMouseLeave={resetParallax}
+              style={{ x: imageScrollX, y: imageScrollY }}
             >
-              <div className="absolute -inset-6 -z-10 rounded-[28px] bg-accent/20 blur-2xl" />
-              <div
-                className="absolute -inset-x-12 -bottom-10 -z-10 h-36 bg-green-blob rounded-full blur-3xl opacity-70"
-                aria-hidden
-              />
-              
-                <PixelTransition
-                  gridSize={isMobile ? 12 : 24}
-                  pixelColor="#1C1303"
-                  animationStepDuration={isMobile ? 0.5 : 0.75}
-                  startActive
-                  aspectRatio="100%"
-                  autoplayReveal
-                  autoplayDelayMs={isMobile ? 0 : 150}
-                  firstContent={
-                    <Image
-                      src="/kino crop.png"
-                      alt="Kino"
-                      priority
-                      className="w-full h-auto object-contain shadow-2xl"
-                      width={0}
-                      height={0}
-                      sizes="100vw"
-                    />
-                  }
-                  secondContent={<div className="w-full h-full bg-[#1C1303]" />}
-                />
-              
-              <motion.div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                animate={isMobile ? {} : { y: [0, -8, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              />
+              <HeroArtwork isMobile={isMobile} />
             </motion.div>
           </motion.div>
         

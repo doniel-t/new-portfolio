@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 
-export default function LocalTimeClient() {
+type LocalTimeClientProps = {
+  className?: string;
+};
+
+export default function LocalTimeClient({
+  className = "font-mono text-[11px] text-foreground/70",
+}: LocalTimeClientProps) {
   const [time, setTime] = useState<string | null>(null);
 
   useEffect(() => {
@@ -19,7 +25,7 @@ export default function LocalTimeClient() {
   if (!time) return null;
 
   return (
-    <p className="font-mono text-[11px] text-foreground/70 tracking-wider">
+    <p className={className}>
       {time}
     </p>
   );

@@ -4,16 +4,31 @@ import React from "react";
 import { Mail, Github, Linkedin } from "lucide-react";
 import PixelDivider from "@/components/PixelDivider";
 import ContactForm from "@/components/ContactForm";
+import { useSectionScroll } from "@/hooks/useSectionScroll";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import FooterDecorations from "./FooterDecorations";
 import FooterName from "./FooterName";
 
 export default function FooterSection() {
   const isMobile = useIsMobile();
+  const scrollToSection = useSectionScroll();
   const footerRef = React.useRef<HTMLElement>(null);
 
+  const handleSectionLinkClick = React.useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+      event.preventDefault();
+      scrollToSection(href);
+    },
+    [scrollToSection]
+  );
+
   return (
-    <footer ref={footerRef} id="contact" className="relative w-full bg-[#0d0b08] overflow-hidden">
+    <footer
+      ref={footerRef}
+      id="contact"
+      data-snap-section="contact"
+      className="relative w-full bg-[#0d0b08] overflow-hidden"
+    >
       {/* PixelDivider at very top of footer - white, going down */}
 {/* White PixelDivider at the top - going down */}
 <div className="relative w-full h-0" aria-hidden>
@@ -69,11 +84,8 @@ export default function FooterSection() {
                 </div>
                 <nav className="flex flex-col gap-3">
                   <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
+                    href="#home"
+                    onClick={(event) => handleSectionLinkClick(event, "#home")}
                     className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
                   >
                     <div className="w-4 h-px bg-white/20 group-hover:bg-white/50 group-hover:w-6 transition-all duration-300" />
@@ -81,6 +93,7 @@ export default function FooterSection() {
                   </a>
                   <a
                     href="#work"
+                    onClick={(event) => handleSectionLinkClick(event, "#work")}
                     className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
                   >
                     <div className="w-4 h-px bg-white/20 group-hover:bg-white/50 group-hover:w-6 transition-all duration-300" />
@@ -88,6 +101,7 @@ export default function FooterSection() {
                   </a>
                   <a
                     href="#projects"
+                    onClick={(event) => handleSectionLinkClick(event, "#projects")}
                     className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
                   >
                     <div className="w-4 h-px bg-white/20 group-hover:bg-white/50 group-hover:w-6 transition-all duration-300" />
@@ -95,6 +109,7 @@ export default function FooterSection() {
                   </a>
                   <a
                     href="#hobbies"
+                    onClick={(event) => handleSectionLinkClick(event, "#hobbies")}
                     className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
                   >
                     <div className="w-4 h-px bg-white/20 group-hover:bg-white/50 group-hover:w-6 transition-all duration-300" />

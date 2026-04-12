@@ -8,6 +8,7 @@ import DecodingWord from "@/components/DecodingWord";
 import Aurora from "@/components/Aurora";
 import HorizontalPixelDivider from "@/components/HorizontalPixelDivider";
 import PixelDivider from "@/components/PixelDivider";
+import { useSectionScroll } from "@/hooks/useSectionScroll";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import ExpandedHobbyModal from "./ExpandedHobbyModal";
 import { HOBBIES } from "./data";
@@ -15,15 +16,15 @@ import type { HobbyCard as HobbyCardType } from "./types";
 
 const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-function handleSmoothScroll(e: React.MouseEvent<HTMLAnchorElement>, targetId: string) {
-  e.preventDefault();
-  const element = document.getElementById(targetId);
-  if (element) {
-    element.scrollIntoView({ behavior: "smooth", block: "center" });
-  }
-}
-
-function ScrollSpy({ activeIndex, isVisible }: { activeIndex: number; isVisible: boolean }) {
+function ScrollSpy({
+  activeIndex,
+  isVisible,
+  onNavigate,
+}: {
+  activeIndex: number;
+  isVisible: boolean;
+  onNavigate: (targetId: string) => void;
+}) {
   return (
     <AnimatePresence>
       {isVisible && (
@@ -45,7 +46,10 @@ function ScrollSpy({ activeIndex, isVisible }: { activeIndex: number; isVisible:
                   <a
                     key={hobby.title}
                     href={`#hobby-${index}`}
-                    onClick={(e) => handleSmoothScroll(e, `hobby-${index}`)}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      onNavigate(`hobby-${index}`);
+                    }}
                     className="group relative flex items-center"
                     aria-label={`Go to ${spyLabel}`}
                   >
@@ -85,10 +89,12 @@ const HobbiesScrollSpyLayer = React.memo(function HobbiesScrollSpyLayer({
   sectionRef,
   hobbyRefs,
   isMobile,
+  onNavigate,
 }: {
   sectionRef: React.RefObject<HTMLElement | null>;
   hobbyRefs: HobbyRefs;
   isMobile: boolean;
+  onNavigate: (targetId: string) => void;
 }) {
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [isScrollSpyVisible, setIsScrollSpyVisible] = React.useState(false);
@@ -141,7 +147,13 @@ const HobbiesScrollSpyLayer = React.memo(function HobbiesScrollSpyLayer({
     return () => observer.disconnect();
   }, [hobbyRefs]);
 
-  return <ScrollSpy activeIndex={activeIndex} isVisible={isScrollSpyVisible && !isMobile} />;
+  return (
+    <ScrollSpy
+      activeIndex={activeIndex}
+      isVisible={isScrollSpyVisible && !isMobile}
+      onNavigate={onNavigate}
+    />
+  );
 });
 
 const HobbiesHeader = React.memo(function HobbiesHeader({
@@ -569,6 +581,7 @@ function HobbiesSection() {
   const sectionRef = React.useRef<HTMLElement | null>(null);
   const isInViewOnce = useInView(containerRef, { once: true, margin: "0px 0px -20% 0px" });
   const isMobile = useIsMobile();
+  const scrollToSection = useSectionScroll();
   const [expandedCard, setExpandedCard] = React.useState<number | null>(null);
   const hobbyRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const auroraRef = React.useRef<HTMLDivElement | null>(null);
@@ -601,8 +614,23 @@ function HobbiesSection() {
     setExpandedCard(null);
   }, []);
 
+  const handleHobbyNavigate = React.useCallback(
+    (targetId: string) => {
+      scrollToSection(`#${targetId}`, {
+        align: "center",
+        duration: 0.9,
+      });
+    },
+    [scrollToSection]
+  );
+
   return (
-    <section id="hobbies" ref={sectionRef} className="relative bg-[#f6f4ef]">
+    <section
+      id="hobbies"
+      data-snap-section="hobbies"
+      ref={sectionRef}
+      className="relative bg-[#f6f4ef]"
+    >
       <div
         ref={auroraRef}
         className="absolute inset-x-0 top-0 h-[100vh] z-[1] pointer-events-none overflow-hidden"
@@ -611,7 +639,12 @@ function HobbiesSection() {
       </div>
       <div className="absolute inset-0 work-section-noise pointer-events-none z-0 opacity-30" />
 
-      <HobbiesScrollSpyLayer sectionRef={sectionRef} hobbyRefs={hobbyRefs} isMobile={isMobile} />
+      <HobbiesScrollSpyLayer
+        sectionRef={sectionRef}
+        hobbyRefs={hobbyRefs}
+        isMobile={isMobile}
+        onNavigate={handleHobbyNavigate}
+      />
 
       <div className="relative w-full h-0" aria-hidden>
         <div className="absolute inset-x-0" style={{ top: "0px", height: "180px", zIndex: 5 }}>

@@ -11,10 +11,16 @@ import { useGPUDetection } from "@/hooks/useGPUDetection";
 
 type TechItem = {
   name: string;
-  category: string;
   cost: number;
   icon: React.ReactNode;
   description: string;
+};
+
+type CategoryDef = {
+  key: string;
+  label: string;
+  tag: string;
+  items: TechItem[];
 };
 
 type ActiveRect = {
@@ -59,27 +65,56 @@ const ICONS = {
   figma: <SiFigma size={24} />,
 };
 
-const TECH_STACK: TechItem[] = [
-  { name: "Next.js", category: "Framework", cost: 12, icon: ICONS.nextjs, description: "Server-side Rendering" },
-  { name: "React", category: "Library", cost: 10, icon: ICONS.react, description: "UI Components" },
-  { name: "TypeScript", category: "Language", cost: 8, icon: ICONS.typescript, description: "Type Safety" },
-  { name: "Tailwind", category: "CSS", cost: 6, icon: ICONS.tailwind, description: "Utility-first" },
-  { name: "Go", category: "Language", cost: 14, icon: ICONS.go, description: "High Performance" },
-  { name: "Python", category: "Language", cost: 10, icon: ICONS.python, description: "Automation & AI" },
-  { name: "Postgres", category: "Database", cost: 11, icon: ICONS.postgres, description: "Relational DB" },
-  { name: "Strapi", category: "CMS", cost: 9, icon: ICONS.strapi, description: "Headless CMS" },
-  { name: "Payload", category: "CMS", cost: 9, icon: ICONS.payload, description: "Code-first CMS" },
-  { name: "Docker", category: "Container", cost: 15, icon: ICONS.docker, description: "Containerization" },
-  { name: "Podman", category: "Container", cost: 12, icon: ICONS.podman, description: "Daemonless" },
-  { name: "Nginx", category: "Server", cost: 8, icon: ICONS.nginx, description: "Reverse Proxy" },
-  { name: "Git", category: "VCS", cost: 4, icon: ICONS.git, description: "Version Control" },
-  { name: "GitHub Actions", category: "CI/CD", cost: 13, icon: ICONS.github, description: "Automation Workflows" },
-  { name: "GitLab CI", category: "CI/CD", cost: 13, icon: ICONS.gitlab, description: "DevOps Pipelines" },
-  { name: "Figma", category: "Design", cost: 7, icon: ICONS.figma, description: "UI/UX Design" },
+const CATEGORIES: CategoryDef[] = [
+  {
+    key: "frontend",
+    label: "FRONTEND",
+    tag: "SYS.UI",
+    items: [
+      { name: "Next.js", cost: 12, icon: ICONS.nextjs, description: "Server-side Rendering" },
+      { name: "React", cost: 10, icon: ICONS.react, description: "UI Components" },
+      { name: "TypeScript", cost: 8, icon: ICONS.typescript, description: "Type Safety" },
+      { name: "Tailwind", cost: 6, icon: ICONS.tailwind, description: "Utility-first" },
+    ],
+  },
+  {
+    key: "backend",
+    label: "BACKEND",
+    tag: "SYS.CORE",
+    items: [
+      { name: "Go", cost: 14, icon: ICONS.go, description: "High Performance" },
+      { name: "Python", cost: 10, icon: ICONS.python, description: "Automation & AI" },
+      { name: "Postgres", cost: 11, icon: ICONS.postgres, description: "Relational DB" },
+      { name: "Nginx", cost: 8, icon: ICONS.nginx, description: "Reverse Proxy" },
+    ],
+  },
+  {
+    key: "cms",
+    label: "CMS",
+    tag: "SYS.DATA",
+    items: [
+      { name: "Strapi", cost: 9, icon: ICONS.strapi, description: "Headless CMS" },
+      { name: "Payload", cost: 9, icon: ICONS.payload, description: "Code-first CMS" },
+    ],
+  },
+  {
+    key: "tooling",
+    label: "TOOLING",
+    tag: "SYS.OPS",
+    items: [
+      { name: "Docker", cost: 15, icon: ICONS.docker, description: "Containerization" },
+      { name: "Podman", cost: 12, icon: ICONS.podman, description: "Daemonless" },
+      { name: "Git", cost: 4, icon: ICONS.git, description: "Version Control" },
+      { name: "GitHub Actions", cost: 13, icon: ICONS.github, description: "Automation Workflows" },
+      { name: "GitLab CI", cost: 13, icon: ICONS.gitlab, description: "DevOps Pipelines" },
+      { name: "Figma", cost: 7, icon: ICONS.figma, description: "UI/UX Design" },
+    ],
+  },
 ];
 
-// Pre-compute total memory cost
-const TOTAL_MEMORY = TECH_STACK.reduce((acc, item) => acc + item.cost, 0);
+// Flatten all items for particle layer indexing
+const ALL_ITEMS = CATEGORIES.flatMap(c => c.items);
+const TOTAL_MEMORY = ALL_ITEMS.reduce((acc, item) => acc + item.cost, 0);
 
 export default function TechStack() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -94,9 +129,9 @@ export default function TechStack() {
   const enableHoverParticles = !isMobile && !prefersReducedMotion && gpuSupport !== 'none';
   const enableCursor = !prefersReducedMotion && gpuSupport !== 'none';
 
-  // Memoize hover handlers to prevent recreation on each render
-  const hoverHandlers = useMemo(() => 
-    TECH_STACK.map((_, index) => ({
+  // Memoize hover handlers for all items (flat index)
+  const hoverHandlers = useMemo(() =>
+    ALL_ITEMS.map((_, index) => ({
       onHoverStart: () => {
         if (!enableHoverParticles) return;
         sharedParticleLayerRef.current?.setHoveredIndex(index);
@@ -105,110 +140,160 @@ export default function TechStack() {
         if (!enableHoverParticles) return;
         sharedParticleLayerRef.current?.setHoveredIndex(null);
       },
-    })), 
+    })),
   [enableHoverParticles]);
-  
+
+  // Build a flat index offset per category
+  let flatIndex = 0;
+
   return (
-    <section id="installed_chips" className="relative w-full py-20 overflow-hidden" ref={containerRef}>
-      {/* Target Cursor for Tech Cards */}
+    <section
+      id="installed_chips"
+      data-snap-section="installed_chips"
+      className="relative w-full py-20 overflow-hidden"
+      ref={containerRef}
+    >
       {enableCursor && (
-        
-          <TargetCursor 
-            targetSelector=".tech-card" 
-            spinDuration={4} 
-            hideDefaultCursor={false} 
-            hoverDuration={0.15}
-            parallaxOn={false}
-          />
-        
+        <TargetCursor
+          targetSelector=".tech-card"
+          spinDuration={4}
+          hideDefaultCursor={false}
+          hoverDuration={0.15}
+          parallaxOn={false}
+        />
       )}
 
       {/* Background decorations */}
       <div className="absolute inset-0 bg-[#0d0b08]/95 -z-20" style={{ backgroundColor: "var(--dark)" }} />
-      
-      {/* Decorative Separator & Fade Mask */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#A69F8D]/30 to-transparent z-10" />
-      <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-[var(--dark)] to-transparent z-0 pointer-events-none" />
+      <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-[var(--dark)] to-transparent z-0 pointer-events-none" />
 
-      {/* Dither animated background - disabled on mobile */}
+      {/* Dither animated background */}
       {!prefersReducedMotion && !isMobile && (
-        
-          <div 
-            className="absolute inset-0 -z-15 opacity-[0.16] pointer-events-none" 
-            style={{ 
-              maskImage: "linear-gradient(to bottom, transparent 20%, black 100%)", 
-              WebkitMaskImage: "linear-gradient(to bottom, transparent 20%, black 100%)"
-            }}
-          >
-            <Dither
-              waveColor={[166 / 255, 159 / 255, 141 / 255]}
-              disableAnimation={false}
-              enableMouseInteraction={false}
-              colorNum={2}
-              waveAmplitude={0.1}
-              waveFrequency={2}
-              waveSpeed={0.05}
-            />
-          </div>
-        
+        <div
+          className="absolute inset-0 -z-15 opacity-[0.16] pointer-events-none"
+          style={{
+            maskImage: "linear-gradient(to bottom, transparent 50%, black 100%)",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent 50%, black 100%)"
+          }}
+        >
+          <Dither
+            waveColor={[166 / 255, 159 / 255, 141 / 255]}
+            disableAnimation={false}
+            enableMouseInteraction={false}
+            colorNum={2}
+            waveAmplitude={0.1}
+            waveFrequency={2}
+            waveSpeed={0.05}
+          />
+        </div>
       )}
       <div className="absolute inset-0 scanlines -z-10 opacity-30 pointer-events-none" style={{ maskImage: "linear-gradient(to bottom, transparent 0%, black 150px)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 150px)" }} />
-
-      {/* Bottom fade overlay - on top of dither */}
       <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[#3C3A35] to-transparent z-0 pointer-events-none" />
 
       {/* Header */}
       <div className="max-w-7xl mx-auto px-8 mb-16">
-         
-           <motion.div 
-             className="flex items-center gap-4 border-b border-[#A69F8D]/30 pb-4 mb-8"
-           >
-              <div className="w-2 h-2 bg-[#A69F8D] rotate-45" />
-              <h2 className="text-2xl sm:text-3xl font-display tracking-widest text-[#A69F8D]">
-                <DecodingWord word="INSTALLED_CHIPS" active={isInView} />
-              </h2>
-              <div className="flex-1" />
-              <div className="text-xs font-mono text-[#A69F8D]/60 tracking-widest">
-                MEMORY: {TOTAL_MEMORY} / 256
-              </div>
-           </motion.div>
-         
+        <motion.div className="flex items-center gap-4 border-b border-[#A69F8D]/30 pb-4 mb-12">
+          <div className="w-2 h-2 bg-[#A69F8D] rotate-45" />
+          <h2 className="text-2xl sm:text-3xl font-display tracking-widest text-[#A69F8D]">
+            <DecodingWord word="INSTALLED_CHIPS" active={isInView} />
+          </h2>
+          <div className="flex-1" />
+          <div className="text-xs font-mono text-[#A69F8D]/60 tracking-widest">
+            MEMORY: {TOTAL_MEMORY} / 256
+          </div>
+        </motion.div>
 
-         {/* Grid of Chips */}
-         <div ref={gridContainerRef} className="relative">
-             {enableHoverParticles && (
-               
-                 <SharedParticleLayer 
-                   ref={sharedParticleLayerRef}
-                   containerRef={gridContainerRef} 
-                   cardRefs={cardRefs}
-                 />
-               
-             )}
-            
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 relative z-10">
-                {TECH_STACK.map((tech, index) => (
-                  
-                    <Chip 
-                      key={tech.name}
-                      tech={tech} 
-                      index={index} 
-                      cardRefs={cardRefs}
-                      onHoverStart={hoverHandlers[index].onHoverStart}
-                      onHoverEnd={hoverHandlers[index].onHoverEnd}
-                    />
-                  
-                ))}
-              </div>
-            
-         </div>
+        {/* Categorized chip grid */}
+        <div ref={gridContainerRef} className="relative">
+          {enableHoverParticles && (
+            <SharedParticleLayer
+              ref={sharedParticleLayerRef}
+              containerRef={gridContainerRef}
+              cardRefs={cardRefs}
+            />
+          )}
+
+          <div className="space-y-14 relative z-10">
+            {CATEGORIES.map((category) => {
+              const startIndex = flatIndex;
+              flatIndex += category.items.length;
+              const categoryMem = category.items.reduce((a, b) => a + b.cost, 0);
+
+              return (
+                <CategoryBlock
+                  key={category.key}
+                  category={category}
+                  categoryMem={categoryMem}
+                  startIndex={startIndex}
+                  cardRefs={cardRefs}
+                  hoverHandlers={hoverHandlers}
+                  isInView={isInView}
+                />
+              );
+            })}
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
-// Pre-compute cost bars to avoid recreation
-const COST_BARS = TECH_STACK.map(tech => Math.ceil(tech.cost / 3));
+// ── Category header + grid ──────────────────────────────────────────────
+
+const CategoryBlock = memo(function CategoryBlock({
+  category,
+  categoryMem,
+  startIndex,
+  cardRefs,
+  hoverHandlers,
+  isInView,
+}: {
+  category: CategoryDef;
+  categoryMem: number;
+  startIndex: number;
+  cardRefs: React.MutableRefObject<(HTMLDivElement | null)[]>;
+  hoverHandlers: { onHoverStart: () => void; onHoverEnd: () => void }[];
+  isInView: boolean;
+}) {
+  return (
+    <div>
+      {/* Category header */}
+      <div className="flex items-center gap-4 mb-5 font-mono select-none">
+        <div className="w-1.5 h-1.5 bg-[#A69F8D] rotate-45 shrink-0" />
+        <h3 className="text-3xl sm:text-4xl font-display font-bold italic leading-none tracking-tight text-[#A69F8D] whitespace-nowrap">
+          {isInView ? <DecodingWord word={category.label} /> : category.label}
+        </h3>
+        <div className="flex-1 h-px bg-[#A69F8D]/15" />
+        <span className="text-[10px] tracking-widest text-[#A69F8D]/35 uppercase hidden sm:block">
+          {category.tag}
+        </span>
+        <span className="text-[10px] font-mono tracking-wider text-[#A69F8D]/50">
+          {category.items.length} chips
+        </span>
+      </div>
+
+      {/* Cards grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        {category.items.map((tech, localIdx) => {
+          const globalIdx = startIndex + localIdx;
+          return (
+            <Chip
+              key={tech.name}
+              tech={tech}
+              index={globalIdx}
+              cardRefs={cardRefs}
+              onHoverStart={hoverHandlers[globalIdx].onHoverStart}
+              onHoverEnd={hoverHandlers[globalIdx].onHoverEnd}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+});
+
+// Pre-compute cost bars
+const COST_BARS = ALL_ITEMS.map(tech => Math.ceil(tech.cost / 3));
 
 // Particle pool size - reduced from 90 for better performance
 const MAX_PARTICLES = 40;
@@ -237,7 +322,6 @@ const Chip = memo(function Chip({
 }) {
   const filledBars = COST_BARS[index];
 
-  // Stable ref callback - avoids creating new functions on parent re-render
   const setRef = useCallback((element: HTMLDivElement | null) => {
     cardRefs.current[index] = element;
   }, [cardRefs, index]);
@@ -250,7 +334,7 @@ const Chip = memo(function Chip({
       onFocus={onHoverStart}
       onBlur={onHoverEnd}
       tabIndex={0}
-      className="relative min-h-[140px] h-auto p-4 border transition-colors duration-200 cursor-default group overflow-hidden tech-card bg-[#0d0b08]/40 border-[#A69F8D]/30 text-[#A69F8D] hover:border-[#A69F8D]/80 hover:bg-[#A69F8D] hover:text-[#0d0b08] focus-visible:border-[#A69F8D] focus-visible:bg-[#A69F8D] focus-visible:text-[#0d0b08]"
+      className="relative min-h-[160px] h-auto p-5 border transition-colors duration-200 cursor-default group overflow-hidden tech-card backdrop-blur-sm bg-[#0d0b08]/50 border-[#A69F8D]/30 text-[#A69F8D] hover:border-[#A69F8D]/80 hover:bg-[#A69F8D] hover:text-[#0d0b08] focus-visible:border-[#A69F8D] focus-visible:bg-[#A69F8D] focus-visible:text-[#0d0b08]"
     >
       {/* Corner decorative markers */}
       <div className="absolute top-0 left-0 w-1 h-1 transition-colors bg-[#A69F8D] group-hover:bg-[#0d0b08] group-focus-visible:bg-[#0d0b08]" />
@@ -275,15 +359,14 @@ const Chip = memo(function Chip({
             {tech.name}
           </span>
         </div>
-        
+
         <div className="h-[1px] w-full bg-current opacity-20 mb-2" />
-        
+
         <div className="flex justify-between items-end">
           <span className="text-[10px] font-mono uppercase tracking-widest opacity-80 truncate mr-2">
-              {tech.category}
+            {tech.description}
           </span>
-          
-          {/* Hover reveal description or static decorative bar */}
+
           <CostBars filled={filledBars} />
         </div>
       </div>

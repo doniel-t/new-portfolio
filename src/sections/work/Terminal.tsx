@@ -265,7 +265,10 @@ function Terminal({
       <div className="relative z-0 flex flex-col lg:flex-row h-[calc(100%-40px)]">
         {/* Left panel: Terminal/Project list */}
         
-          <div className="flex-1 lg:flex-none lg:w-[55%] p-4 sm:p-6 font-mono text-sm lg:border-r border-[#d4cdc4]/10 overflow-y-auto terminal-scrollbar">
+          <div
+            data-lenis-prevent
+            className="flex-1 lg:flex-none lg:w-[55%] p-4 sm:p-6 font-mono text-sm lg:border-r border-[#d4cdc4]/10 overflow-y-auto terminal-scrollbar"
+          >
           {/* Boot sequence */}
           {!isMobile && (
             <div className="space-y-1.5 mb-6">
@@ -450,6 +453,7 @@ function Terminal({
                     >
                       <div
                         ref={outputRef}
+                        data-lenis-prevent
                         className="mt-4 max-h-40 overflow-y-auto space-y-2 border-t border-dashed border-[#d4cdc4]/10 pt-3 terminal-scrollbar"
                       >
                         {commandHistory.map((entry, i) => (

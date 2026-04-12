@@ -75,10 +75,11 @@ function ProjectModal({
   return (
     <>
       {/* Solid black base - prevents white flicker */}
-      <div className="fixed inset-0 z-50 bg-[#0d0b08] animate-[fadeIn_0.2s_ease-out]" />
+      <div data-lenis-prevent className="fixed inset-0 z-50 bg-[#0d0b08] animate-[fadeIn_0.2s_ease-out]" />
 
       {/* Loading spinner - fades out when ready */}
       <div
+        data-lenis-prevent
         className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 ${
           isReady ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
@@ -89,6 +90,7 @@ function ProjectModal({
       {/* Backdrop with blurred project image */}
       <div
         onClick={onClose}
+        data-lenis-prevent
         className={`fixed inset-0 z-50 overflow-hidden transition-opacity duration-300 ${
           isReady ? "opacity-100" : "opacity-0"
         }`}
@@ -125,7 +127,10 @@ function ProjectModal({
           isReady ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/20 bg-[#0d0b08] pointer-events-auto">
+        <div
+          data-lenis-prevent
+          className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/20 bg-[#0d0b08] pointer-events-auto"
+        >
           {/* Close button */}
           <button
             onClick={onClose}

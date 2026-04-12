@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSectionScroll } from "@/hooks/useSectionScroll";
 
 const NAV_ITEMS = [
   { label: "Home", href: "#home" },
@@ -17,18 +18,6 @@ const DARK_SECTIONS = ["work", "installed_chips", "contact", "projects"];
 // Pixel grid configuration
 const PIXEL_SIZE = 6; // px - fixed square size
 const PIXEL_ANIMATION_DURATION = 350; // ms
-
-function handleSmoothScroll(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
-  e.preventDefault();
-  if (href === "#home") {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    return;
-  }
-  const element = document.getElementById(href.slice(1));
-  if (element) {
-    element.scrollIntoView({ behavior: "smooth" });
-  }
-}
 
 // Check for reduced motion preference (cached at module level for performance)
 const prefersReducedMotion = typeof window !== "undefined"
@@ -164,6 +153,7 @@ function PixelTransitionOverlay({
 }
 
 export default function Navbar() {
+  const scrollToSection = useSectionScroll();
   const [isOpen, setIsOpen] = React.useState(false);
   const [isHovered, setIsHovered] = React.useState(false);
   const [activeSection, setActiveSection] = React.useState("home");
@@ -173,6 +163,15 @@ export default function Navbar() {
   const [isAnimating, setIsAnimating] = React.useState(false);
   const [showContent, setShowContent] = React.useState(false);
   const prevShouldShowRef = React.useRef(false);
+
+  const handleNavClick = React.useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+      event.preventDefault();
+      scrollToSection(href);
+      setIsOpen(false);
+    },
+    [scrollToSection]
+  );
 
   // Desktop menu is expanded when hovered or clicked open
   const isExpanded = isHovered || isOpen;
@@ -189,7 +188,7 @@ export default function Navbar() {
 
   // Track active section and dark background via IntersectionObserver (no layout thrashing)
   React.useEffect(() => {
-    const sections = ["contact", "hobbies", "work", "installed_chips", "projects"];
+    const sections = ["home", "work", "installed_chips", "projects", "hobbies", "contact"];
     const activeSections = new Set<string>();
     const darkSections = new Set<string>();
 
@@ -351,10 +350,7 @@ export default function Navbar() {
                       <React.Fragment key={item.label}>
                         <a
                           href={item.href}
-                          onClick={(e) => {
-                            handleSmoothScroll(e, item.href);
-                            setIsOpen(false);
-                          }}
+                          onClick={(e) => handleNavClick(e, item.href)}
                           className={`relative group px-4 py-3 font-mono text-[11px] tracking-[0.15em] uppercase transition-all duration-300 ${
                             isActive
                               ? `${textColor} ${activeBg}`
@@ -554,10 +550,7 @@ export default function Navbar() {
                     <a
                       key={item.label}
                       href={item.href}
-                      onClick={(e) => {
-                        handleSmoothScroll(e, item.href);
-                        setIsOpen(false);
-                      }}
+                      onClick={(e) => handleNavClick(e, item.href)}
                       className={`relative group flex items-center gap-3 px-3 py-3 font-mono text-[12px] tracking-[0.15em] uppercase transition-all duration-300 ${
                         isActive
                           ? "text-white bg-white/10 border-l-2 border-white"
