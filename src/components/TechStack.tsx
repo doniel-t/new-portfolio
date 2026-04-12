@@ -342,20 +342,18 @@ const Chip = memo(function Chip({
       <div className="absolute bottom-0 left-0 w-1 h-1 transition-colors bg-[#A69F8D] group-hover:bg-[#0d0b08] group-focus-visible:bg-[#0d0b08]" />
       <div className="absolute bottom-0 right-0 w-1 h-1 transition-colors bg-[#A69F8D] group-hover:bg-[#0d0b08] group-focus-visible:bg-[#0d0b08]" />
 
-      {/* Icon in Top Left */}
-      <div className="absolute top-3 left-3 transition-colors opacity-80 group-hover:opacity-100">
-        {tech.icon}
-      </div>
-
       {/* Memory Cost Top Right */}
       <div className="absolute top-3 right-3 font-mono text-xs opacity-60">
         [{tech.cost}]
       </div>
 
       {/* Content - Centered/Bottom */}
-      <div className="relative z-10 flex flex-col justify-end h-full mt-4">
-        <div className="mb-2">
-          <span className="block font-bold font-mono tracking-tight text-lg uppercase group-hover:glitch-jitter group-focus-visible:glitch-jitter">
+      <div className="relative z-10 flex flex-col justify-end h-full">
+        <div className="mb-2 flex items-center gap-2.5">
+          <div className="shrink-0 opacity-80 group-hover:opacity-100 transition-colors">
+            {tech.icon}
+          </div>
+          <span className="font-bold font-mono tracking-tight text-lg uppercase group-hover:glitch-jitter group-focus-visible:glitch-jitter">
             {tech.name}
           </span>
         </div>

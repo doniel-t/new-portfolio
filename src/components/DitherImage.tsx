@@ -140,7 +140,7 @@ function ImagePlane({ src }: { src: string }) {
   return (
     <mesh scale={scale}>
       <planeGeometry args={[1, 1]} />
-      <meshBasicMaterial map={texture} toneMapped={false} />
+      <meshBasicMaterial map={texture as any} toneMapped={false} />
     </mesh>
   );
 }

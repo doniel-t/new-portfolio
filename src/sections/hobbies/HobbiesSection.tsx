@@ -8,6 +8,7 @@ import DecodingWord from "@/components/DecodingWord";
 import Aurora from "@/components/Aurora";
 import HorizontalPixelDivider from "@/components/HorizontalPixelDivider";
 import PixelDivider from "@/components/PixelDivider";
+import PixelDissolveOverlay from "@/components/PixelDissolveOverlay";
 import { useSectionScroll } from "@/hooks/useSectionScroll";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import ExpandedHobbyModal from "./ExpandedHobbyModal";
@@ -583,6 +584,9 @@ function HobbiesSection() {
   const isMobile = useIsMobile();
   const scrollToSection = useSectionScroll();
   const [expandedCard, setExpandedCard] = React.useState<number | null>(null);
+  const [dissolveActive, setDissolveActive] = React.useState(false);
+  const pendingCardRef = React.useRef<number | null>(null);
+  const isClosingRef = React.useRef(false);
   const hobbyRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const auroraRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -594,10 +598,8 @@ function HobbiesSection() {
     const onScroll = () => {
       const rect = section.getBoundingClientRect();
       const vh = window.innerHeight;
-      // rect.top = vh → section at bottom of screen (100%)
-      // rect.top = 0  → section at top of screen (10%)
       const t = Math.min(Math.max(rect.top / vh, 0), 1);
-      const opacity = 0.6 - t * 0.35; // 0.25 → 0.6 (low at bottom, high at top)
+      const opacity = 0.6 - t * 0.35;
       aurora.style.opacity = String(opacity);
     };
 
@@ -607,11 +609,26 @@ function HobbiesSection() {
   }, []);
 
   const handleExpandCard = React.useCallback((index: number) => {
-    setExpandedCard(index);
+    pendingCardRef.current = index;
+    isClosingRef.current = false;
+    setDissolveActive(true);
   }, []);
 
   const handleCloseModal = React.useCallback(() => {
-    setExpandedCard(null);
+    isClosingRef.current = true;
+    setDissolveActive(true);
+  }, []);
+
+  const handleDissolveCovered = React.useCallback(() => {
+    if (isClosingRef.current) {
+      setExpandedCard(null);
+    } else {
+      setExpandedCard(pendingCardRef.current);
+    }
+  }, []);
+
+  const handleDissolveDone = React.useCallback(() => {
+    setDissolveActive(false);
   }, []);
 
   const handleHobbyNavigate = React.useCallback(
@@ -683,6 +700,14 @@ function HobbiesSection() {
           onClose={handleCloseModal}
         />
       )}
+
+      <PixelDissolveOverlay
+        active={dissolveActive}
+        onCovered={handleDissolveCovered}
+        onDone={handleDissolveDone}
+        holdMs={700}
+        revealMs={1000}
+      />
     </section>
   );
 }
