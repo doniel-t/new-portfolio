@@ -6,7 +6,7 @@ import PixelDivider from "@/components/PixelDivider";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import LocalTimeClient from "./LocalTime";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useScrollFade } from "@/hooks/useScrollFade";
 import type { IconType } from "react-icons";
 import { FaBriefcase, FaChartBar, FaCode, FaMapMarkerAlt, FaRegAddressCard, FaSignal, FaUser } from "react-icons/fa";
 import { SiGo, SiNextdotjs, SiTailwindcss, SiTypescript } from "react-icons/si";
@@ -125,17 +125,12 @@ function SectionLabel({ icon: Icon, children }: { icon: IconType; children: Reac
 }
 
 function ScrollFadeBlock({ children, className = "" }: { children?: React.ReactNode; className?: string }) {
-  const ref = React.useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.2, 1, 1, 0.2]);
+  const ref = useScrollFade<HTMLDivElement>();
 
   return (
-    <motion.div ref={ref} className={className} style={{ opacity }}>
+    <div ref={ref} className={className} style={{ opacity: 0.2 }}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 

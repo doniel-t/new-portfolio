@@ -1,16 +1,21 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import DecodingWord from "@/components/DecodingWord";
-import Dither from "@/components/Dither";
 import PixelDivider from "@/components/PixelDivider";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import ExpandedProjectModal from "./ExpandedProjectModal";
 import { PROJECTS } from "./data";
 import type { Project } from "./types";
+
+const Dither = dynamic(() => import("@/components/Dither"), {
+  ssr: false,
+  loading: () => null,
+});
 
 const workEase = [0.16, 1, 0.3, 1] as const;
 

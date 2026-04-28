@@ -9,35 +9,49 @@ type FooterNameProps = {
 
 export default function FooterName({ name, footerRef }: FooterNameProps) {
   const nameRef = React.useRef<HTMLDivElement>(null);
-  const [mousePosition, setMousePosition] = React.useState({ x: -1000, y: -1000 });
-  const [isHovering, setIsHovering] = React.useState(false);
   const clientMousePos = React.useRef({ x: 0, y: 0 });
-
-  const updateRelativePosition = React.useCallback(() => {
-    if (!nameRef.current) return;
-    const rect = nameRef.current.getBoundingClientRect();
-    const x = ((clientMousePos.current.x - rect.left) / rect.width) * 100;
-    const y = ((clientMousePos.current.y - rect.top) / rect.height) * 100;
-    setMousePosition({ x, y });
-  }, []);
+  const isHoveringRef = React.useRef(false);
+  const rafIdRef = React.useRef(0);
 
   React.useEffect(() => {
     const footer = footerRef.current;
-    if (!footer) return;
+    const nameEl = nameRef.current;
+    if (!footer || !nameEl) return;
+
+    const writePosition = () => {
+      rafIdRef.current = 0;
+      const el = nameRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      const x = ((clientMousePos.current.x - rect.left) / rect.width) * 100;
+      const y = ((clientMousePos.current.y - rect.top) / rect.height) * 100;
+      el.style.setProperty("--mouse-x", `${x}%`);
+      el.style.setProperty("--mouse-y", `${y}%`);
+    };
+
+    const schedule = () => {
+      if (rafIdRef.current) return;
+      rafIdRef.current = window.requestAnimationFrame(writePosition);
+    };
 
     const handleMouseMove = (e: MouseEvent) => {
       clientMousePos.current = { x: e.clientX, y: e.clientY };
-      updateRelativePosition();
+      schedule();
     };
 
     const handleScroll = () => {
-      if (isHovering) {
-        updateRelativePosition();
-      }
+      if (isHoveringRef.current) schedule();
     };
 
-    const handleMouseEnter = () => setIsHovering(true);
-    const handleMouseLeave = () => setIsHovering(false);
+    const handleMouseEnter = () => {
+      isHoveringRef.current = true;
+      nameEl.classList.add("is-hovering");
+    };
+    const handleMouseLeave = () => {
+      isHoveringRef.current = false;
+      nameEl.classList.remove("is-hovering");
+    };
 
     footer.addEventListener("mousemove", handleMouseMove);
     footer.addEventListener("mouseenter", handleMouseEnter);
@@ -49,8 +63,12 @@ export default function FooterName({ name, footerRef }: FooterNameProps) {
       footer.removeEventListener("mouseenter", handleMouseEnter);
       footer.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("scroll", handleScroll);
+      if (rafIdRef.current) {
+        window.cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = 0;
+      }
     };
-  }, [footerRef, isHovering, updateRelativePosition]);
+  }, [footerRef]);
 
   // Create the text content - repeated enough to fill the screen
   const textContent = `${name}   -   ${name}   -   ${name}   -   ${name}   -   ${name}   -   `;
@@ -58,13 +76,11 @@ export default function FooterName({ name, footerRef }: FooterNameProps) {
   return (
     <div
       ref={nameRef}
-      className={`footer-name-wrapper absolute bottom-0 left-0 right-0 pb-4 sm:pb-8 ${
-        isHovering ? "is-hovering" : ""
-      }`}
+      className="footer-name-wrapper absolute bottom-0 left-0 right-0 pb-4 sm:pb-8"
       style={
         {
-          "--mouse-x": `${mousePosition.x}%`,
-          "--mouse-y": `${mousePosition.y}%`,
+          "--mouse-x": "-1000%",
+          "--mouse-y": "-1000%",
         } as React.CSSProperties
       }
     >

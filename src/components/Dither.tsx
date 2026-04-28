@@ -69,6 +69,30 @@ function useIsVisible(ref: React.RefObject<HTMLElement | null>) {
   return isVisible;
 }
 
+function useHasBeenVisible(ref: React.RefObject<HTMLElement | null>) {
+  const [hasBeenVisible, setHasBeenVisible] = useState(false);
+
+  useEffect(() => {
+    if (hasBeenVisible) return;
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasBeenVisible(true);
+        }
+      },
+      { threshold: 0, rootMargin: '200px' }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref, hasBeenVisible]);
+
+  return hasBeenVisible;
+}
+
 const waveVertexShader = `
 precision highp float;
 varying vec2 vUv;
@@ -436,13 +460,18 @@ export default function Dither({
   const containerRef = useRef<HTMLDivElement>(null);
   const renderDpr = useCappedRenderDpr(containerRef);
   const isVisible = useIsVisible(containerRef);
+  const hasBeenVisible = useHasBeenVisible(containerRef);
   const isPageVisible = usePageVisibility();
   const gpuSupport = useGPUDetection();
   const isMobile = useIsMobile();
-  
+
   // Disable canvas on mobile unless explicitly enabled (e.g., hero section)
   const mobileDisabled = isMobile && !enableOnMobile;
-  const canUseCanvas = gpuSupport !== 'none' && !mobileDisabled;
+  const gpuReady = gpuSupport === 'full' || gpuSupport === 'limited';
+  // Only mount the Canvas (and create a WebGL context) once the section
+  // has entered the viewport at least once. Subsequent off-screen scrolls
+  // keep the canvas mounted but pause the frame loop.
+  const canUseCanvas = gpuReady && !mobileDisabled && hasBeenVisible;
   // Keep canvas mounted but pause animation when not visible
   const shouldAnimate = isPageVisible && isVisible;
   const isDisabled = disableAnimation || !shouldAnimate;

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-export type GPUSupport = 'full' | 'limited' | 'none';
+export type GPUSupport = 'pending' | 'full' | 'limited' | 'none';
 
 interface GPUInfo {
   support: GPUSupport;
@@ -61,7 +61,9 @@ async function detectGPU(): Promise<GPUInfo> {
 }
 
 export function useGPUDetection(): GPUSupport {
-  const [gpuSupport, setGPUSupport] = useState<GPUSupport>('full');
+  const [gpuSupport, setGPUSupport] = useState<GPUSupport>(() =>
+    cachedGPUInfo ? cachedGPUInfo.support : 'pending'
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -108,7 +110,7 @@ export function useAnimationControls(gpuSupport: GPUSupport, options?: {
     if (options?.forceEnabled) return true;
     if (!isPageVisible) return false;
     if (prefersReducedMotion) return false;
-    if (gpuSupport === 'none') return false;
+    if (gpuSupport === 'none' || gpuSupport === 'pending') return false;
     return true;
   }, [gpuSupport, isPageVisible, prefersReducedMotion, options?.forceEnabled]);
 

@@ -1,13 +1,18 @@
 "use client";
 
 import React, { useRef, useEffect, useMemo, useCallback, memo, forwardRef, useImperativeHandle } from "react";
+import dynamic from "next/dynamic";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { SiNextdotjs, SiReact, SiTypescript, SiTailwindcss, SiGo, SiPython, SiPostgresql, SiStrapi, SiPayloadcms, SiDocker, SiPodman, SiNginx, SiGit, SiGithubactions, SiGitlab, SiFigma } from "react-icons/si";
 import DecodingWord from "./DecodingWord";
 import TargetCursor from "./TargetCursor";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import Dither from "./Dither";
 import { useGPUDetection } from "@/hooks/useGPUDetection";
+
+const Dither = dynamic(() => import("./Dither"), {
+  ssr: false,
+  loading: () => null,
+});
 
 type TechItem = {
   name: string;
@@ -126,8 +131,9 @@ export default function TechStack() {
   const prefersReducedMotion = useReducedMotion();
   const gpuSupport = useGPUDetection();
 
-  const enableHoverParticles = !isMobile && !prefersReducedMotion && gpuSupport !== 'none';
-  const enableCursor = !prefersReducedMotion && gpuSupport !== 'none';
+  const gpuReady = gpuSupport === 'full' || gpuSupport === 'limited';
+  const enableHoverParticles = !isMobile && !prefersReducedMotion && gpuReady;
+  const enableCursor = !prefersReducedMotion && gpuReady;
 
   // Memoize hover handlers for all items (flat index)
   const hoverHandlers = useMemo(() =>

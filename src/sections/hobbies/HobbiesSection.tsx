@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import DecodingWord from "@/components/DecodingWord";
-import Aurora from "@/components/Aurora";
 import HorizontalPixelDivider from "@/components/HorizontalPixelDivider";
 import PixelDivider from "@/components/PixelDivider";
 import PixelDissolveOverlay from "@/components/PixelDissolveOverlay";
@@ -14,6 +14,11 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import ExpandedHobbyModal from "./ExpandedHobbyModal";
 import { HOBBIES } from "./data";
 import type { HobbyCard as HobbyCardType } from "./types";
+
+const Aurora = dynamic(() => import("@/components/Aurora"), {
+  ssr: false,
+  loading: () => null,
+});
 
 const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const HOBBIES_CONTENT_SHELL =
@@ -595,7 +600,10 @@ function HobbiesSection() {
     const aurora = auroraRef.current;
     if (!section || !aurora) return;
 
-    const onScroll = () => {
+    let rafId = 0;
+
+    const computeOpacity = () => {
+      rafId = 0;
       const rect = section.getBoundingClientRect();
       const vh = window.innerHeight;
       const t = Math.min(Math.max(rect.top / vh, 0), 1);
@@ -603,9 +611,17 @@ function HobbiesSection() {
       aurora.style.opacity = String(opacity);
     };
 
+    const onScroll = () => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(computeOpacity);
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+    computeOpacity();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
   }, []);
 
   const handleExpandCard = React.useCallback((index: number) => {
