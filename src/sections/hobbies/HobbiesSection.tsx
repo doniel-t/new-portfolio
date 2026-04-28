@@ -16,6 +16,8 @@ import { HOBBIES } from "./data";
 import type { HobbyCard as HobbyCardType } from "./types";
 
 const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const HOBBIES_CONTENT_SHELL =
+  "pl-[5%] pr-[5%] lg:pl-[10%] min-[2000px]:mx-auto min-[2000px]:max-w-[1600px] min-[2000px]:px-0";
 
 function ScrollSpy({
   activeIndex,
@@ -246,86 +248,84 @@ const HobbyLane = React.memo(function HobbyLane({
   registerRef: (index: number, element: HTMLDivElement | null) => void;
 }) {
   const laneRef = React.useRef<HTMLDivElement | null>(null);
-  const isInView = useInView(laneRef, { once: true, margin: "0px 0px -20% 0px" });
+  const isInView = useInView(laneRef, {
+    once: true,
+    margin: isMobile ? "0px 0px -8% 0px" : "0px 0px 12% 0px",
+  });
   const imageRight = !isMobile && cardIndex % 2 !== 0;
+  const spawnFromRight = cardIndex % 2 !== 0;
   const [isImageHovered, setIsImageHovered] = React.useState(false);
 
   const laneVariants = React.useMemo(
     () => ({
-      hidden: { opacity: 0, y: isMobile ? 20 : 36 },
+      hidden: {
+        opacity: 0,
+        x: spawnFromRight ? (isMobile ? 36 : 96) : (isMobile ? -36 : -96),
+        filter: "blur(18px)",
+      },
       show: {
         opacity: 1,
-        y: 0,
+        x: 0,
+        filter: "blur(0px)",
         transition: {
-          duration: isMobile ? 0.32 : 0.5,
+          duration: isMobile ? 0.56 : 0.72,
           ease: EASE_OUT,
-          when: "beforeChildren",
-          staggerChildren: isMobile ? 0.04 : 0.07,
-          delayChildren: 0,
+          opacity: { duration: isMobile ? 0.32 : 0.44, ease: "linear" },
+          filter: { duration: isMobile ? 0.44 : 0.58, ease: EASE_OUT },
         },
       },
     }),
-    [isMobile],
+    [isMobile, spawnFromRight],
   );
 
   const imageVariants = React.useMemo(
     () => ({
-      hidden: { opacity: 0, x: imageRight ? 26 : -26 },
+      hidden: { opacity: 1 },
       show: {
         opacity: 1,
-        x: 0,
-        transition: { duration: isMobile ? 0.28 : 0.4, ease: EASE_OUT },
       },
     }),
-    [imageRight, isMobile],
+    [],
   );
 
   const titleVariants = React.useMemo(
     () => ({
-      hidden: { opacity: 0, y: 18 },
+      hidden: { opacity: 1 },
       show: {
         opacity: 1,
-        y: 0,
-        transition: { duration: isMobile ? 0.24 : 0.34, ease: EASE_OUT },
       },
     }),
-    [isMobile],
+    [],
   );
 
   const infoVariants = React.useMemo(
     () => ({
-      hidden: { opacity: 0, y: 16 },
+      hidden: { opacity: 1 },
       show: {
         opacity: 1,
-        y: 0,
-        transition: { duration: isMobile ? 0.24 : 0.34, ease: EASE_OUT },
       },
     }),
-    [isMobile],
+    [],
   );
 
   const statsVariants = React.useMemo(
     () => ({
-      hidden: { opacity: 0, y: 16 },
+      hidden: { opacity: 1 },
       show: {
         opacity: 1,
-        y: 0,
-        transition: { duration: isMobile ? 0.24 : 0.34, ease: EASE_OUT },
       },
     }),
-    [isMobile],
+    [],
   );
 
   const quoteVariants = React.useMemo(
     () => ({
-      hidden: { opacity: 0, y: 14 },
+      hidden: { opacity: 1 },
       show: {
         opacity: 1,
-        y: 0,
-        transition: { duration: isMobile ? 0.22 : 0.32, ease: EASE_OUT },
       },
     }),
-    [isMobile],
+    [],
   );
 
   const setRefs = React.useCallback(
@@ -353,7 +353,7 @@ const HobbyLane = React.memo(function HobbyLane({
       variants={laneVariants}
       initial="hidden"
       animate={isInView ? "show" : "hidden"}
-      className="relative py-10 sm:py-14"
+      className="relative py-10 sm:py-14 will-change-[transform,opacity,filter]"
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-8 sm:h-10 opacity-70">
         <HorizontalPixelDivider
@@ -677,11 +677,11 @@ function HobbiesSection() {
       </div>
 
       <div ref={containerRef} className="relative z-[1] pt-32 pb-20">
-        <div className="pl-[5%] pr-[5%] lg:pl-[10%] mb-16">
+        <div className={`${HOBBIES_CONTENT_SHELL} mb-16`}>
           <HobbiesHeader isInViewOnce={isInViewOnce} isMobile={isMobile} />
         </div>
 
-        <div className="pl-[5%] pr-[5%] lg:pl-[10%]">
+        <div className={HOBBIES_CONTENT_SHELL}>
           <HobbiesRunway
             isInViewOnce={isInViewOnce}
             isMobile={isMobile}

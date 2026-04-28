@@ -438,17 +438,17 @@ function WorkSection() {
             hidden: { opacity: 0, y: 12 },
             show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: workEase } },
           }}
-          className="mb-5 flex items-center gap-4 border-b border-[#A69F8D]/30 pb-4"
+          className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-[#A69F8D]/30 pb-4"
         >
           <div className="h-2 w-2 shrink-0 rotate-45 bg-[#A69F8D]" />
           <h2
             id="projects-heading"
-            className="font-display text-[40px] leading-none tracking-[0.12em] text-[#A69F8D] sm:text-[56px] lg:text-[68px]"
+            className="font-display text-5xl leading-[1.05] tracking-tight text-[#A69F8D] sm:text-7xl md:text-8xl"
           >
-            <DecodingWord word="PROJECTS" active={introInView} />
+            <DecodingWord word="PROJECTS" className="leading-[1.05] tracking-tight" active={introInView} />
           </h2>
           <div className="flex-1" />
-          <div className="font-mono text-xs tracking-widest text-[#A69F8D]/60">
+          <div className="ml-auto font-mono text-xs tracking-widest text-[#A69F8D]/60">
             WORK: {visibleProjects.length} / {PROJECTS.length}
           </div>
         </motion.div>

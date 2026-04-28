@@ -85,6 +85,27 @@ The D&D group loves it. There's something deeply satisfying about watching your 
     year: "2023",
   },
   {
+    id: "project-dnd-notes",
+    slug: "dnd-notes",
+    title: "PROJECT_DND_NOTES",
+    image: "/placeholder-project.jpg",
+    techStack: ["Next.js", "Supabase", "pgvector", "RAG"],
+    description:
+      "A cross-device note-taking app for Dungeons & Dragons campaigns, backed by Supabase sync and a RAG chat layer for querying campaign lore, NPCs, places, and session history.",
+    challenges:
+      "Designing a clean sync model across devices while keeping retrieval fast, grounded, and useful for messy campaign notes.",
+    blogContent: `DND Notes started from a familiar tabletop problem: campaign knowledge spreads everywhere. Session notes live in one document, NPC names hide in a phone note, location details get buried in chat, and by the next session everyone remembers a slightly different version of the truth.
+
+The goal was to build a focused note-taking app that works across devices and makes that pile of campaign context searchable in a more natural way. Supabase handles authentication, database storage, and real-time sync, so notes written on desktop are available on mobile without needing a manual export ritual before game night.
+
+The RAG layer turns the notebook into something closer to a campaign assistant. Notes are chunked, embedded, and stored with enough metadata to keep retrieval grounded by campaign, session, character, and topic. The chat experience can answer questions like "what did we learn about the old chapel?" or "which NPC owed us a favor?" while still pointing back to the notes that informed the answer.
+
+The hardest part was not the chat UI itself. It was deciding how notes should be structured so retrieval stays useful when the source material is messy. D&D notes are full of half-remembered names, crossed-out plans, jokes that became canon, and lore that only matters three sessions later. I built the data model around small, linkable note fragments instead of long documents, which makes retrieval more precise and keeps edits lightweight.
+
+This project is less about replacing the human table memory and more about supporting it. The app keeps the facts close enough that players can stay in the story instead of hunting through old notes mid-session.`,
+    year: "2024-today",
+  },
+  {
     id: "project-delta",
     slug: "uwu-bot",
     title: "PROJECT_UWU_BOT",
