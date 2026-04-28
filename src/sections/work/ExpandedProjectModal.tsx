@@ -4,22 +4,8 @@ import React from "react";
 import Image from "next/image";
 import { ArrowLeft, ExternalLink, Github } from "lucide-react";
 import Dither from "@/components/Dither";
+import { LoadTransitionOverlay } from "@/components/InitialLoadTransition";
 import type { Project } from "./types";
-
-function LoadingSpinner() {
-  return (
-    <div className="relative w-10 h-10">
-      <div
-        className="absolute inset-0 border-2 border-[#d4cdc4]/25 border-t-[#d4cdc4]/80 rounded-full animate-spin"
-        style={{ animationDuration: "0.8s" }}
-      />
-      <div
-        className="absolute inset-1 border-2 border-[#d4cdc4]/20 border-b-[#d4cdc4]/60 rounded-full animate-spin"
-        style={{ animationDuration: "1.2s", animationDirection: "reverse" }}
-      />
-    </div>
-  );
-}
 
 type ExpandedProjectModalProps = {
   projects: Project[];
@@ -31,21 +17,7 @@ type ExpandedProjectModalProps = {
 
 function ExpandedProjectModal({ projects, projectIndex, isMobile, onClose, onNavigate }: ExpandedProjectModalProps) {
   const project = projects[projectIndex];
-  const [imageLoaded, setImageLoaded] = React.useState(project.image === "/placeholder-project.jpg");
-  const [minTimeElapsed, setMinTimeElapsed] = React.useState(false);
   const scrollContainerRef = React.useRef<HTMLDivElement | null>(null);
-
-  const isReady = imageLoaded && minTimeElapsed;
-
-  React.useEffect(() => {
-    setImageLoaded(project.image === "/placeholder-project.jpg");
-  }, [project.image]);
-
-  React.useEffect(() => {
-    setMinTimeElapsed(false);
-    const timer = setTimeout(() => setMinTimeElapsed(true), 500);
-    return () => clearTimeout(timer);
-  }, [projectIndex]);
 
   React.useEffect(() => {
     if (scrollContainerRef.current) {
@@ -60,13 +32,28 @@ function ExpandedProjectModal({ projects, projectIndex, isMobile, onClose, onNav
       }
     };
 
+    const scrollY = window.scrollY;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
     const previousOverflow = document.body.style.overflow;
+    const previousPosition = document.body.style.position;
+    const previousTop = document.body.style.top;
+    const previousWidth = document.body.style.width;
+
     document.addEventListener("keydown", handleEscape);
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
+      document.documentElement.style.overflow = previousHtmlOverflow;
       document.body.style.overflow = previousOverflow;
+      document.body.style.position = previousPosition;
+      document.body.style.top = previousTop;
+      document.body.style.width = previousWidth;
+      window.scrollTo(0, scrollY);
     };
   }, [onClose]);
 
@@ -78,23 +65,13 @@ function ExpandedProjectModal({ projects, projectIndex, isMobile, onClose, onNav
 
   return (
     <>
-      <div data-lenis-prevent className="fixed inset-0 z-50 bg-[#0d0b08] animate-[fadeIn_0.2s_ease-out]" />
-
-      <div
-        data-lenis-prevent
-        className={`fixed inset-0 z-[60] flex items-center justify-center transition-opacity duration-300 ${
-          isReady ? "opacity-0 pointer-events-none" : "opacity-100"
-        }`}
-      >
-        <LoadingSpinner />
-      </div>
+      <div data-lenis-prevent className="fixed inset-0 z-[100] bg-[#0d0b08] animate-[fadeIn_0.2s_ease-out]" />
+      <LoadTransitionOverlay blockPointerEvents />
 
       <div
         ref={scrollContainerRef}
         data-lenis-prevent
-        className={`fixed inset-0 z-[55] overflow-y-auto transition-opacity duration-300 ${
-          isReady ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className="fixed inset-0 z-[110] overflow-y-auto overscroll-contain"
       >
         <div className="min-h-screen bg-[#0d0b08] text-[#d4cdc4] relative">
           {!isMobile && (
@@ -153,7 +130,6 @@ function ExpandedProjectModal({ projects, projectIndex, isMobile, onClose, onNav
                     className="object-cover sepia opacity-60"
                     sizes="100vw"
                     priority
-                    onLoad={() => setImageLoaded(true)}
                   />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08] via-[#0d0b08]/60 to-transparent" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { HeroSection, AboutSection, HobbiesSection, FooterSection } from "@/sections";
+import { HeroSection, AboutSection, WorkSection, HobbiesSection, FooterSection } from "@/sections";
 import Navbar from "@/components/Navbar";
 import TechStack from "@/components/TechStack";
 
@@ -13,7 +13,7 @@ export default function Home() {
 
       <TechStack />
 
-      {/* <WorkSection /> */}
+      <WorkSection />
 
       <HobbiesSection />
       <FooterSection />

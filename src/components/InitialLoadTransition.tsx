@@ -31,7 +31,15 @@ function hashNoise(column: number, row: number) {
   return seed - Math.floor(seed);
 }
 
-export default function InitialLoadTransition() {
+type LoadTransitionOverlayProps = {
+  label?: string;
+  blockPointerEvents?: boolean;
+};
+
+export function LoadTransitionOverlay({
+  label = "Initializing",
+  blockPointerEvents = false,
+}: LoadTransitionOverlayProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const cellsRef = useRef<Float32Array>(new Float32Array());
   const gridRef = useRef({ columns: 0, rows: 0 });
@@ -261,7 +269,7 @@ export default function InitialLoadTransition() {
 
   return (
     <div
-      className={`fixed inset-0 z-[200] pointer-events-none ${
+      className={`fixed inset-0 z-[200] ${blockPointerEvents ? "pointer-events-auto" : "pointer-events-none"} ${
         reducedMotion ? "transition-opacity duration-300 ease-out" : ""
       }`}
       style={{
@@ -281,10 +289,14 @@ export default function InitialLoadTransition() {
           style={{ color: LOADER_COLOR }}
         >
           <HashLoader color={LOADER_COLOR} size={72} speedMultiplier={0.9} />
-          <span className="font-display text-xl leading-none">Initializing</span>
+          <span className="font-display text-xl leading-none">{label}</span>
         </div>
       </div>
       {!reducedMotion ? <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" /> : null}
     </div>
   );
+}
+
+export default function InitialLoadTransition() {
+  return <LoadTransitionOverlay />;
 }

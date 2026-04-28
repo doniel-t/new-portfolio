@@ -118,7 +118,7 @@ function FrameTicks({ className = "border-[#d4cdc4]/50" }: { className?: string 
 function SectionLabel({ icon: Icon, children }: { icon: IconType; children: React.ReactNode }) {
   return (
     <p className="flex items-center gap-2 font-mono text-[12px] uppercase text-[#d4cdc4]/40 font-semibold">
-      <Icon className="h-3.5 w-3.5 text-[#7a9a5a]" aria-hidden />
+      <Icon className="h-3.5 w-3.5 text-[#e6c3a8]" aria-hidden />
       <span>{children}</span>
     </p>
   );
@@ -165,7 +165,7 @@ function PortraitStamp() {
 
 function StickyIntroLabel() {
   return (
-    <ScrollFadeBlock className="pb-5 font-mono text-[11px] uppercase text-[#7a9a5a] sm:border-b sm:border-[#d4cdc4]/50">
+    <ScrollFadeBlock className="pb-5 font-mono text-[11px] uppercase text-[#e6c3a8] sm:border-b sm:border-[#d4cdc4]/50">
       <p className="flex items-center gap-2 text-[12px] font-bold">
         <FaRegAddressCard className="h-3.5 w-3.5" aria-hidden />
         <span>[01] Introduction</span>
@@ -182,18 +182,18 @@ function VibeSignal() {
     <ScrollFadeBlock className="py-4 lg:mt-8">
       <div className="mb-4 flex items-center justify-between gap-4 font-mono text-[10px] uppercase text-[#d4cdc4]/40">
         <span className="inline-flex items-center gap-2 font-bold text-[12px]">
-          <FaSignal className={`h-3 w-3 ${isTyping ? "animate-pulse text-[#7a9a5a]" : "text-[#d4cdc4]/25"}`} aria-hidden />
+          <FaSignal className={`h-3 w-3 ${isTyping ? "animate-pulse text-[#e6c3a8]" : "text-[#d4cdc4]/25"}`} aria-hidden />
           VIBE SIGNAL
         </span>
         <span>{VIBE_EMOJIS.length} states</span>
       </div>
       <div className="font-mono text-3xl font-semibold leading-none text-[#d4cdc4] sm:text-4xl">
         {displayedText}
-        <span className="ml-1 inline-block h-[1em] w-[3px] translate-y-1 bg-[#7a9a5a] align-baseline" />
+        <span className="ml-1 inline-block h-[1em] w-[3px] translate-y-1 bg-[#e6c3a8] align-baseline" />
       </div>
       <div className="mt-5 flex flex-wrap gap-2 font-mono text-[10px] text-[#d4cdc4]/30">
         {VIBE_EMOJIS.map((emoji) => (
-          <span key={emoji} className={displayedText === emoji ? "text-[#7a9a5a]" : undefined}>
+          <span key={emoji} className={displayedText === emoji ? "text-[#e6c3a8]" : undefined}>
             {emoji}
           </span>
         ))}
@@ -227,7 +227,7 @@ function StackLine() {
 
           return (
             <span key={item.label} className="inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase text-[#d4cdc4]">
-              <span className="mr-2 text-[#7a9a5a]">{String(index + 1).padStart(2, "0")}</span>
+              <span className="mr-2 text-[#e6c3a8]">{String(index + 1).padStart(2, "0")}</span>
               <StackIcon className="h-4 w-4 text-[#d4cdc4]" aria-hidden />
               {item.label}
             </span>
@@ -252,7 +252,7 @@ function InlineStats() {
               </p>
             ) : (
               <p className="flex items-center gap-2 font-mono text-base font-semibold text-[#d4cdc4]">
-                {label === "Status" && <span className="h-2 w-2 rounded-full bg-[#7a9a5a]" />}
+                {label === "Status" && <span className="h-2 w-2 rounded-full bg-[#e6c3a8]" />}
                 {value}
               </p>
             )}
@@ -278,14 +278,14 @@ function ExperienceLedger() {
           >
             <span
               className={`absolute left-[-27px] top-[1.45rem] h-[9px] w-[9px] border border-[#0d0b08] ${
-                index === 0 ? "bg-[#7a9a5a]" : "bg-[#d4cdc4]/45"
+                index === 0 ? "bg-[#e6c3a8]" : "bg-[#d4cdc4]/45"
               }`}
               aria-hidden
             />
             <div>
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <h3 className="font-mono text-sm font-semibold text-[#d4cdc4]">{item.role}</h3>
-                <span className={index === 0 ? "font-mono text-[10px] uppercase text-[#7a9a5a]" : "font-mono text-[10px] uppercase text-[#d4cdc4]/40"}>
+                <span className={index === 0 ? "font-mono text-[10px] uppercase text-[#e6c3a8]" : "font-mono text-[10px] uppercase text-[#d4cdc4]/40"}>
                   {item.badge}
                 </span>
               </div>
@@ -301,12 +301,12 @@ function ExperienceLedger() {
               {index === 0 ? (
                 <span className="relative h-1 w-20 overflow-hidden bg-[#d4cdc4]/10">
                   <span
-                    className="absolute inset-y-0 w-1/2 bg-[#7a9a5a]/75"
+                    className="absolute inset-y-0 w-1/2 bg-[#e6c3a8]/75"
                     style={{ animation: "loading 1.5s ease-in-out infinite" }}
                   />
                 </span>
               ) : (
-                <span className="h-1 w-6 bg-[#7a9a5a]/60" />
+                <span className="h-1 w-6 bg-[#e6c3a8]/60" />
               )}
             </div>
           </ScrollFadeBlock>
@@ -399,7 +399,7 @@ export default function AboutSection() {
         className="relative w-full overflow-hidden py-24 sm:py-32"
       >
         <div className="absolute inset-0 -z-10 bg-[#0d0b08]" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(115deg,rgba(212,205,196,0.08),transparent_28%,rgba(122,154,90,0.08)_72%,transparent)]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(115deg,rgba(212,205,196,0.08),transparent_28%,rgba(166,159,141,0.08)_72%,transparent)]" />
         <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-56 bg-[linear-gradient(180deg,#0d0b08_0%,rgba(13,11,8,0.94)_26%,rgba(13,11,8,0)_100%)]" aria-hidden />
         <div className="absolute inset-0 -z-10 opacity-45" style={SCANLINE_STYLE} />
         <BackgroundLineArt className="opacity-55" />

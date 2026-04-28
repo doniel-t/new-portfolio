@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
-import { Mail, Github, Linkedin } from "lucide-react";
+import { Mail, Github, Linkedin, Send } from "lucide-react";
 import PixelDivider from "@/components/PixelDivider";
-import ContactForm from "@/components/ContactForm";
 import { useSectionScroll } from "@/hooks/useSectionScroll";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import FooterDecorations from "./FooterDecorations";
@@ -67,9 +66,20 @@ export default function FooterSection() {
               </div>
               <h2 className="font-display text-5xl sm:text-6xl tracking-tight text-white mb-8">Contact</h2>
 
-              
-                <ContactForm />
-              
+              <a
+                href="mailto:daniel.theil.g@gmail.com"
+                className="group relative inline-flex w-full items-center justify-center gap-3 overflow-hidden border border-white/20 bg-white/[0.05] px-6 py-4 font-mono text-sm uppercase tracking-widest text-white transition-all duration-300 hover:border-white/35 hover:bg-white/[0.08] sm:w-auto sm:min-w-64"
+              >
+                <div className="absolute inset-0 translate-y-full bg-white/10 transition-transform duration-300 ease-out group-hover:translate-y-0" />
+                <div className="absolute top-0 left-0 h-3 w-3 border-t-2 border-l-2 border-white/30 transition-colors group-hover:border-white/60" />
+                <div className="absolute top-0 right-0 h-3 w-3 border-t-2 border-r-2 border-white/30 transition-colors group-hover:border-white/60" />
+                <div className="absolute bottom-0 left-0 h-3 w-3 border-b-2 border-l-2 border-white/30 transition-colors group-hover:border-white/60" />
+                <div className="absolute right-0 bottom-0 h-3 w-3 border-r-2 border-b-2 border-white/30 transition-colors group-hover:border-white/60" />
+                <span className="relative flex items-center gap-3">
+                  <Send size={16} />
+                  Send Message
+                </span>
+              </a>
             </div>
           
 

@@ -275,7 +275,7 @@ body::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 60; /* Above noise overlay */
+  z-index: 41; /* Above decorative sections, below app chrome */
   /* Two inset guideline rings at 12px and 36px */
 
 }
@@ -286,7 +286,7 @@ body::after {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 59; /* Under rim lines (60), above noise (50) */
+  z-index: 40; /* Below cards/nav/modals so glass panels can blur it */
   /* Two side-only bands between 12px and 36px, with 45° hatching */
   background:
     /* Left band */

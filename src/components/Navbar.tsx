@@ -12,8 +12,8 @@ const NAV_ITEMS = [
   { label: "Contact", href: "#contact" },
 ];
 
-// Dark section IDs where navbar should invert colors
-const DARK_SECTIONS = ["work", "installed_chips", "contact", "projects"];
+// Sections on dark backgrounds should use the bright navbar variant.
+const BRIGHT_NAV_SECTION_IDS = ["work", "installed_chips", "contact", "projects"];
 
 // Pixel grid configuration
 const PIXEL_SIZE = 6; // px - fixed square size
@@ -231,7 +231,11 @@ export default function Navbar() {
         }
         let foundDark = false;
         for (const id of darkSections) {
-          if (DARK_SECTIONS.includes(id)) {
+          const section = document.getElementById(id);
+          if (
+            BRIGHT_NAV_SECTION_IDS.includes(id) ||
+            section?.dataset.navbarVariant === "bright"
+          ) {
             foundDark = true;
             break;
           }
