@@ -48,7 +48,7 @@ function SectionBackdrop({ showTopDither }: { showTopDither: boolean }) {
           />
         </div>
       )}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-44 bg-[linear-gradient(180deg,#3C3A35_0%,rgba(60,58,53,0.62)_34%,rgba(17,16,13,0)_100%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-[linear-gradient(180deg,#3C3A35_0%,rgba(60,58,53,0.62)_34%,rgba(17,16,13,0)_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-[linear-gradient(180deg,rgba(17,16,13,0)_0%,#0d0b08_100%)]" />
     </>
   );
@@ -178,15 +178,17 @@ function ProjectCard({
   return (
     <motion.article
       variants={{
-        hidden: { opacity: 0, y: 18 },
+        hidden: { opacity: 0, y: 34, filter: "blur(14px) brightness(0.88)" },
         show: {
           opacity: 1,
           y: 0,
-          transition: { duration: 0.5, ease: workEase },
+          filter: "blur(0px) brightness(1)",
+          transition: { duration: 0.72, ease: workEase },
         },
       }}
+      whileHover={{ filter: "blur(0px) brightness(1.04)" }}
       data-project-card
-      className="group/project relative flex h-[590px] w-[82vw] shrink-0 cursor-pointer flex-col border border-[#d6d0c5]/18 bg-[#15130f]/58 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.28)] brightness-100 backdrop-blur-md transition duration-300 hover:border-[#d6d0c5]/28 hover:bg-[#1a1814]/66 hover:brightness-[1.04] sm:h-[620px] sm:w-[355px] md:w-[380px]"
+      className="group/project relative flex h-[590px] w-[82vw] shrink-0 cursor-pointer flex-col border border-[#d6d0c5]/18 bg-[#15130f]/58 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.28)] backdrop-blur-md transition-colors duration-300 hover:border-[#d6d0c5]/28 hover:bg-[#1a1814]/66 sm:h-[620px] sm:w-[355px] md:w-[380px]"
     >
       <button
         type="button"
@@ -260,10 +262,18 @@ function ProjectCard({
 
 function WorkSection() {
   const introRef = React.useRef<HTMLDivElement | null>(null);
+  const cardsRef = React.useRef<HTMLDivElement | null>(null);
   const scrollContainerRef = React.useRef<HTMLDivElement | null>(null);
+  const expandedProjectRef = React.useRef<number | null>(null);
+  const modalHistoryPushedRef = React.useRef(false);
   const introInView = useInView(introRef, {
     once: true,
     margin: "-8% 0px -12% 0px",
+  });
+  const cardsInView = useInView(cardsRef, {
+    once: true,
+    amount: 0.18,
+    margin: "0px 0px -10% 0px",
   });
   const isMobile = useIsMobile();
   const prefersReducedMotion = useReducedMotion();
@@ -271,6 +281,10 @@ function WorkSection() {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const visibleProjects = PROJECTS;
+
+  React.useEffect(() => {
+    expandedProjectRef.current = expandedProject;
+  }, [expandedProject]);
 
   const updateScrollState = useCallback(() => {
     const scroller = scrollContainerRef.current;
@@ -289,11 +303,29 @@ function WorkSection() {
   const handleOpenProject = useCallback((projectId: string) => {
     const projectIndex = PROJECTS.findIndex((project) => project.id === projectId);
     if (projectIndex >= 0) {
+      if (expandedProjectRef.current === null) {
+        const currentState = window.history.state;
+        const historyState =
+          typeof currentState === "object" && currentState !== null ? currentState : {};
+
+        window.history.pushState(
+          { ...historyState, workProjectModal: true, projectId },
+          "",
+          window.location.href
+        );
+        modalHistoryPushedRef.current = true;
+      }
+
       setExpandedProject(projectIndex);
     }
   }, []);
 
   const handleCloseProject = useCallback(() => {
+    if (modalHistoryPushedRef.current) {
+      window.history.back();
+      return;
+    }
+
     setExpandedProject(null);
   }, []);
 
@@ -336,6 +368,33 @@ function WorkSection() {
       resizeObserver.disconnect();
     };
   }, [updateScrollState, visibleProjects.length]);
+
+  React.useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const state = event.state as { workProjectModal?: boolean; projectId?: string } | null;
+
+      if (state?.workProjectModal && state.projectId) {
+        const projectIndex = PROJECTS.findIndex((project) => project.id === state.projectId);
+
+        if (projectIndex >= 0) {
+          modalHistoryPushedRef.current = true;
+          setExpandedProject(projectIndex);
+          return;
+        }
+      }
+
+      if (expandedProjectRef.current !== null) {
+        modalHistoryPushedRef.current = false;
+        setExpandedProject(null);
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
 
   return (
     <section
@@ -431,9 +490,17 @@ function WorkSection() {
         </motion.div>
 
         <motion.div
+          ref={cardsRef}
+          initial="hidden"
+          animate={cardsInView ? "show" : "hidden"}
           variants={{
             hidden: {},
-            show: { transition: { staggerChildren: isMobile ? 0.02 : 0.06 } },
+            show: {
+              transition: {
+                delayChildren: isMobile ? 0.02 : 0.08,
+                staggerChildren: isMobile ? 0.045 : 0.09,
+              },
+            },
           }}
         >
           <div

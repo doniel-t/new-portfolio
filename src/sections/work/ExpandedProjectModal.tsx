@@ -66,7 +66,7 @@ function ExpandedProjectModal({ projects, projectIndex, isMobile, onClose, onNav
   return (
     <>
       <div data-lenis-prevent className="fixed inset-0 z-[100] bg-[#0d0b08] animate-[fadeIn_0.2s_ease-out]" />
-      <LoadTransitionOverlay blockPointerEvents />
+      <LoadTransitionOverlay />
 
       <div
         ref={scrollContainerRef}
