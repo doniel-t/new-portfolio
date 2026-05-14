@@ -5,53 +5,111 @@ import { useEffect, useRef, useState } from "react";
 
 const HOLD_MS = 1000;
 const DISSOLVE_MS = 1325;
-const PIXEL_SIZE = 28;
-const CELL_DURATION = 0.36;
-const MAX_DPR = 1.75;
-const MAX_CELL_DELAY = 1 - CELL_DURATION;
+const VIDEO_REVEAL_MS = 1325;
 const LOADER_COLOR = "#A69F8D";
+const WEBM_VP9_TYPE = 'video/webm; codecs="vp9"';
 
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
-}
+type TransitionVideoAsset = {
+  src: string;
+  width: number;
+  height: number;
+  orientation: "landscape" | "portrait";
+};
 
-function easeOutCubic(value: number) {
-  const inverse = 1 - value;
-  return 1 - inverse * inverse * inverse;
-}
-
-function easeInOutCubic(value: number) {
-  return value < 0.5
-    ? 4 * value * value * value
-    : 1 - Math.pow(-2 * value + 2, 3) / 2;
-}
-
-function hashNoise(column: number, row: number) {
-  const seed = Math.sin(column * 127.1 + row * 311.7) * 43758.5453123;
-  return seed - Math.floor(seed);
-}
+const TRANSITION_VIDEO_ASSETS: TransitionVideoAsset[] = [
+  {
+    src: "/load-transition/dissolve-landscape-720.webm",
+    width: 720,
+    height: 450,
+    orientation: "landscape",
+  },
+  {
+    src: "/load-transition/dissolve-landscape-1440.webm",
+    width: 1440,
+    height: 900,
+    orientation: "landscape",
+  },
+  {
+    src: "/load-transition/dissolve-landscape-2560.webm",
+    width: 2560,
+    height: 1600,
+    orientation: "landscape",
+  },
+  {
+    src: "/load-transition/dissolve-landscape-3840.webm",
+    width: 3840,
+    height: 2400,
+    orientation: "landscape",
+  },
+  {
+    src: "/load-transition/dissolve-portrait-720.webm",
+    width: 720,
+    height: 1280,
+    orientation: "portrait",
+  },
+  {
+    src: "/load-transition/dissolve-portrait-1440.webm",
+    width: 1440,
+    height: 2560,
+    orientation: "portrait",
+  },
+  {
+    src: "/load-transition/dissolve-portrait-2160.webm",
+    width: 2160,
+    height: 3840,
+    orientation: "portrait",
+  },
+];
 
 type LoadTransitionOverlayProps = {
   label?: string;
   blockPointerEvents?: boolean;
+  active?: boolean;
+  onCovered?: () => void;
+  onDone?: () => void;
+  holdMs?: number;
+  revealMs?: number;
 };
+
+type TransitionPhase = "holding" | "revealing" | "fading";
+
+function chooseTransitionVideoAsset(width: number, height: number) {
+  const orientation = height > width ? "portrait" : "landscape";
+  const candidates = TRANSITION_VIDEO_ASSETS.filter((asset) => asset.orientation === orientation);
+  const dimension = orientation === "portrait" ? height : width;
+
+  return (
+    candidates.find((asset) => (orientation === "portrait" ? asset.height : asset.width) >= dimension) ??
+    candidates[candidates.length - 1] ??
+    TRANSITION_VIDEO_ASSETS[0]
+  );
+}
 
 export function LoadTransitionOverlay({
   label = "Initializing",
   blockPointerEvents = false,
+  active,
+  onCovered,
+  onDone,
+  holdMs = HOLD_MS,
+  revealMs = DISSOLVE_MS,
 }: LoadTransitionOverlayProps) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const cellsRef = useRef<Float32Array>(new Float32Array());
-  const gridRef = useRef({ columns: 0, rows: 0 });
-  const rafRef = useRef<number | null>(null);
-  const startRef = useRef<number | null>(null);
-  const hasPaintedOverlayRef = useRef(false);
-  const [isVisible, setIsVisible] = useState(true);
+  const shouldRun = active ?? true;
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const onCoveredRef = useRef(onCovered);
+  const onDoneRef = useRef(onDone);
+  const finishRef = useRef<() => void>(() => {});
+  const hasStartedRevealRef = useRef(false);
+  const [isVisible, setIsVisible] = useState(shouldRun);
   const [showLoader, setShowLoader] = useState(true);
-  const [isOverlayPainted, setIsOverlayPainted] = useState(false);
+  const [phase, setPhase] = useState<TransitionPhase>("holding");
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [isReducedMotionFading, setIsReducedMotionFading] = useState(false);
+  const [videoUnsupported, setVideoUnsupported] = useState(false);
   const [darkColor, setDarkColor] = useState("#0d0b08");
+  const [activeAsset, setActiveAsset] = useState<TransitionVideoAsset>(TRANSITION_VIDEO_ASSETS[1]);
+
+  onCoveredRef.current = onCovered;
+  onDoneRef.current = onDone;
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -61,6 +119,11 @@ export function LoadTransitionOverlay({
     mediaQuery.addEventListener("change", syncReducedMotion);
 
     return () => mediaQuery.removeEventListener("change", syncReducedMotion);
+  }, []);
+
+  useEffect(() => {
+    const probe = document.createElement("video");
+    setVideoUnsupported(!probe.canPlayType(WEBM_VP9_TYPE));
   }, []);
 
   useEffect(() => {
@@ -74,213 +137,161 @@ export function LoadTransitionOverlay({
   }, []);
 
   useEffect(() => {
-    if (!isVisible) {
-      return;
-    }
-
-    hasPaintedOverlayRef.current = false;
-    setIsOverlayPainted(reducedMotion);
-    setShowLoader(true);
-
-    const timeoutId = window.setTimeout(() => {
-      setShowLoader(false);
-    }, HOLD_MS);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [isVisible, reducedMotion]);
-
-  useEffect(() => {
-    if (!isVisible || reducedMotion) {
-      return;
-    }
-
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      return;
-    }
-
-    const context = canvas.getContext("2d", { alpha: true });
-    if (!context) {
-      return;
-    }
-
-    let width = 0;
-    let height = 0;
-    let pixel = PIXEL_SIZE;
-
-    const updateSize = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-
-      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
-      pixel = Math.max(20, Math.round(PIXEL_SIZE * Math.min(width / 1440, 1.1)));
-
-      canvas.width = Math.ceil(width * dpr);
-      canvas.height = Math.ceil(height * dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-
-      context.setTransform(1, 0, 0, 1, 0, 0);
-      context.scale(dpr, dpr);
-
-      const columns = Math.ceil(width / pixel);
-      const rows = Math.ceil(height / pixel);
-      const delays = new Float32Array(columns * rows);
-      const maxColumn = Math.max(columns - 1, 1);
-      const maxRow = Math.max(rows - 1, 1);
-
-      for (let row = 0; row < rows; row += 1) {
-        for (let column = 0; column < columns; column += 1) {
-          const fromRight = 1 - column / maxColumn;
-          const rowBand = Math.abs(row / maxRow - 0.5);
-          const noise = hashNoise(column, row);
-          const flutter = hashNoise(row + 17, column + 29);
-          const timingScore = clamp(
-            fromRight * 0.82 + rowBand * 0.08 + noise * 0.06 + flutter * 0.04,
-            0,
-            1
-          );
-
-          delays[row * columns + column] = timingScore * MAX_CELL_DELAY;
-        }
-      }
-
-      gridRef.current = { columns, rows };
-      cellsRef.current = delays;
-    };
-
-    const draw = (timestamp: number) => {
-      if (startRef.current === null) {
-        startRef.current = timestamp;
-      }
-
-      const elapsed = timestamp - startRef.current;
-      context.clearRect(0, 0, width, height);
-
-      if (elapsed <= HOLD_MS) {
-        context.fillStyle = darkColor;
-        context.globalAlpha = 1;
-        context.fillRect(0, 0, width, height);
-
-        if (!hasPaintedOverlayRef.current) {
-          hasPaintedOverlayRef.current = true;
-          setIsOverlayPainted(true);
-        }
-
-        rafRef.current = window.requestAnimationFrame(draw);
-        return;
-      }
-
-      const progress = clamp((elapsed - HOLD_MS) / DISSOLVE_MS, 0, 1);
-      const easedProgress = easeInOutCubic(progress);
-      const { columns, rows } = gridRef.current;
-      const delays = cellsRef.current;
-
-      context.globalCompositeOperation = "source-over";
-      context.fillStyle = darkColor;
-      context.globalAlpha = 1;
-      context.fillRect(0, 0, width, height);
-      context.globalCompositeOperation = "destination-out";
-
-      for (let row = 0; row < rows; row += 1) {
-        for (let column = 0; column < columns; column += 1) {
-          const rawProgress =
-            (easedProgress - delays[row * columns + column]) / CELL_DURATION;
-
-          if (rawProgress <= 0) {
-            continue;
-          }
-
-          const tileX = column * pixel;
-          const tileY = row * pixel;
-
-          if (rawProgress >= 1) {
-            context.globalAlpha = 1;
-            context.clearRect(tileX - 1, tileY - 1, pixel + 2, pixel + 2);
-            continue;
-          }
-
-          const cellProgress = clamp(rawProgress, 0, 1);
-          const carve = easeOutCubic(cellProgress);
-          const size = Math.max(1, pixel * carve);
-          const x = tileX + (pixel - size) / 2;
-          const y = tileY + (pixel - size) / 2;
-
-          context.globalAlpha = carve;
-          context.fillRect(x, y, size, size);
-        }
-      }
-
-      context.globalAlpha = 1;
-      context.globalCompositeOperation = "source-over";
-
-      if (progress >= 1) {
-        setIsVisible(false);
-        return;
-      }
-
-      rafRef.current = window.requestAnimationFrame(draw);
-    };
-
-    updateSize();
-    rafRef.current = window.requestAnimationFrame(draw);
-
-    window.addEventListener("resize", updateSize, { passive: true });
-
-    return () => {
-      if (rafRef.current !== null) {
-        window.cancelAnimationFrame(rafRef.current);
-      }
-
-      window.removeEventListener("resize", updateSize);
-    };
-  }, [darkColor, isVisible, reducedMotion]);
-
-  useEffect(() => {
-    if (!reducedMotion || !isVisible) {
-      return;
-    }
-
-    const fadeTimeout = window.setTimeout(() => {
-      setIsReducedMotionFading(true);
-    }, HOLD_MS);
-
-    const hideTimeout = window.setTimeout(() => {
+    if (!shouldRun) {
       setIsVisible(false);
-    }, HOLD_MS + 220);
+      return;
+    }
 
-    return () => {
-      window.clearTimeout(fadeTimeout);
-      window.clearTimeout(hideTimeout);
-    };
-  }, [isVisible, reducedMotion]);
+    setIsVisible(true);
+  }, [shouldRun]);
 
   useEffect(() => {
-    if (!reducedMotion) {
-      setIsReducedMotionFading(false);
+    if (!isVisible) return;
+
+    const syncAsset = () => {
+      const nextAsset = chooseTransitionVideoAsset(window.innerWidth, window.innerHeight);
+      setActiveAsset((current) => (current.src === nextAsset.src ? current : nextAsset));
+    };
+
+    syncAsset();
+    window.addEventListener("resize", syncAsset, { passive: true });
+
+    return () => window.removeEventListener("resize", syncAsset);
+  }, [isVisible]);
+
+  useEffect(() => {
+    if (!isVisible || !shouldRun) return;
+
+    let done = false;
+    let fallbackTimeoutId = 0;
+    let playbackVideo: HTMLVideoElement | null = null;
+    const video = videoRef.current;
+
+    const finishOnce = () => {
+      if (done) return;
+      done = true;
+      hasStartedRevealRef.current = false;
+      setIsVisible(false);
+      setShowLoader(false);
+      setPhase("holding");
+      onDoneRef.current?.();
+    };
+
+    finishRef.current = finishOnce;
+    hasStartedRevealRef.current = false;
+    setPhase("holding");
+    setShowLoader(true);
+    onCoveredRef.current?.();
+
+    if (video) {
+      video.pause();
+      video.playbackRate = VIDEO_REVEAL_MS / revealMs;
+      try {
+        video.currentTime = 0;
+        video.load();
+      } catch {
+        // The transition can still run once metadata is available.
+      }
     }
-  }, [reducedMotion]);
+
+    if (reducedMotion || videoUnsupported) {
+      const fadeTimeoutId = window.setTimeout(() => {
+        setShowLoader(false);
+        setPhase("fading");
+      }, holdMs);
+      const doneTimeoutId = window.setTimeout(finishOnce, holdMs + 300);
+
+      return () => {
+        done = true;
+        window.clearTimeout(fadeTimeoutId);
+        window.clearTimeout(doneTimeoutId);
+      };
+    }
+
+    const holdTimeoutId = window.setTimeout(() => {
+      const playableVideo = videoRef.current;
+      setShowLoader(false);
+      setPhase("revealing");
+
+      if (!playableVideo) {
+        fallbackTimeoutId = window.setTimeout(finishOnce, revealMs);
+        return;
+      }
+
+      playableVideo.playbackRate = VIDEO_REVEAL_MS / revealMs;
+      playbackVideo = playableVideo;
+      hasStartedRevealRef.current = true;
+
+      try {
+        playableVideo.currentTime = 0;
+      } catch {
+        // Some browsers reject seeking before metadata is ready.
+      }
+
+      void playableVideo.play().catch(() => {
+        setVideoUnsupported(true);
+      });
+
+      fallbackTimeoutId = window.setTimeout(finishOnce, revealMs + 500);
+    }, holdMs);
+
+    return () => {
+      done = true;
+      finishRef.current = () => {};
+      hasStartedRevealRef.current = false;
+      window.clearTimeout(holdTimeoutId);
+      window.clearTimeout(fallbackTimeoutId);
+      playbackVideo?.pause();
+    };
+  }, [holdMs, isVisible, reducedMotion, revealMs, shouldRun, videoUnsupported]);
 
   if (!isVisible) {
     return null;
   }
 
+  const isSoftFade = phase === "fading";
+  const isVideoReveal = phase === "revealing" && !reducedMotion && !videoUnsupported;
+
   return (
     <div
+      data-load-transition-overlay
+      data-load-transition-renderer={isVideoReveal ? "video" : "solid"}
+      data-load-transition-video={activeAsset.src}
       className={`fixed inset-0 z-[200] ${blockPointerEvents ? "pointer-events-auto" : "pointer-events-none"} ${
-        reducedMotion ? "transition-opacity duration-300 ease-out" : ""
+        isSoftFade ? "transition-opacity duration-300 ease-out" : ""
       }`}
       style={{
-        backgroundColor: reducedMotion ? darkColor : "transparent",
-        opacity: reducedMotion && isReducedMotionFading ? 0 : 1,
+        backgroundColor: isVideoReveal ? "transparent" : darkColor,
+        opacity: isSoftFade ? 0 : 1,
       }}
     >
+      {!reducedMotion && !videoUnsupported ? (
+        <video
+          key={activeAsset.src}
+          ref={videoRef}
+          aria-hidden
+          muted
+          playsInline
+          preload="auto"
+          width={activeAsset.width}
+          height={activeAsset.height}
+          onEnded={() => {
+            if (hasStartedRevealRef.current) {
+              finishRef.current();
+            }
+          }}
+          onError={() => setVideoUnsupported(true)}
+          className="absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 object-cover"
+          style={{ imageRendering: "pixelated" }}
+        >
+          <source src={activeAsset.src} type={WEBM_VP9_TYPE} />
+        </video>
+      ) : null}
+
       <div
-        aria-hidden={!(showLoader && isOverlayPainted)}
+        aria-hidden={!showLoader}
         className="absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-200 ease-out"
-        style={{ opacity: showLoader && isOverlayPainted ? 1 : 0 }}
+        style={{ opacity: showLoader ? 1 : 0 }}
       >
         <div
           role="status"
@@ -292,7 +303,6 @@ export function LoadTransitionOverlay({
           <span className="font-display text-xl leading-none">{label}</span>
         </div>
       </div>
-      {!reducedMotion ? <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" /> : null}
     </div>
   );
 }

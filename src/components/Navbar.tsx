@@ -3,6 +3,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSectionScroll } from "@/hooks/useSectionScroll";
+import { canUseOffscreenCanvas } from "@/lib/offscreenCanvas";
 
 const NAV_ITEMS = [
   { label: "Home", href: "#home" },
@@ -38,15 +39,75 @@ function PixelTransitionOverlay({
 }) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const animationRef = React.useRef<number>(0);
+  const workerRef = React.useRef<Worker | null>(null);
+  const workerCleanupTimerRef = React.useRef<number>(0);
+  const usesWorkerRef = React.useRef(false);
+  const isRevealingRef = React.useRef(isRevealing);
+  const onCompleteRef = React.useRef(onComplete);
+  const onShowContentRef = React.useRef(onShowContent);
   const hasCalledShowContent = React.useRef(false);
   const hasCalledComplete = React.useRef(false);
+
+  isRevealingRef.current = isRevealing;
+  onCompleteRef.current = onComplete;
+  onShowContentRef.current = onShowContent;
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !canUseOffscreenCanvas(canvas)) return;
+
+    if (workerCleanupTimerRef.current) {
+      window.clearTimeout(workerCleanupTimerRef.current);
+      workerCleanupTimerRef.current = 0;
+      return () => {
+        workerCleanupTimerRef.current = window.setTimeout(() => {
+          workerRef.current?.postMessage({ type: "stop" });
+          workerRef.current?.terminate();
+          workerRef.current = null;
+          usesWorkerRef.current = false;
+        }, 0);
+      };
+    }
+
+    if (!workerRef.current && !usesWorkerRef.current) {
+      const worker = new Worker(new URL("../workers/pixelWipeCanvas.worker.ts", import.meta.url), {
+        type: "module",
+      });
+      const offscreen = canvas.transferControlToOffscreen();
+
+      worker.onmessage = (event: MessageEvent<{ type: "showContent" | "complete" }>) => {
+        if (event.data.type === "showContent") {
+          if (!hasCalledShowContent.current && isRevealingRef.current && onShowContentRef.current) {
+            hasCalledShowContent.current = true;
+            onShowContentRef.current();
+          }
+          return;
+        }
+
+        if (!hasCalledComplete.current) {
+          hasCalledComplete.current = true;
+          onCompleteRef.current();
+        }
+      };
+
+      workerRef.current = worker;
+      usesWorkerRef.current = true;
+      worker.postMessage({ type: "init", canvas: offscreen }, [offscreen]);
+    }
+
+    return () => {
+      workerCleanupTimerRef.current = window.setTimeout(() => {
+        workerRef.current?.postMessage({ type: "stop" });
+        workerRef.current?.terminate();
+        workerRef.current = null;
+        usesWorkerRef.current = false;
+      }, 0);
+    };
+  }, []);
 
   React.useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    const ctx = canvas.getContext("2d", { alpha: true });
-    if (!ctx) return;
 
     // Reset callback flags
     hasCalledShowContent.current = false;
@@ -55,6 +116,34 @@ function PixelTransitionOverlay({
     // Get actual size and set canvas dimensions
     const rect = canvas.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap DPR for performance
+
+    if (usesWorkerRef.current && workerRef.current) {
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      workerRef.current.postMessage({
+        type: "resize",
+        width: rect.width,
+        height: rect.height,
+        dpr,
+      });
+      workerRef.current.postMessage({
+        type: "play",
+        mode: "navbar",
+        color: pixelColor,
+        durationMs: prefersReducedMotion ? 150 : PIXEL_ANIMATION_DURATION,
+        isRevealing,
+        pixelSize: PIXEL_SIZE,
+        showThreshold: 0.8,
+      });
+
+      return () => {
+        workerRef.current?.postMessage({ type: "stop" });
+      };
+    }
+
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
     ctx.scale(dpr, dpr);

@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  getPixelDividerMediaAssets,
+  PixelDividerVideo,
+} from "@/components/PixelDividerMedia";
+import { canUseOffscreenCanvas } from "@/lib/offscreenCanvas";
 
 type PixelDividerProps = {
   color?: string;
@@ -73,7 +78,19 @@ function unsubscribe(cb: TickCallback) {
 }
 
 // ── Component ──
-export default function PixelDivider({
+function getMaskStyle(direction: "up" | "down"): React.CSSProperties {
+  return direction === "up"
+    ? {
+        WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
+        maskImage: "linear-gradient(to top, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
+      }
+    : {
+        WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
+        maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
+      };
+}
+
+function CanvasPixelDivider({
   color = "#0d0b08",
   pixelSize = 28,
   durationSec = 4.5,
@@ -88,12 +105,52 @@ export default function PixelDivider({
   const particlesRef = useRef<Particle[]>([]);
   const dimensionsRef = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const workerRef = useRef<Worker | null>(null);
+  const workerCleanupTimerRef = useRef<number>(0);
+  const usesWorkerRef = useRef(false);
   const [isVisible, setIsVisible] = useState(false);
 
   // Pre-compute constants
   const riseMultiplier = parseRise(rise);
   const travelDistance = pixelSize * riseMultiplier;
   const invDuration = 1 / durationSec;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !canUseOffscreenCanvas(canvas)) return;
+
+    if (workerCleanupTimerRef.current) {
+      window.clearTimeout(workerCleanupTimerRef.current);
+      workerCleanupTimerRef.current = 0;
+      return () => {
+        workerCleanupTimerRef.current = window.setTimeout(() => {
+          workerRef.current?.postMessage({ type: "stop" });
+          workerRef.current?.terminate();
+          workerRef.current = null;
+          usesWorkerRef.current = false;
+        }, 0);
+      };
+    }
+
+    if (!workerRef.current && !usesWorkerRef.current) {
+      const worker = new Worker(new URL("../workers/pixelDividerCanvas.worker.ts", import.meta.url), {
+        type: "module",
+      });
+      const offscreen = canvas.transferControlToOffscreen();
+      workerRef.current = worker;
+      usesWorkerRef.current = true;
+      worker.postMessage({ type: "init", canvas: offscreen }, [offscreen]);
+    }
+
+    return () => {
+      workerCleanupTimerRef.current = window.setTimeout(() => {
+        workerRef.current?.postMessage({ type: "stop" });
+        workerRef.current?.terminate();
+        workerRef.current = null;
+        usesWorkerRef.current = false;
+      }, 0);
+    };
+  }, []);
 
   // Setup canvas and handle resize
   useEffect(() => {
@@ -106,12 +163,30 @@ export default function PixelDivider({
       const height = container.clientHeight || 0;
       const dpr = window.devicePixelRatio || 1;
 
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
 
       dimensionsRef.current = { width, height };
+
+      if (usesWorkerRef.current && workerRef.current) {
+        workerRef.current.postMessage({
+          type: "config",
+          axis: "vertical",
+          width,
+          height,
+          dpr,
+          color,
+          pixelSize,
+          durationSec,
+          travelMultiplier: riseMultiplier,
+          streams: streamsPerCol,
+          direction,
+        });
+        return;
+      }
+
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
       ctxRef.current = canvas.getContext("2d");
 
       const columns = Math.max(1, Math.ceil(width / pixelSize) + 2);
@@ -128,7 +203,7 @@ export default function PixelDivider({
     const ro = new ResizeObserver(updateSize);
     ro.observe(container);
     return () => ro.disconnect();
-  }, [pixelSize, streamsPerCol]);
+  }, [color, direction, durationSec, pixelSize, riseMultiplier, streamsPerCol]);
 
   // Observe visibility
   useEffect(() => {
@@ -143,9 +218,13 @@ export default function PixelDivider({
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    workerRef.current?.postMessage({ type: "active", active: isVisible });
+  }, [isVisible]);
+
   // Subscribe to shared RAF loop when visible
   useEffect(() => {
-    if (!isVisible) return;
+    if (!isVisible || usesWorkerRef.current) return;
 
     const tick: TickCallback = (deltaTime) => {
       const ctx = ctxRef.current;
@@ -211,23 +290,54 @@ export default function PixelDivider({
     return () => unsubscribe(tick);
   }, [isVisible, color, pixelSize, travelDistance, invDuration, direction]);
 
-  const maskStyle: React.CSSProperties = direction === "up"
-    ? {
-        WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
-        maskImage: "linear-gradient(to top, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
-      }
-    : {
-        WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
-        maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)",
-      };
+  const maskStyle = getMaskStyle(direction);
 
   return (
     <div
       ref={containerRef}
+      data-pixel-divider-renderer="canvas"
+      data-pixel-divider-axis="vertical"
       className={`relative w-full h-full overflow-hidden pointer-events-none ${className}`}
       style={{ ...style, ...maskStyle }}
     >
       <canvas ref={canvasRef} className="absolute inset-0" />
     </div>
+  );
+}
+
+export default function PixelDivider(props: PixelDividerProps) {
+  const color = props.color ?? "#0d0b08";
+  const pixelSize = props.pixelSize ?? 28;
+  const durationSec = props.durationSec ?? 4.5;
+  const rise = props.rise ?? "-180%";
+  const streamsPerCol = props.streamsPerCol ?? 5;
+  const direction = props.direction ?? "up";
+  const className = props.className ?? "";
+  const style = props.style ?? {};
+  const assets = useMemo(
+    () =>
+      getPixelDividerMediaAssets({
+        axis: "vertical",
+        color,
+        pixelSize,
+        durationSec,
+        travel: rise,
+        streams: streamsPerCol,
+        direction,
+      }),
+    [color, direction, durationSec, pixelSize, rise, streamsPerCol],
+  );
+
+  if (assets.length === 0) {
+    return <CanvasPixelDivider {...props} />;
+  }
+
+  return (
+    <PixelDividerVideo
+      assets={assets}
+      className={`relative w-full h-full overflow-hidden pointer-events-none ${className}`}
+      style={{ ...style, ...getMaskStyle(direction) }}
+      fallback={<CanvasPixelDivider {...props} />}
+    />
   );
 }

@@ -6,6 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "render:load-transition": "node scripts/render-load-transition.mjs",
+    "render:pixel-dividers": "node scripts/render-pixel-dividers.mjs",
     "lint": "eslint"
   },
   "dependencies": {

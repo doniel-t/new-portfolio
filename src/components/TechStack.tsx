@@ -8,6 +8,7 @@ import DecodingWord from "./DecodingWord";
 import TargetCursor from "./TargetCursor";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useGPUDetection } from "@/hooks/useGPUDetection";
+import { canUseOffscreenCanvas } from "@/lib/offscreenCanvas";
 
 const Dither = dynamic(() => import("./Dither"), {
   ssr: false,
@@ -223,13 +224,11 @@ export default function TechStack() {
             {CATEGORIES.map((category) => {
               const startIndex = flatIndex;
               flatIndex += category.items.length;
-              const categoryMem = category.items.reduce((a, b) => a + b.cost, 0);
 
               return (
                 <CategoryBlock
                   key={category.key}
                   category={category}
-                  categoryMem={categoryMem}
                   startIndex={startIndex}
                   cardRefs={cardRefs}
                   hoverHandlers={hoverHandlers}
@@ -248,14 +247,12 @@ export default function TechStack() {
 
 const CategoryBlock = memo(function CategoryBlock({
   category,
-  categoryMem,
   startIndex,
   cardRefs,
   hoverHandlers,
   isInView,
 }: {
   category: CategoryDef;
-  categoryMem: number;
   startIndex: number;
   cardRefs: React.MutableRefObject<(HTMLDivElement | null)[]>;
   hoverHandlers: { onHoverStart: () => void; onHoverEnd: () => void }[];
@@ -407,6 +404,9 @@ const SharedParticleLayer = memo(
     const hoveredIndexRef = useRef<number | null>(null);
     const lastFrameTimeRef = useRef(0);
     const syncFrameRef = useRef<number | null>(null);
+    const workerRef = useRef<Worker | null>(null);
+    const workerCleanupTimerRef = useRef<number>(0);
+    const usesWorkerRef = useRef(false);
 
     const particlePoolRef = useRef<Particle[] | null>(null);
     if (particlePoolRef.current === null) {
@@ -458,6 +458,99 @@ const SharedParticleLayer = memo(
       const canvas = canvasRef.current;
       const container = containerRef.current;
       if (!canvas || !container) return;
+
+      if (canUseOffscreenCanvas(canvas)) {
+        if (workerCleanupTimerRef.current) {
+          window.clearTimeout(workerCleanupTimerRef.current);
+          workerCleanupTimerRef.current = 0;
+        }
+
+        if (!workerRef.current && !usesWorkerRef.current) {
+          const worker = new Worker(new URL("../workers/techParticlesCanvas.worker.ts", import.meta.url), {
+            type: "module",
+          });
+          const offscreen = canvas.transferControlToOffscreen();
+          workerRef.current = worker;
+          usesWorkerRef.current = true;
+          worker.postMessage({ type: "init", canvas: offscreen, maxParticles: MAX_PARTICLES }, [offscreen]);
+        }
+
+        const worker = workerRef.current;
+        if (!worker) return;
+
+        const resize = () => {
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const w = container.clientWidth;
+          const h = container.clientHeight;
+          canvas.style.width = `${w}px`;
+          canvas.style.height = `${h}px`;
+          worker.postMessage({ type: "resize", width: w, height: h, dpr });
+        };
+
+        const postActiveRect = () => {
+          worker.postMessage({
+            type: "activeRect",
+            rect: activeRectRef.current,
+            color: colorRef.current,
+          });
+        };
+
+        const scheduleRectSync = () => {
+          if (syncFrameRef.current !== null) return;
+
+          syncFrameRef.current = requestAnimationFrame(() => {
+            syncFrameRef.current = null;
+            syncActiveRect();
+            postActiveRect();
+          });
+        };
+
+        resize();
+        syncActiveRect();
+        postActiveRect();
+        startLoopRef.current = postActiveRect;
+
+        let resizeObserver: ResizeObserver | null = null;
+        const canObserve = typeof ResizeObserver !== "undefined";
+        if (canObserve) {
+          resizeObserver = new ResizeObserver(() => {
+            resize();
+            scheduleRectSync();
+          });
+          resizeObserver.observe(container);
+        } else {
+          window.addEventListener("resize", resize);
+        }
+
+        window.addEventListener("resize", scheduleRectSync);
+        window.addEventListener("scroll", scheduleRectSync, true);
+
+        return () => {
+          if (syncFrameRef.current !== null) {
+            cancelAnimationFrame(syncFrameRef.current);
+            syncFrameRef.current = null;
+          }
+
+          startLoopRef.current = null;
+          workerCleanupTimerRef.current = window.setTimeout(() => {
+            worker.postMessage({ type: "stop" });
+            worker.terminate();
+            if (workerRef.current === worker) {
+              workerRef.current = null;
+            }
+            usesWorkerRef.current = false;
+          }, 0);
+
+          if (resizeObserver) {
+            resizeObserver.disconnect();
+          } else {
+            window.removeEventListener("resize", resize);
+          }
+
+          window.removeEventListener("resize", scheduleRectSync);
+          window.removeEventListener("scroll", scheduleRectSync, true);
+        };
+      }
 
       const ctx = canvas.getContext("2d", { alpha: true });
       if (!ctx) return;

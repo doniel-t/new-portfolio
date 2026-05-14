@@ -8,7 +8,7 @@ import { ArrowRight } from "lucide-react";
 import DecodingWord from "@/components/DecodingWord";
 import HorizontalPixelDivider from "@/components/HorizontalPixelDivider";
 import PixelDivider from "@/components/PixelDivider";
-import PixelDissolveOverlay from "@/components/PixelDissolveOverlay";
+import { LoadTransitionOverlay } from "@/components/InitialLoadTransition";
 import { useSectionScroll } from "@/hooks/useSectionScroll";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import ExpandedHobbyModal from "./ExpandedHobbyModal";
@@ -717,7 +717,7 @@ function HobbiesSection() {
         />
       )}
 
-      <PixelDissolveOverlay
+      <LoadTransitionOverlay
         active={dissolveActive}
         onCovered={handleDissolveCovered}
         onDone={handleDissolveDone}

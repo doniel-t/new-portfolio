@@ -1,18 +1,16 @@
 'use client';
 import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react';
-import { gsap } from 'gsap';
-import { InertiaPlugin } from 'gsap/InertiaPlugin';
 import { usePageVisibility } from '@/hooks/useGPUDetection';
 import { useIsMobile } from '@/hooks/useIsMobile';
-
-gsap.registerPlugin(InertiaPlugin);
+import { canUseOffscreenCanvas } from '@/lib/offscreenCanvas';
 
 interface Dot {
   cx: number;
   cy: number;
   xOffset: number;
   yOffset: number;
-  _inertiaApplied: boolean;
+  vx: number;
+  vy: number;
 }
 
 export interface DotGridProps {
@@ -42,6 +40,9 @@ const DotGrid: React.FC<DotGridProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dotsRef = useRef<Dot[]>([]);
   const dimensionsRef = useRef({ width: 0, height: 0 });
+  const workerRef = useRef<Worker | null>(null);
+  const workerCleanupTimerRef = useRef<number>(0);
+  const usesWorkerRef = useRef(false);
 
   const isPageVisible = usePageVisibility();
   const isMobile = useIsMobile();
@@ -63,6 +64,43 @@ const DotGrid: React.FC<DotGridProps> = ({
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !canUseOffscreenCanvas(canvas)) return;
+
+    if (workerCleanupTimerRef.current) {
+      window.clearTimeout(workerCleanupTimerRef.current);
+      workerCleanupTimerRef.current = 0;
+      return () => {
+        workerCleanupTimerRef.current = window.setTimeout(() => {
+          workerRef.current?.postMessage({ type: 'stop' });
+          workerRef.current?.terminate();
+          workerRef.current = null;
+          usesWorkerRef.current = false;
+        }, 0);
+      };
+    }
+
+    if (!workerRef.current && !usesWorkerRef.current) {
+      const worker = new Worker(new URL('../workers/dotGridCanvas.worker.ts', import.meta.url), {
+        type: 'module',
+      });
+      const offscreen = canvas.transferControlToOffscreen();
+      workerRef.current = worker;
+      usesWorkerRef.current = true;
+      worker.postMessage({ type: 'init', canvas: offscreen }, [offscreen]);
+    }
+
+    return () => {
+      workerCleanupTimerRef.current = window.setTimeout(() => {
+        workerRef.current?.postMessage({ type: 'stop' });
+        workerRef.current?.terminate();
+        workerRef.current = null;
+        usesWorkerRef.current = false;
+      }, 0);
+    };
+  }, []);
+
   const circlePath = useMemo(() => {
     if (typeof window === 'undefined' || !window.Path2D) return null;
 
@@ -82,10 +120,25 @@ const DotGrid: React.FC<DotGridProps> = ({
     // Store CSS dimensions for proper clearing
     dimensionsRef.current = { width, height };
 
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
+
+    if (usesWorkerRef.current && workerRef.current) {
+      workerRef.current.postMessage({
+        type: 'config',
+        width,
+        height,
+        dpr,
+        dotSize,
+        gap,
+        baseColor,
+        returnDuration,
+      });
+      return;
+    }
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
     const ctx = canvas.getContext('2d');
     if (ctx) ctx.scale(dpr, dpr);
 
@@ -107,14 +160,18 @@ const DotGrid: React.FC<DotGridProps> = ({
       for (let x = 0; x < cols; x++) {
         const cx = startX + x * cell;
         const cy = startY + y * cell;
-        dots.push({ cx, cy, xOffset: 0, yOffset: 0, _inertiaApplied: false });
+        dots.push({ cx, cy, xOffset: 0, yOffset: 0, vx: 0, vy: 0 });
       }
     }
     dotsRef.current = dots;
-  }, [dotSize, gap]);
+  }, [baseColor, dotSize, gap, returnDuration]);
 
   useEffect(() => {
-    if (!circlePath || !shouldRunAnimation) return;
+    workerRef.current?.postMessage({ type: 'active', active: shouldRunAnimation });
+  }, [shouldRunAnimation]);
+
+  useEffect(() => {
+    if (!circlePath || !shouldRunAnimation || usesWorkerRef.current) return;
 
     let rafId: number;
     let isRunning = true;
@@ -138,7 +195,28 @@ const DotGrid: React.FC<DotGridProps> = ({
       ctx.clearRect(0, 0, width, height);
 
       ctx.fillStyle = baseColor;
+      const spring = Math.max(0.012, 0.045 / Math.max(returnDuration, 0.3));
+      const damping = 0.86;
       for (const dot of dotsRef.current) {
+        dot.vx += -dot.xOffset * spring;
+        dot.vy += -dot.yOffset * spring;
+        dot.vx *= damping;
+        dot.vy *= damping;
+        dot.xOffset += dot.vx;
+        dot.yOffset += dot.vy;
+
+        if (
+          Math.abs(dot.xOffset) < 0.02 &&
+          Math.abs(dot.yOffset) < 0.02 &&
+          Math.abs(dot.vx) < 0.02 &&
+          Math.abs(dot.vy) < 0.02
+        ) {
+          dot.xOffset = 0;
+          dot.yOffset = 0;
+          dot.vx = 0;
+          dot.vy = 0;
+        }
+
         const ox = dot.cx + dot.xOffset;
         const oy = dot.cy + dot.yOffset;
 
@@ -156,10 +234,13 @@ const DotGrid: React.FC<DotGridProps> = ({
       isRunning = false;
       cancelAnimationFrame(rafId);
     };
-  }, [baseColor, circlePath, shouldRunAnimation]);
+  }, [baseColor, circlePath, returnDuration, shouldRunAnimation]);
 
   useEffect(() => {
     if (!shouldRunAnimation) {
+      workerRef.current?.postMessage({ type: 'active', active: false });
+      if (usesWorkerRef.current) return;
+
       dotsRef.current = [];
       const canvas = canvasRef.current;
       if (canvas) {
@@ -173,7 +254,9 @@ const DotGrid: React.FC<DotGridProps> = ({
     let ro: ResizeObserver | null = null;
     if ('ResizeObserver' in window) {
       ro = new ResizeObserver(buildGrid);
-      wrapperRef.current && ro.observe(wrapperRef.current);
+      if (wrapperRef.current) {
+        ro.observe(wrapperRef.current);
+      }
     } else {
       (window as Window).addEventListener('resize', buildGrid);
     }
@@ -190,26 +273,26 @@ const DotGrid: React.FC<DotGridProps> = ({
       const rect = canvasRef.current!.getBoundingClientRect();
       const cx = e.clientX - rect.left;
       const cy = e.clientY - rect.top;
+
+      if (usesWorkerRef.current && workerRef.current) {
+        workerRef.current.postMessage({
+          type: 'click',
+          x: cx,
+          y: cy,
+          shockRadius,
+          shockStrength,
+          resistance,
+        });
+        return;
+      }
+
+      const resistanceScale = Math.max(0.3, Math.min(2, 750 / Math.max(resistance, 1)));
       for (const dot of dotsRef.current) {
         const dist = Math.hypot(dot.cx - cx, dot.cy - cy);
-        if (dist < shockRadius && !dot._inertiaApplied) {
-          dot._inertiaApplied = true;
-          gsap.killTweensOf(dot);
+        if (dist < shockRadius) {
           const falloff = Math.max(0, 1 - dist / shockRadius);
-          const pushX = (dot.cx - cx) * shockStrength * falloff;
-          const pushY = (dot.cy - cy) * shockStrength * falloff;
-          gsap.to(dot, {
-            inertia: { xOffset: pushX, yOffset: pushY, resistance },
-            onComplete: () => {
-              gsap.to(dot, {
-                xOffset: 0,
-                yOffset: 0,
-                duration: returnDuration,
-                ease: 'elastic.out(1,0.75)'
-              });
-              dot._inertiaApplied = false;
-            }
-          });
+          dot.vx += (dot.cx - cx) * shockStrength * falloff * 0.035 * resistanceScale;
+          dot.vy += (dot.cy - cy) * shockStrength * falloff * 0.035 * resistanceScale;
         }
       }
     };

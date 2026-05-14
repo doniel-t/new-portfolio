@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { gsap } from "gsap";
+import { canUseOffscreenCanvas } from "@/lib/offscreenCanvas";
 
 type PixelTransitionProps = {
   firstContent: React.ReactNode;
@@ -34,22 +34,96 @@ export default function PixelTransition({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const activeRef = useRef<HTMLDivElement | null>(null);
   const animFrameRef = useRef<number>(0);
+  const workerRef = useRef<Worker | null>(null);
+  const workerCleanupTimerRef = useRef<number>(0);
+  const usesWorkerRef = useRef(false);
+  const pendingActivateRef = useRef(startActive);
 
   const [, setIsActive] = useState<boolean>(startActive);
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !canUseOffscreenCanvas(canvas)) return;
+
+    if (workerCleanupTimerRef.current) {
+      window.clearTimeout(workerCleanupTimerRef.current);
+      workerCleanupTimerRef.current = 0;
+      return () => {
+        workerCleanupTimerRef.current = window.setTimeout(() => {
+          workerRef.current?.postMessage({ type: "stop" });
+          workerRef.current?.terminate();
+          workerRef.current = null;
+          usesWorkerRef.current = false;
+        }, 0);
+      };
+    }
+
+    if (!workerRef.current && !usesWorkerRef.current) {
+      const worker = new Worker(new URL("../workers/pixelWipeCanvas.worker.ts", import.meta.url), {
+        type: "module",
+      });
+      const offscreen = canvas.transferControlToOffscreen();
+
+      worker.onmessage = (event: MessageEvent<{ type: "midpoint" | "complete" }>) => {
+        if (event.data.type !== "midpoint") return;
+
+        const activeEl = activeRef.current;
+        if (!activeEl) return;
+
+        const activate = pendingActivateRef.current;
+        activeEl.style.display = activate ? "block" : "none";
+        activeEl.style.pointerEvents = activate ? "none" : "";
+      };
+
+      workerRef.current = worker;
+      usesWorkerRef.current = true;
+      worker.postMessage({ type: "init", canvas: offscreen }, [offscreen]);
+    }
+
+    return () => {
+      workerCleanupTimerRef.current = window.setTimeout(() => {
+        workerRef.current?.postMessage({ type: "stop" });
+        workerRef.current?.terminate();
+        workerRef.current = null;
+        usesWorkerRef.current = false;
+      }, 0);
+    };
+  }, []);
+
   const animatePixels = useCallback((activate: boolean) => {
     setIsActive(activate);
+    pendingActivateRef.current = activate;
 
     const canvas = canvasRef.current;
     const container = containerRef.current;
     const activeEl = activeRef.current;
     if (!canvas || !container || !activeEl) return;
 
+    const rect = container.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    if (usesWorkerRef.current && workerRef.current) {
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      workerRef.current.postMessage({
+        type: "resize",
+        width: rect.width,
+        height: rect.height,
+        dpr,
+      });
+      workerRef.current.postMessage({
+        type: "play",
+        mode: "content",
+        color: pixelColor,
+        durationMs: animationStepDuration * 2000,
+        gridSize,
+      });
+      return;
+    }
+
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    const rect = container.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
     ctx.scale(dpr, dpr);
