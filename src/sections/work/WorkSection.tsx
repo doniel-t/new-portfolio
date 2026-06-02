@@ -149,21 +149,20 @@ function ProjectVisual({
   const hasImage = project.image !== "/placeholder-project.jpg";
 
   return (
-    <div className="relative mt-7 h-44 overflow-hidden border border-[#d6d0c5]/12 bg-[#0f0e0b] sm:h-48">
+    <div className="relative mt-5 h-44 overflow-hidden border border-[#d6d0c5]/10 bg-[#0f0e0b] sm:h-48">
       {hasImage ? (
         <Image
           src={project.image}
           alt={`${displayTitle} preview`}
           fill
           priority={index < 2}
-          className="object-cover grayscale-[24%] sepia-[0.18] saturate-[0.76] contrast-[1.08] transition duration-500 group-hover/project:scale-[1.04] group-hover/project:grayscale-0"
+          className="object-cover grayscale-[12%] saturate-[0.9] contrast-[1.02] transition duration-500 group-hover/project:scale-[1.025] group-hover/project:grayscale-0"
           sizes="(max-width: 640px) 82vw, 380px"
         />
       ) : (
         <PlaceholderInterface index={index} />
       )}
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(17,16,13,0.04),rgba(17,16,13,0.58))]" />
-      <div className="absolute inset-0 opacity-25 [background-image:repeating-linear-gradient(0deg,rgba(255,255,255,0.1)_0_1px,transparent_1px_4px)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(17,16,13,0.02),rgba(17,16,13,0.32))]" />
     </div>
   );
 }
@@ -191,9 +190,13 @@ function ProjectCard({
           transition: { duration: 0.72, ease: workEase },
         },
       }}
-      whileHover={{ filter: "blur(0px) brightness(1.04)" }}
+      whileHover={{
+        x: 5,
+        filter: "blur(0px) brightness(1.03)",
+        transition: { duration: 0.2, ease: workEase },
+      }}
       data-project-card
-      className="group/project relative flex h-[590px] w-[82vw] shrink-0 cursor-pointer flex-col border border-[#d6d0c5]/18 bg-[#15130f]/58 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.28)] backdrop-blur-md transition-colors duration-300 hover:border-[#d6d0c5]/28 hover:bg-[#1a1814]/66 sm:h-[620px] sm:w-[355px] md:w-[380px]"
+      className="group/project relative flex h-[500px] w-[82vw] shrink-0 cursor-pointer flex-col border border-[#d6d0c5]/12 bg-[#15130f]/42 p-4 transition-colors duration-300 hover:border-[#d6d0c5]/24 hover:bg-[#17140f]/58 sm:h-[530px] sm:w-[340px] sm:p-5 md:w-[360px]"
     >
       <button
         type="button"
@@ -201,38 +204,32 @@ function ProjectCard({
         className="absolute inset-0 z-10 cursor-pointer focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-[#d6d0c5]/60"
         aria-label={`Read article for ${displayTitle}`}
       />
-      <span className="pointer-events-none absolute left-0 top-0 z-30 h-2 w-2 border-l border-t border-[#d6d0c5]/70 transition-transform duration-300 group-hover/project:translate-x-2 group-hover/project:translate-y-2" />
-      <span className="pointer-events-none absolute right-0 top-0 z-30 h-2 w-2 border-r border-t border-[#d6d0c5]/34 transition-transform duration-300 group-hover/project:-translate-x-2 group-hover/project:translate-y-2" />
-      <span className="pointer-events-none absolute bottom-0 left-0 z-30 h-2 w-2 border-b border-l border-[#d6d0c5]/70 transition-transform duration-300 group-hover/project:translate-x-2 group-hover/project:-translate-y-2" />
-      <span className="pointer-events-none absolute bottom-0 right-0 z-30 h-2 w-2 border-b border-r border-[#d6d0c5]/34 transition-transform duration-300 group-hover/project:-translate-x-2 group-hover/project:-translate-y-2" />
+      <span className="pointer-events-none absolute inset-x-4 top-0 h-px bg-[#d6d0c5]/14 transition-colors duration-300 group-hover/project:bg-[#d6d0c5]/30 sm:inset-x-5" />
 
-      <div className="relative z-0 flex items-center justify-between font-mono text-[12px] text-[#d6d0c5]/58">
+      <div className="relative z-0 flex items-center justify-between font-mono text-[11px] text-[#d6d0c5]/48">
         <span>[{String(index + 1).padStart(2, "0")}]</span>
         <span>{project.year}</span>
       </div>
 
       <ProjectVisual project={project} displayTitle={displayTitle} index={index} />
 
-      <div className="relative z-0 mt-8 min-h-[144px]">
-        <h3 className="max-w-[11ch] font-display text-[34px] leading-[0.98] text-[#d6d0c5] transition group-hover/project:text-[#f4eee3] sm:text-[38px]">
+      <div className="relative z-0 mt-6 min-h-[132px]">
+        <h3 className="max-w-[12ch] font-display text-[30px] leading-none text-[#d6d0c5] transition-colors duration-300 group-hover/project:text-[#f4eee3] sm:text-[34px]">
           {displayTitle}
         </h3>
-        <p className="mt-6 overflow-hidden font-mono text-[13px] leading-6 text-[#d6d0c5]/64 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">
+        <p className="mt-4 overflow-hidden text-sm leading-6 text-[#d6d0c5]/62 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">
           {project.description}
         </p>
       </div>
 
       <div className="relative z-20 mt-auto">
-        <div className="mb-6 h-px bg-[#d6d0c5]/12" />
-        <div className="mb-7">
-          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-[#d6d0c5]/44">
-            Stack
-          </p>
-          <div className="flex flex-wrap gap-2">
+        <div className="mb-5 h-px bg-[#d6d0c5]/10" />
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-x-3 gap-y-2">
             {project.techStack.slice(0, 3).map((tech) => (
               <span
                 key={tech}
-                className="border border-[#d6d0c5]/16 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.08em] text-[#d6d0c5]/58"
+                className="border-l border-[#d6d0c5]/14 pl-3 font-mono text-[10px] uppercase text-[#d6d0c5]/52 first:border-l-0 first:pl-0"
               >
                 {tech}
               </span>
@@ -240,24 +237,24 @@ function ProjectCard({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-4">
           {primaryUrl && (
             <a
               href={primaryUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-11 cursor-pointer items-center gap-2 border border-[#d6d0c5]/20 px-4 font-mono text-[11px] uppercase tracking-[0.08em] text-[#f4eee3] transition hover:border-[var(--mid)] hover:bg-[var(--mid)] hover:text-[#0d0b08]"
+              className="inline-flex h-9 cursor-pointer items-center gap-2 border-b border-[#d6d0c5]/24 font-mono text-[11px] uppercase text-[#f4eee3] transition hover:border-[#f4eee3]"
             >
-              View Project
+              Open
               <ArrowUpRight className="h-4 w-4" aria-hidden />
             </a>
           )}
           <button
             type="button"
             onClick={onOpen}
-            className="inline-flex h-11 cursor-pointer items-center gap-2 border border-[#d6d0c5]/12 px-4 font-mono text-[11px] uppercase tracking-[0.08em] text-[#d6d0c5]/70 transition hover:border-[#d6d0c5]/32 hover:text-[#f4eee3]"
+            className="inline-flex h-9 cursor-pointer items-center border-b border-transparent font-mono text-[11px] uppercase text-[#d6d0c5]/62 transition hover:border-[#d6d0c5]/24 hover:text-[#f4eee3]"
           >
-            Read Article
+            Read
           </button>
         </div>
       </div>

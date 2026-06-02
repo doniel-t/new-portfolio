@@ -50,7 +50,7 @@ const VIBE_EMOJIS = [
 ];
 
 const PROFILE_STATS = [
-  { value: "7+", label: "Programming Experience" },
+  { value: "7+", label: "Programming Exp" },
   { value: "2+", label: "Years Professional Exp" },
 ] as const;
 
@@ -169,21 +169,21 @@ function ScrollFadeBlock({ children, className = "" }: { children?: React.ReactN
 
 function PortraitStamp() {
   return (
-    <figure className="relative w-full max-w-[240px] sm:max-w-[260px] lg:max-w-[300px]">
+    <figure className="relative w-full max-w-[210px] sm:max-w-[230px] lg:max-w-[246px]">
       <div className="relative aspect-[3/4] overflow-hidden border border-[#d4cdc4]/25">
         <Image
           alt="Daniel Theil pixel portrait"
           src="/me crop pixel.png"
           fill
           priority={false}
-          sizes="(min-width: 1024px) 300px, 260px"
+          sizes="(min-width: 1024px) 246px, 230px"
           className="object-cover object-center grayscale-[30%] saturate-[0.78] contrast-[1.08] brightness-[0.94]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(13,11,8,0)_35%,rgba(13,11,8,0.68)_100%)]" />
         <div className="absolute inset-0 opacity-60 mix-blend-overlay" style={SCANLINE_STYLE} />
         <FrameTicks />
       </div>
-      <ScrollFadeBlock className="mt-3 flex items-center justify-between gap-3 pb-3 font-mono text-[10px] uppercase text-[#d4cdc4]/60 sm:border-b sm:border-[#d4cdc4]/20">
+      <ScrollFadeBlock className="mt-2 flex items-center justify-between gap-3 pb-2 font-mono text-[10px] uppercase text-[#d4cdc4]/60 sm:border-b sm:border-[#d4cdc4]/20">
         <span>PORTRAIT_FEED</span>
         <span>2025.01.21</span>
       </ScrollFadeBlock>
@@ -193,7 +193,7 @@ function PortraitStamp() {
 
 function StickyIntroLabel() {
   return (
-    <ScrollFadeBlock className="pb-5 font-mono text-[11px] uppercase text-[#e6c3a8] sm:border-b sm:border-[#d4cdc4]/50">
+    <ScrollFadeBlock className="pb-4 font-mono text-[11px] uppercase text-[#e6c3a8] sm:border-b sm:border-[#d4cdc4]/50">
       <p className="flex items-center gap-2 text-[12px] font-bold">
         <FaRegAddressCard className="h-3.5 w-3.5" aria-hidden />
         <span>[01] Introduction</span>
@@ -207,19 +207,19 @@ function VibeSignal() {
   const { displayedText, isTyping } = useTypewriter(VIBE_EMOJIS, 100, 2000);
 
   return (
-    <ScrollFadeBlock className="py-4 lg:mt-8">
-      <div className="mb-4 flex items-center justify-between gap-4 font-mono text-[10px] uppercase text-[#d4cdc4]/40">
+    <ScrollFadeBlock className="py-3 lg:mt-4">
+      <div className="mb-3 flex items-center justify-between gap-4 font-mono text-[10px] uppercase text-[#d4cdc4]/40">
         <span className="inline-flex items-center gap-2 text-[12px] font-bold">
           <FaSignal className={`h-3 w-3 ${isTyping ? "animate-pulse text-[#e6c3a8]" : "text-[#d4cdc4]/25"}`} aria-hidden />
           VIBE SIGNAL
         </span>
         <span>{VIBE_EMOJIS.length} states</span>
       </div>
-      <div className="font-mono text-3xl font-semibold leading-none text-[#d4cdc4] sm:text-4xl">
+      <div className="font-mono text-3xl font-semibold leading-none text-[#d4cdc4] sm:text-4xl lg:text-[2rem]">
         {displayedText}
         <span className="ml-1 inline-block h-[1em] w-[3px] translate-y-1 bg-[#e6c3a8] align-baseline" />
       </div>
-      <div className="mt-5 flex flex-wrap gap-2 font-mono text-[10px] text-[#d4cdc4]/30">
+      <div className="mt-3 flex flex-wrap gap-x-2 gap-y-1.5 font-mono text-[10px] text-[#d4cdc4]/30">
         {VIBE_EMOJIS.map((emoji) => (
           <span key={emoji} className={displayedText === emoji ? "text-[#e6c3a8]" : undefined}>
             {emoji}
@@ -232,11 +232,11 @@ function VibeSignal() {
 
 function RailNamePlate() {
   return (
-    <ScrollFadeBlock className="py-5 sm:border-b sm:border-[#d4cdc4]/20 lg:mb-2">
+    <ScrollFadeBlock className="py-3 sm:border-b sm:border-[#d4cdc4]/20">
       <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#d4cdc4]/36">
         operator
       </p>
-      <p className="mt-3 max-w-[8ch] font-display text-5xl uppercase leading-[0.88] text-[#d4cdc4] sm:text-6xl lg:text-7xl">
+      <p className="mt-2 max-w-[9ch] font-display text-4xl uppercase leading-[0.9] text-[#d4cdc4] sm:text-5xl lg:text-[3.35rem]">
         Daniel Theil
       </p>
     </ScrollFadeBlock>
@@ -309,7 +309,7 @@ function FloatingPanel({
   className?: string;
 }) {
   return (
-    <div className={`relative bg-[#0d0b08]/24 p-5 shadow-[0_22px_90px_rgba(0,0,0,0.14)] backdrop-blur-[2px] sm:p-6 ${className}`}>
+    <div className={`relative bg-[#0d0b08]/24 p-5 shadow-[0_22px_90px_rgba(0,0,0,0.14)] sm:p-6 ${className}`}>
       <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,rgba(230,195,168,0.52),rgba(212,205,196,0.12)_45%,transparent)]" />
       <span className="pointer-events-none absolute left-0 top-0 h-2 w-2 border-l border-t border-[#e6c3a8]/70" />
       <span className="pointer-events-none absolute bottom-0 right-0 h-2 w-2 border-b border-r border-[#d4cdc4]/24" />
@@ -318,64 +318,78 @@ function FloatingPanel({
   );
 }
 
+function ProfileSheetRow({
+  children,
+  icon,
+  label,
+  className = "",
+}: {
+  children: React.ReactNode;
+  icon: IconType;
+  label: string;
+  className?: string;
+}) {
+  return (
+    <section className={`grid gap-6 border-t border-[#d4cdc4]/14 py-8 md:grid-cols-[142px_minmax(0,1fr)] md:py-9 xl:grid-cols-[164px_minmax(0,1fr)] ${className}`}>
+      <SectionLabel icon={icon}>{label}</SectionLabel>
+      <div className="min-w-0">{children}</div>
+    </section>
+  );
+}
+
 function ProfileSummaryPanel() {
   return (
-    <FloatingPanel className="max-w-[62rem] grid gap-8 xl:grid-cols-[minmax(0,1fr)_260px]">
-      <div>
-        <SectionLabel icon={FaUser}>Profile</SectionLabel>
-        <p className="mt-5 max-w-2xl text-lg leading-8 text-[#d4cdc4]/80 sm:text-xl">
+    <ProfileSheetRow icon={FaUser} label="Profile" className="border-t-0 pt-0">
+      <div className="space-y-7">
+        <p className="max-w-3xl text-lg leading-8 text-[#d4cdc4]/82 sm:text-xl">
           I&apos;m a fullstack engineer creating software for the love of the game.
-          <br />
-          <span className="text-[#d4cdc4]/58">
-            I&apos;ve been coding for 7+ years and building professionally for 2+ years.
-          </span>
+          <span className="text-[#d4cdc4]/58"> I&apos;ve been coding for 7+ years and building professionally for 2+ years.</span>
         </p>
-      </div>
 
-      <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-        {PROFILE_STATS.map((stat) => (
-          <div key={stat.label} className="relative bg-[#d4cdc4]/[0.035] p-4">
-            <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[#d4cdc4]/12" />
-            <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/42">
-              {stat.label}
-            </dt>
-            <dd className="mt-3 font-display text-5xl leading-none text-[#e6c3a8] sm:text-6xl">
-              {stat.value}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </FloatingPanel>
+        <dl className="grid grid-cols-2 gap-3 sm:max-w-[34rem] sm:gap-4">
+          {PROFILE_STATS.map((stat) => (
+            <div key={stat.label} className="relative min-w-0 border border-[#d4cdc4]/14 bg-[#0d0b08]/18 p-4 sm:p-5">
+              <span className="pointer-events-none absolute left-0 top-0 h-1.5 w-1.5 bg-[#e6c3a8]/70" />
+              <span className="pointer-events-none absolute bottom-0 right-0 h-1.5 w-1.5 bg-[#d4cdc4]/24" />
+              <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/42">
+                {stat.label}
+              </dt>
+              <dd className="mt-2 font-display text-5xl leading-none text-[#e6c3a8] sm:text-6xl">
+                {stat.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </ProfileSheetRow>
   );
 }
 
 function CoreStackPanel() {
   return (
-    <FloatingPanel className="max-w-[48rem] grid gap-5 md:ml-auto md:grid-cols-[150px_minmax(0,1fr)]">
-      <SectionLabel icon={FaCode}>Core stack</SectionLabel>
-      <div className="grid grid-cols-1 gap-x-7 gap-y-4 sm:grid-cols-2">
+    <ProfileSheetRow icon={FaCode} label="Core stack">
+      <div className="grid grid-cols-2 gap-x-8 gap-y-4 xl:grid-cols-4">
         {CORE_STACK_ITEMS.map((item, index) => (
           <span
             key={item.name}
-            className="inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase text-[#d4cdc4]"
+            className="inline-flex min-w-0 items-center gap-2 font-mono text-xs font-semibold uppercase text-[#d4cdc4]"
           >
-            <span className="mr-2 text-[#e6c3a8]">{String(index + 1).padStart(2, "0")}</span>
-            <span className="text-[#d4cdc4]" aria-hidden>{item.icon}</span>
-            {item.name}
+            <span className="text-[#e6c3a8]">{String(index + 1).padStart(2, "0")}</span>
+            <span className="shrink-0 text-[#d4cdc4]" aria-hidden>{item.icon}</span>
+            <span className="truncate">{item.name}</span>
           </span>
         ))}
       </div>
-    </FloatingPanel>
+    </ProfileSheetRow>
   );
 }
 
 function PersonalStatsPanel() {
   return (
-    <FloatingPanel className="max-w-[56rem] grid gap-5 lg:grid-cols-[150px_minmax(0,1fr)]">
-      <SectionLabel icon={FaChartBar}>Stats</SectionLabel>
-      <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
+    <ProfileSheetRow icon={FaChartBar} label="Stats">
+      <div className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-4">
         {PERSONAL_STATS_ITEMS.map(([label, value]) => (
-          <div key={label}>
+          <div key={label} className="min-w-0">
             <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/40">
               {label}
             </p>
@@ -386,92 +400,120 @@ function PersonalStatsPanel() {
           </div>
         ))}
       </div>
-    </FloatingPanel>
+    </ProfileSheetRow>
   );
 }
 
 function ExperiencePanel() {
   return (
-    <FloatingPanel className="max-w-[68rem] grid gap-7 md:ml-8 md:grid-cols-[150px_minmax(0,1fr)] xl:ml-16">
-      <SectionLabel icon={FaBriefcase}>Experience</SectionLabel>
-      <div className="relative pl-7">
-        <span className="absolute bottom-5 left-[4px] top-1 w-px bg-[#d4cdc4]/20" aria-hidden />
+    <ProfileSheetRow icon={FaBriefcase} label="Experience" className="py-10 md:py-11">
+      <div className="relative pl-9 sm:pl-12">
+        <span
+          className="absolute bottom-8 left-[6px] top-2 w-px bg-[linear-gradient(180deg,rgba(230,195,168,0.86),rgba(212,205,196,0.22)_52%,rgba(212,205,196,0.04))]"
+          aria-hidden
+        />
         {EXPERIENCE_ITEMS.map((item, index) => (
-          <div
+          <article
             key={`${item.company}-${item.role}`}
-            className="relative grid gap-3 py-5 first:pt-0 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.15fr)_auto]"
+            className="relative pb-10 last:pb-0"
           >
             <span
-              className={`absolute left-[-27px] top-[1.45rem] h-[9px] w-[9px] border border-[#0d0b08] ${
-                index === 0 ? "bg-[#e6c3a8]" : "bg-[#d4cdc4]/45"
+              className={`absolute left-[-38px] top-1 h-[13px] w-[13px] border border-[#0d0b08] sm:left-[-50px] ${
+                index === 0 ? "bg-[#e6c3a8] shadow-[0_0_0_5px_rgba(230,195,168,0.12)]" : "bg-[#d4cdc4]/48"
               }`}
               aria-hidden
             />
-            <div>
-              <div className="mb-2 flex flex-wrap items-center gap-2">
-                <h3 className="font-mono text-sm font-semibold text-[#d4cdc4]">{item.role}</h3>
-                <span className={index === 0 ? "font-mono text-[10px] uppercase text-[#e6c3a8]" : "font-mono text-[10px] uppercase text-[#d4cdc4]/40"}>
-                  {item.badge}
-                </span>
+            <span
+              className="absolute left-[-31px] top-[7px] hidden h-px w-7 bg-[#d4cdc4]/20 sm:left-[-43px] sm:block"
+              aria-hidden
+            />
+
+            <div className="grid gap-5 border-t border-[#d4cdc4]/10 pt-5 first:border-t-0 first:pt-0 lg:grid-cols-[minmax(210px,0.62fr)_minmax(0,1fr)] lg:gap-8">
+              <div className="min-w-0">
+                <div className="mb-3 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
+                  <h3 className="font-mono text-base font-semibold leading-snug text-[#d4cdc4]">
+                    {item.role}
+                  </h3>
+                  <span className={index === 0 ? "font-mono text-[10px] uppercase text-[#e6c3a8]" : "font-mono text-[10px] uppercase text-[#d4cdc4]/40"}>
+                    {item.badge}
+                  </span>
+                </div>
+                <p className="font-mono text-xs text-[#d4cdc4]/58">
+                  {item.company}
+                </p>
+                <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.1em] text-[#d4cdc4]/34">
+                  {item.duration}
+                </p>
               </div>
-              <p className="font-mono text-xs text-[#d4cdc4]/60">
-                {item.company} <span className="text-[#d4cdc4]/40">({item.duration})</span>
-              </p>
+
+              <div className="min-w-0 space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  {item.focus.map((focus) => (
+                    <span
+                      key={focus}
+                      className="border border-[#d4cdc4]/12 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[#d4cdc4]/58"
+                    >
+                      {focus}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-3 font-mono text-[10px] uppercase text-[#d4cdc4]/40">
+                  <span>{item.status}</span>
+                  {index === 0 ? (
+                    <span className="relative h-1 w-24 overflow-hidden bg-[#d4cdc4]/10">
+                      <span
+                        className="absolute inset-y-0 w-1/2 bg-[#e6c3a8]/75"
+                        style={{ animation: "loading 1.5s ease-in-out infinite" }}
+                      />
+                    </span>
+                  ) : (
+                    <span className="h-1 w-8 bg-[#e6c3a8]/60" />
+                  )}
+                </div>
+              </div>
             </div>
-            <p className="font-mono text-[11px] leading-5 text-[#d4cdc4]/60">
-              {item.focus.join(" / ")}
-            </p>
-            <div className="flex items-center gap-3 font-mono text-[10px] uppercase text-[#d4cdc4]/40 md:justify-end">
-              <span>{item.status}</span>
-              {index === 0 ? (
-                <span className="relative h-1 w-20 overflow-hidden bg-[#d4cdc4]/10">
-                  <span
-                    className="absolute inset-y-0 w-1/2 bg-[#e6c3a8]/75"
-                    style={{ animation: "loading 1.5s ease-in-out infinite" }}
-                  />
-                </span>
-              ) : (
-                <span className="h-1 w-6 bg-[#e6c3a8]/60" />
-              )}
-            </div>
-          </div>
+          </article>
         ))}
       </div>
-    </FloatingPanel>
+    </ProfileSheetRow>
   );
 }
 
 function LocationPanel() {
   return (
-    <FloatingPanel className="max-w-[58rem] grid gap-5 md:ml-auto md:grid-cols-[150px_minmax(0,1fr)_minmax(0,1fr)]">
-      <SectionLabel icon={FaMapMarkerAlt}>Location</SectionLabel>
-      <div>
-        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/40">
-          Region
-        </p>
-        <p className="font-mono text-sm font-semibold text-[#d4cdc4]">Bavaria, Germany</p>
+    <ProfileSheetRow icon={FaMapMarkerAlt} label="Location" className="pb-0">
+      <div className="grid gap-6 sm:grid-cols-2">
+        <div>
+          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/40">
+            Region
+          </p>
+          <p className="font-mono text-sm font-semibold text-[#d4cdc4]">Bavaria, Germany</p>
+        </div>
+        <div>
+          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/40">
+            Local time
+          </p>
+          <LocalTimeClient className="font-mono text-sm font-semibold text-[#d4cdc4]" />
+        </div>
       </div>
-      <div>
-        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/40">
-          Local time
-        </p>
-        <LocalTimeClient className="font-mono text-sm font-semibold text-[#d4cdc4]" />
-      </div>
-    </FloatingPanel>
+    </ProfileSheetRow>
   );
 }
 
 function SoftwareEngineerView() {
   return (
-    <FadeInView id="about-software-engineer" className="pt-6">
+    <FadeInView id="about-software-engineer" className="pt-6 lg:min-h-[92vh]">
       <ViewTitle title="Software Engineer" meta="view 01 / profile" />
 
-      <div className="space-y-5">
-        <ProfileSummaryPanel />
-        <CoreStackPanel />
-        <PersonalStatsPanel />
-        <ExperiencePanel />
-        <LocationPanel />
+      <div className="relative max-w-[76rem]">
+        <span className="pointer-events-none absolute bottom-0 left-0 top-1 hidden w-px bg-[linear-gradient(180deg,rgba(230,195,168,0.48),rgba(212,205,196,0.12)_35%,transparent)] md:block" />
+        <div className="md:pl-6 xl:pl-8">
+          <ProfileSummaryPanel />
+          <ExperiencePanel />
+          <CoreStackPanel />
+          <PersonalStatsPanel />
+          <LocationPanel />
+        </div>
       </div>
     </FadeInView>
   );
@@ -507,7 +549,7 @@ function ProjectVisual({ project, displayTitle, index }: { project: Project; dis
   const hasImage = project.image !== "/placeholder-project.jpg";
 
   return (
-    <div className="relative min-h-44 overflow-hidden border border-[#d4cdc4]/12 bg-[#11100d] sm:min-h-48">
+    <div className="relative min-h-40 overflow-hidden border border-[#d4cdc4]/10 bg-[#11100d] sm:min-h-44">
       {hasImage ? (
         <Image
           src={project.image}
@@ -515,13 +557,12 @@ function ProjectVisual({ project, displayTitle, index }: { project: Project; dis
           fill
           priority={index < 2}
           sizes="(min-width: 1024px) 220px, 100vw"
-          className="object-cover grayscale-[22%] sepia-[0.18] saturate-[0.78] contrast-[1.08] transition duration-500 group-hover/project:scale-[1.04] group-hover/project:grayscale-0"
+          className="object-cover grayscale-[12%] saturate-[0.9] contrast-[1.02] transition duration-500 group-hover/project:scale-[1.025] group-hover/project:grayscale-0"
         />
       ) : (
         <ProjectPlaceholder index={index} />
       )}
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(13,11,8,0.04),rgba(13,11,8,0.62))]" />
-      <div className="absolute inset-0 opacity-25 [background-image:repeating-linear-gradient(0deg,rgba(255,255,255,0.1)_0_1px,transparent_1px_4px)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(13,11,8,0.02),rgba(13,11,8,0.34))]" />
     </div>
   );
 }
@@ -538,44 +579,41 @@ function ProjectListCard({
   const displayTitle = formatProjectTitle(project.title);
 
   return (
-    <article className="group/project relative grid gap-6 border-l border-[#d4cdc4]/16 bg-[#11100d]/34 px-5 py-6 transition-colors duration-300 hover:border-[#e6c3a8]/48 hover:bg-[#171510]/48 sm:grid-cols-[220px_minmax(0,1fr)]">
-      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent,rgba(212,205,196,0.16),transparent)]" />
-      <span className="pointer-events-none absolute left-0 top-0 h-2 w-2 border-l border-t border-[#e6c3a8]/70" />
-
+    <article className="group/project grid transform-gpu gap-5 border-t border-[#d4cdc4]/12 py-6 transition-[border-color,translate] duration-200 ease-out first:border-t-0 first:pt-0 hover:translate-x-1.5 hover:border-[#d4cdc4]/22 motion-reduce:transition-none motion-reduce:hover:translate-x-0 sm:grid-cols-[196px_minmax(0,1fr)] sm:gap-6">
       <ProjectVisual project={project} displayTitle={displayTitle} index={index} />
 
       <div className="flex min-w-0 flex-col">
-        <div className="mb-3 flex items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.1em] text-[#d4cdc4]/42">
+        <div className="mb-3 flex items-center justify-between gap-4 font-mono text-[10px] uppercase text-[#d4cdc4]/42">
           <span>[{String(index + 1).padStart(2, "0")}]</span>
           <span>{project.year}</span>
         </div>
 
-        <h4 className="font-display text-4xl leading-none text-[#d4cdc4] sm:text-5xl">
+        <h4 className="font-display text-3xl leading-none text-[#d4cdc4] transition-colors duration-300 group-hover/project:text-[#f4eee3] sm:text-4xl">
           {displayTitle}
         </h4>
 
-        <p className="mt-4 overflow-hidden font-mono text-[12px] leading-6 text-[#d4cdc4]/62 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">
+        <p className="mt-3 overflow-hidden text-sm leading-6 text-[#d4cdc4]/62 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">
           {project.description}
         </p>
 
-        <div className="mt-5 flex flex-wrap gap-2">
+        <div className="mt-5 flex flex-wrap gap-x-3 gap-y-2">
           {project.techStack.slice(0, 4).map((tech) => (
             <span
               key={tech}
-              className="border border-[#d4cdc4]/14 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[#d4cdc4]/58"
+              className="border-l border-[#d4cdc4]/14 pl-3 font-mono text-[10px] uppercase text-[#d4cdc4]/54 first:border-l-0 first:pl-0"
             >
               {tech}
             </span>
           ))}
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center gap-3">
+        <div className="mt-6 flex flex-wrap items-center gap-4">
           <button
             type="button"
             onClick={() => onOpen(project.id)}
-            className="inline-flex h-10 items-center gap-2 border border-[#d4cdc4]/18 px-3.5 font-mono text-[10px] uppercase tracking-[0.1em] text-[#f4eee3] transition hover:border-[#e6c3a8]/60 hover:bg-[#e6c3a8] hover:text-[#0d0b08]"
+            className="inline-flex h-8 items-center gap-2 border-b border-[#d4cdc4]/24 font-mono text-[10px] uppercase text-[#f4eee3] transition hover:border-[#f4eee3]"
           >
-            Read Log
+            Read
             <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
           </button>
           {project.liveUrl ? (
@@ -583,7 +621,7 @@ function ProjectListCard({
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-10 items-center gap-2 border border-[#d4cdc4]/12 px-3.5 font-mono text-[10px] uppercase tracking-[0.1em] text-[#d4cdc4]/62 transition hover:border-[#d4cdc4]/30 hover:text-[#f4eee3]"
+              className="inline-flex h-8 items-center gap-2 border-b border-transparent font-mono text-[10px] uppercase text-[#d4cdc4]/62 transition hover:border-[#d4cdc4]/24 hover:text-[#f4eee3]"
             >
               <ExternalLink className="h-3.5 w-3.5" aria-hidden />
               Live
@@ -594,7 +632,7 @@ function ProjectListCard({
               href={project.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-10 items-center gap-2 border border-[#d4cdc4]/12 px-3.5 font-mono text-[10px] uppercase tracking-[0.1em] text-[#d4cdc4]/62 transition hover:border-[#d4cdc4]/30 hover:text-[#f4eee3]"
+              className="inline-flex h-8 items-center gap-2 border-b border-transparent font-mono text-[10px] uppercase text-[#d4cdc4]/62 transition hover:border-[#d4cdc4]/24 hover:text-[#f4eee3]"
             >
               <Github className="h-3.5 w-3.5" aria-hidden />
               Source
@@ -655,7 +693,7 @@ function AboutTechChip({ tech }: { tech: TechItem }) {
   return (
     <div
       tabIndex={0}
-      className="about-tech-card group relative min-h-[142px] cursor-default overflow-hidden border border-[#A69F8D]/30 bg-[#0d0b08]/52 p-4 text-[#A69F8D] backdrop-blur-sm transition-colors duration-200 hover:border-[#A69F8D]/80 hover:bg-[#A69F8D] hover:text-[#0d0b08] focus-visible:border-[#A69F8D] focus-visible:bg-[#A69F8D] focus-visible:text-[#0d0b08] focus-visible:outline-none"
+      className="about-tech-card group relative min-h-[142px] cursor-default overflow-hidden border border-[#A69F8D]/30 bg-[#0d0b08]/24 p-4 text-[#A69F8D] transition-colors duration-200 hover:border-[#A69F8D]/80 hover:bg-[#A69F8D] hover:text-[#0d0b08] focus-visible:border-[#A69F8D] focus-visible:bg-[#A69F8D] focus-visible:text-[#0d0b08] focus-visible:outline-none"
     >
       <div className="absolute left-0 top-0 h-1 w-1 bg-[#A69F8D] transition-colors group-hover:bg-[#0d0b08] group-focus-visible:bg-[#0d0b08]" />
       <div className="absolute right-0 top-0 h-1 w-1 bg-[#A69F8D] transition-colors group-hover:bg-[#0d0b08] group-focus-visible:bg-[#0d0b08]" />
@@ -718,23 +756,18 @@ function AboutTechCategory({ category }: { category: TechCategoryDef }) {
 function AboutTechStackView() {
   return (
     <FadeInView id="about-tech-stack" className="pb-2">
-      <div className="relative max-w-[72rem] bg-[#0d0b08]/18 p-1 sm:p-2 xl:ml-auto">
-        <div className="mb-8 flex flex-col gap-5 border-b border-[#A69F8D]/30 pb-5 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <SectionLabel icon={FaCode}>Tech stack</SectionLabel>
-            <h3 className="mt-4 font-display text-5xl leading-none text-[#d4cdc4] sm:text-7xl">
-              Installed Chips
-            </h3>
-          </div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#A69F8D]/60 sm:text-right">
-            <p>view 03 / stack</p>
-            <p className="mt-1">
-              memory: {TECH_STACK_TOTAL_MEMORY} / 256 - {TECH_STACK_ITEMS.length} chips
-            </p>
+      <ViewTitle title="Tech Stack" meta={`view 03 / ${TECH_STACK_ITEMS.length} installed chips`} />
+
+      <div className="relative max-w-[72rem] xl:ml-auto">
+        <div className="mb-9 grid gap-5 border-t border-[#A69F8D]/26 pt-5 sm:grid-cols-[minmax(150px,0.34fr)_minmax(0,1fr)] sm:items-end">
+          <SectionLabel icon={FaCode}>Installed chips</SectionLabel>
+          <div className="flex flex-col gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#A69F8D]/58 sm:items-end sm:text-right">
+            <p>memory: {TECH_STACK_TOTAL_MEMORY} / 256</p>
+            <p>{TECH_STACK_CATEGORIES.length} categories / cursor enabled in view</p>
           </div>
         </div>
 
-        <div className="space-y-10">
+        <div className="space-y-11">
           {TECH_STACK_CATEGORIES.map((category) => (
             <AboutTechCategory key={category.key} category={category} />
           ))}
@@ -798,6 +831,8 @@ function AboutTechCursor() {
 function SectionDitherBackdrop() {
   const prefersReducedMotion = useReducedMotion();
   const layerRef = React.useRef<HTMLDivElement>(null);
+  const ditherStartedRef = React.useRef(false);
+  const [hasDitherStarted, setHasDitherStarted] = React.useState(false);
 
   React.useEffect(() => {
     const layer = layerRef.current;
@@ -823,6 +858,11 @@ function SectionDitherBackdrop() {
         layer.style.clipPath = "inset(50% 0px 50% 0px)";
         layer.style.setProperty("-webkit-clip-path", "inset(50% 0px 50% 0px)");
         return;
+      }
+
+      if (!ditherStartedRef.current) {
+        ditherStartedRef.current = true;
+        setHasDitherStarted(true);
       }
 
       const topClip = Math.max(0, visibleTop - layerRect.top);
@@ -870,16 +910,18 @@ function SectionDitherBackdrop() {
       }}
       aria-hidden
     >
-      <Dither
-        waveColor={[166 / 255, 159 / 255, 141 / 255]}
-        disableAnimation={Boolean(prefersReducedMotion)}
-        enableMouseInteraction={false}
-        enableOnMobile
-        colorNum={2}
-        waveAmplitude={0.08}
-        waveFrequency={2}
-        waveSpeed={0.05}
-      />
+      {hasDitherStarted ? (
+        <Dither
+          waveColor={[166 / 255, 159 / 255, 141 / 255]}
+          disableAnimation={Boolean(prefersReducedMotion)}
+          enableMouseInteraction={false}
+          enableOnMobile
+          colorNum={2}
+          waveAmplitude={0.08}
+          waveFrequency={2}
+          waveSpeed={0.05}
+        />
+      ) : null}
     </div>
   );
 }
@@ -1077,17 +1119,17 @@ function ModernAboutLayout() {
   return (
     <div className="relative">
       <AboutTechCursor />
-      <div className="grid gap-12 lg:grid-cols-[minmax(230px,0.52fr)_minmax(0,1.48fr)] lg:items-stretch xl:gap-16 xl:grid-cols-[minmax(250px,0.48fr)_minmax(0,1.52fr)]">
+      <div className="grid gap-12 lg:grid-cols-[minmax(210px,0.48fr)_minmax(0,1.52fr)] lg:items-stretch xl:gap-16 xl:grid-cols-[minmax(230px,0.44fr)_minmax(0,1.56fr)]">
         <aside ref={columnRef} className="relative">
           <div
             ref={railRef}
             style={railStyle}
-            className="grid gap-5 sm:grid-cols-[minmax(180px,260px)_minmax(0,1fr)] sm:items-end lg:block"
+            className="grid gap-4 sm:grid-cols-[minmax(170px,230px)_minmax(0,1fr)] sm:items-end lg:block"
           >
-            <div className="sm:col-span-2 lg:mb-6">
+            <div className="sm:col-span-2 lg:mb-4">
               <StickyIntroLabel />
             </div>
-            <div className="lg:mb-8">
+            <div className="lg:mb-5">
               <PortraitStamp />
             </div>
             <RailNamePlate />
