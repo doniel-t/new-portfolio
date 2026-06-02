@@ -128,7 +128,6 @@ export function PixelDividerVideo({ assets, className, style, fallback }: PixelD
   const [activeAsset, setActiveAsset] = React.useState(() => assets[0]);
   const [videoUnsupported, setVideoUnsupported] = React.useState(false);
   const [reducedMotion, setReducedMotion] = React.useState(false);
-  const [isNearViewport, setIsNearViewport] = React.useState(false);
 
   React.useEffect(() => {
     setActiveAsset((current) => {
@@ -138,23 +137,6 @@ export function PixelDividerVideo({ assets, className, style, fallback }: PixelD
   }, [assets]);
 
   React.useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsNearViewport(entry.isIntersecting);
-      },
-      { threshold: 0, rootMargin: "220px" },
-    );
-
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, []);
-
-  React.useEffect(() => {
-    if (!isNearViewport) return;
-
     const container = containerRef.current;
     if (!container) return;
 
@@ -168,7 +150,7 @@ export function PixelDividerVideo({ assets, className, style, fallback }: PixelD
     observer.observe(container);
 
     return () => observer.disconnect();
-  }, [assets, isNearViewport]);
+  }, [assets]);
 
   React.useEffect(() => {
     const probe = document.createElement("video");
@@ -186,18 +168,24 @@ export function PixelDividerVideo({ assets, className, style, fallback }: PixelD
   }, []);
 
   React.useEffect(() => {
-    if (videoUnsupported || !isNearViewport) return;
+    if (videoUnsupported) return;
 
+    const container = containerRef.current;
     const video = videoRef.current;
-    if (!video) return;
+    if (!container || !video) return;
 
+    let inView = false;
     let disposed = false;
 
     const syncPlayback = () => {
       if (disposed) return;
 
-      if (reducedMotion) {
-        resetVideoToFirstFrame(video);
+      if (reducedMotion || !inView) {
+        if (reducedMotion) {
+          resetVideoToFirstFrame(video);
+        } else {
+          video.pause();
+        }
         return;
       }
 
@@ -206,13 +194,23 @@ export function PixelDividerVideo({ assets, className, style, fallback }: PixelD
       });
     };
 
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        inView = entry.isIntersecting;
+        syncPlayback();
+      },
+      { threshold: 0, rootMargin: "140px" },
+    );
+
+    observer.observe(container);
     syncPlayback();
 
     return () => {
       disposed = true;
+      observer.disconnect();
       video.pause();
     };
-  }, [activeAsset.src, isNearViewport, reducedMotion, videoUnsupported]);
+  }, [activeAsset.src, reducedMotion, videoUnsupported]);
 
   if (videoUnsupported) {
     return fallback;
@@ -228,24 +226,22 @@ export function PixelDividerVideo({ assets, className, style, fallback }: PixelD
       className={className}
       style={style}
     >
-      {isNearViewport ? (
-        <video
-          key={activeAsset.src}
-          ref={videoRef}
-          aria-hidden
-          muted
-          loop
-          playsInline
-          preload="none"
-          width={activeAsset.width}
-          height={activeAsset.height}
-          onError={() => setVideoUnsupported(true)}
-          className="absolute left-1/2 top-0 h-full min-w-full max-w-none -translate-x-1/2 object-cover"
-          style={{ width: "auto", imageRendering: "pixelated" }}
-        >
-          <source src={activeAsset.src} type={WEBM_VP9_TYPE} />
-        </video>
-      ) : null}
+      <video
+        key={activeAsset.src}
+        ref={videoRef}
+        aria-hidden
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        width={activeAsset.width}
+        height={activeAsset.height}
+        onError={() => setVideoUnsupported(true)}
+        className="absolute left-1/2 top-0 h-full min-w-full max-w-none -translate-x-1/2 object-cover"
+        style={{ width: "auto", imageRendering: "pixelated" }}
+      >
+        <source src={activeAsset.src} type={WEBM_VP9_TYPE} />
+      </video>
     </div>
   );
 }
