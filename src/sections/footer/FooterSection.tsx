@@ -110,8 +110,8 @@ export default function FooterSection() {
                     <span className="font-mono text-sm">About me</span>
                   </a>
                   <a
-                    href="#projects"
-                    onClick={(event) => handleSectionLinkClick(event, "#projects")}
+                    href="#about-projects"
+                    onClick={(event) => handleSectionLinkClick(event, "#about-projects")}
                     className="group flex items-center gap-3 text-white/50 hover:text-white transition-colors duration-300"
                   >
                     <div className="w-4 h-px bg-white/20 group-hover:bg-white/50 group-hover:w-6 transition-all duration-300" />

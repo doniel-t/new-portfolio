@@ -8,8 +8,6 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 const SNAP_SECTION_ORDER = [
   "home",
   "work",
-  "installed_chips",
-  "projects",
   "hobbies",
   "contact",
 ] as const;

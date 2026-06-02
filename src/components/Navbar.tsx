@@ -7,13 +7,12 @@ import { useSectionScroll } from "@/hooks/useSectionScroll";
 const NAV_ITEMS = [
   { label: "Home", href: "#home" },
   { label: "Me", href: "#work" },
-  { label: "Work", href: "#projects" },
   { label: "Hobbies", href: "#hobbies" },
   { label: "Contact", href: "#contact" },
 ];
 
 // Sections on dark backgrounds should use the bright navbar variant.
-const BRIGHT_NAV_SECTION_IDS = ["work", "installed_chips", "contact", "projects"];
+const BRIGHT_NAV_SECTION_IDS = ["work", "contact"];
 
 // Pixel grid configuration
 const PIXEL_SIZE = 6; // px - fixed square size
@@ -188,7 +187,7 @@ export default function Navbar() {
 
   // Track active section and dark background via IntersectionObserver (no layout thrashing)
   React.useEffect(() => {
-    const sections = ["home", "work", "installed_chips", "projects", "hobbies", "contact"];
+    const sections = ["home", "work", "hobbies", "contact"];
     const activeSections = new Set<string>();
     const darkSections = new Set<string>();
 
@@ -209,7 +208,7 @@ export default function Navbar() {
         } else {
           for (const sectionId of sections) {
             if (activeSections.has(sectionId)) {
-              setActiveSection(sectionId === "installed_chips" ? "work" : sectionId);
+              setActiveSection(sectionId);
               break;
             }
           }

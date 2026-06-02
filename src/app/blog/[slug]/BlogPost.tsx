@@ -22,7 +22,7 @@ export default function BlogPost({ slug }: { slug: string }) {
           <div className="text-4xl mb-4">◇</div>
           <div className="text-sm tracking-widest mb-2">[DATA NOT FOUND]</div>
           <button
-            onClick={() => router.push("/#projects")}
+            onClick={() => router.push("/#about-projects")}
             className="text-xs tracking-widest text-[#d4cdc4]/60 hover:text-[#d4cdc4] transition-colors"
           >
             ◆ RETURN TO ARCHIVE
@@ -68,7 +68,7 @@ export default function BlogPost({ slug }: { slug: string }) {
         <header className="sticky top-0 z-30 bg-[#0d0b08]/80 backdrop-blur-md border-b border-[#d4cdc4]/10">
           <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
             <button
-              onClick={() => router.push("/#projects")}
+              onClick={() => router.push("/#about-projects")}
               className="flex items-center gap-2 text-[#d4cdc4]/60 hover:text-[#d4cdc4] transition-colors font-mono text-xs tracking-widest"
             >
               <ArrowLeft size={16} />

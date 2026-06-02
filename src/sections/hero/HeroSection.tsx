@@ -105,8 +105,8 @@ export default function HeroSection() {
               <div className="flex flex-wrap gap-3">
                 <motion.a
                   className="group inline-flex items-center gap-2 rounded-md px-5 py-3 bg-[#0d0b08] text-background hover:opacity-90 transition-colors z-99"
-                  href="#projects"
-                  onClick={(event) => handleSectionLinkClick(event, "#projects")}
+                  href="#about-projects"
+                  onClick={(event) => handleSectionLinkClick(event, "#about-projects")}
                   whileHover={isMobile ? {} : { x: 4, scale: 1.01 }}
                   whileTap={isMobile ? {} : { scale: 0.98 }}
                 >
