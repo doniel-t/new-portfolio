@@ -48,7 +48,7 @@ export default function HeroSection() {
       id="home"
       data-snap-section="home"
       ref={sectionRef}
-      className="relative min-h-[100vh] sm:min-h-[100vh] flex items-center justify-center p-8 sm:p-16"
+      className="relative min-h-screen sm:min-h-screen flex items-center justify-center p-8 sm:p-16"
     >
       {/* Dither effect background for hero section */}
       <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
@@ -87,7 +87,7 @@ export default function HeroSection() {
                 <span className="inline-block">
                   {headingWords.map((word, i) => (
                     <span key={`${word}-${i}`} className="inline-block" style={{ display: "inline-block" }}>
-                      <DecodingWord word={word} startDelayMs={isMobile ? 0 : i * 250} />
+                      <DecodingWord word={word} />
                       {i < headingWords.length - 1 ? "\u00A0" : ""}
                     </span>
                   ))}
@@ -120,7 +120,7 @@ export default function HeroSection() {
                       transition-all
                       duration-300
                       ease-out
-                      group-hover:max-w-[20px]
+                      group-hover:max-w-5
                       group-hover:opacity-100
                     "
                   >
@@ -145,7 +145,7 @@ export default function HeroSection() {
                       transition-all
                       duration-300
                       ease-out
-                      group-hover:max-w-[20px]
+                      group-hover:max-w-5
                       group-hover:opacity-100
                     "
                   >

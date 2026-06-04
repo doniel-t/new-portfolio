@@ -68,7 +68,7 @@ export default function FooterSection() {
 
               <a
                 href="mailto:daniel.theil.g@gmail.com"
-                className="group relative inline-flex w-full items-center justify-center gap-3 overflow-hidden border border-white/20 bg-white/[0.05] px-6 py-4 font-mono text-sm uppercase tracking-widest text-white transition-all duration-300 hover:border-white/35 hover:bg-white/[0.08] sm:w-auto sm:min-w-64"
+                className="group relative inline-flex w-full items-center justify-center gap-3 overflow-hidden border border-white/20 bg-white/5 px-6 py-4 font-mono text-sm uppercase tracking-widest text-white transition-all duration-300 hover:border-white/35 hover:bg-white/8 sm:w-auto sm:min-w-64"
               >
                 <div className="absolute inset-0 translate-y-full bg-white/10 transition-transform duration-300 ease-out group-hover:translate-y-0" />
                 <div className="absolute top-0 left-0 h-3 w-3 border-t-2 border-l-2 border-white/30 transition-colors group-hover:border-white/60" />

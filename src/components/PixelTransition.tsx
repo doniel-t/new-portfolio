@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { gsap } from "gsap";
 
 type PixelTransitionProps = {
   firstContent: React.ReactNode;
@@ -150,11 +149,11 @@ export default function PixelTransition({
 
       <div className="absolute inset-0 w-full h-full">{firstContent}</div>
 
-      <div ref={activeRef} className="absolute inset-0 w-full h-full z-[2]" style={{ display: "none" }}>
+      <div ref={activeRef} className="absolute inset-0 w-full h-full z-2" style={{ display: "none" }}>
         {secondContent ?? null}
       </div>
 
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none z-[3]" />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none z-3" />
     </div>
   );
 }

@@ -44,7 +44,7 @@ function ScrollSpy({
           className="hidden lg:flex fixed left-[2.1%] top-1/2 -translate-y-1/2 z-40"
         >
           <div className="relative pl-5">
-            <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-foreground/28 to-transparent" />
+            <div className="absolute left-0 top-0 bottom-0 w-px bg-linear-to-b from-transparent via-foreground/28 to-transparent" />
             <div className="flex flex-col gap-3.5">
               {HOBBIES.map((hobby, index) => {
                 const isActive = activeIndex === index;
@@ -62,7 +62,7 @@ function ScrollSpy({
                     aria-label={`Go to ${spyLabel}`}
                   >
                     <span
-                      className={`h-[10px] w-[10px] transition-all duration-250 ${
+                      className={`h-2.5 w-2.5 transition-all duration-250 ${
                         isActive
                           ? "bg-foreground border border-foreground"
                           : "bg-transparent border border-foreground/40 group-hover:border-foreground/65"
@@ -72,7 +72,7 @@ function ScrollSpy({
                     {isActive && (
                       <motion.span
                         layoutId="hobby-scroll-active-dot"
-                        className="absolute left-0 h-[10px] w-[10px] bg-foreground/45"
+                        className="absolute left-0 h-2.5 w-2.5 bg-foreground/45"
                         transition={{ duration: 0.2, ease: EASE_OUT }}
                       />
                     )}
@@ -210,7 +210,7 @@ const HobbiesHeader = React.memo(function HobbiesHeader({
       >
         {"Hobbies & Interests".split(" ").map((word, i, arr) => (
           <span key={`hobby-title-${i}`} className="inline-block">
-            <DecodingWord word={word} startDelayMs={isMobile ? 0 : i * 180} active={isInViewOnce} />
+            <DecodingWord word={word} />
             {i < arr.length - 1 ? "\u00A0" : ""}
           </span>
         ))}
@@ -385,7 +385,7 @@ const HobbyLane = React.memo(function HobbyLane({
 
       <div
         aria-hidden
-        className={`absolute top-1/2 -translate-y-1/2 font-display leading-none text-[5.5rem] sm:text-[8rem] lg:text-[10rem] text-foreground/[0.06] ${
+        className={`absolute top-1/2 -translate-y-1/2 font-display leading-none text-[5.5rem] sm:text-[8rem] lg:text-[10rem] text-foreground/6 ${
           imageRight ? "left-3 sm:left-8" : "right-3 sm:right-8"
         }`}
       >
@@ -397,7 +397,7 @@ const HobbyLane = React.memo(function HobbyLane({
           <span className="font-mono text-[10px] sm:text-xs tracking-[0.18em] text-foreground/50">
             [NODE_{String(cardIndex + 1).padStart(2, "0")}] / {String(totalCards).padStart(2, "0")}
           </span>
-          <span className="h-px flex-1 bg-gradient-to-r from-foreground/35 to-transparent" />
+          <span className="h-px flex-1 bg-linear-to-r from-foreground/35 to-transparent" />
           <span className="hidden sm:inline font-mono text-[10px] tracking-[0.18em] uppercase text-[#7a9a5a]/75">
             ACTIVE FEED
           </span>
@@ -413,7 +413,7 @@ const HobbyLane = React.memo(function HobbyLane({
               whileHover={isMobile ? {} : { scale: 1.01 }}
               whileTap={isMobile ? {} : { scale: 0.99 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="group/image relative block w-full h-[250px] sm:h-[330px] lg:h-[410px] overflow-hidden cursor-pointer"
+              className="group/image relative block w-full h-62.5 sm:h-82.5 lg:h-102.5 overflow-hidden cursor-pointer"
               style={isMobile ? undefined : { clipPath: imageClipPath }}
             >
               <Image
@@ -424,7 +424,7 @@ const HobbyLane = React.memo(function HobbyLane({
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 680px"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08]/95 via-[#0d0b08]/45 to-[#0d0b08]/10" />
+              <div className="absolute inset-0 bg-linear-to-t from-[#0d0b08]/95 via-[#0d0b08]/45 to-[#0d0b08]/10" />
               <div className="absolute inset-0 scanlines opacity-20 pointer-events-none" />
 
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 opacity-80">
@@ -458,7 +458,7 @@ const HobbyLane = React.memo(function HobbyLane({
                   : { scaleX: 0, opacity: 0 }
               }
               transition={{ duration: 0.45, ease: EASE_OUT }}
-              className={`mt-2 h-[2px] bg-foreground/60 ${imageRight ? "origin-right" : "origin-left"}`}
+              className={`mt-2 h-0.5 bg-foreground/60 ${imageRight ? "origin-right" : "origin-left"}`}
             />
 
             <p className="mt-4 font-mono text-[10px] sm:text-xs uppercase tracking-[0.14em] text-foreground/55">
@@ -470,11 +470,7 @@ const HobbyLane = React.memo(function HobbyLane({
             <motion.h3 variants={titleVariants} className="font-display text-4xl sm:text-5xl lg:text-6xl leading-[0.96] tracking-tight text-foreground mb-6">
               {titleWords.map((word, index) => (
                 <span key={`${card.title}-${word}-${index}`} className="inline-block mr-3">
-                  <DecodingWord
-                    word={word}
-                    startDelayMs={isMobile ? 0 : cardIndex * 140 + index * 120}
-                    active={isInView}
-                  />
+                  <DecodingWord word={word} />
                 </span>
               ))}
             </motion.h3>
@@ -486,18 +482,14 @@ const HobbyLane = React.memo(function HobbyLane({
             </motion.div>
 
             <motion.div variants={statsVariants} className="space-y-4 mb-8">
-              {card.stats.map((stat, statIndex) => (
+              {card.stats.map((stat) => (
                 <div key={stat.label} className="flex items-end gap-3 sm:gap-4">
-                  <span className="min-w-[118px] sm:min-w-[144px] font-mono text-[10px] sm:text-xs uppercase tracking-[0.15em] text-foreground/55">
+                  <span className="min-w-29.5 sm:min-w-36 font-mono text-[10px] sm:text-xs uppercase tracking-[0.15em] text-foreground/55">
                     {stat.label}
                   </span>
-                  <span className="h-px flex-1 bg-foreground/20 mb-[7px]" />
+                  <span className="h-px flex-1 bg-foreground/20 mb-1.75" />
                   <span className="font-display text-xl sm:text-2xl text-foreground leading-none">
-                    <DecodingWord
-                      word={stat.value}
-                      startDelayMs={isMobile ? 0 : cardIndex * 160 + statIndex * 90 + 240}
-                      active={isInView}
-                    />
+                    <DecodingWord word={stat.value} />
                   </span>
                 </div>
               ))}
@@ -521,7 +513,7 @@ const HobbyLane = React.memo(function HobbyLane({
               className="group inline-flex items-center gap-2 px-5 py-3 border border-muted/40 text-foreground hover:bg-[#0d0b08] hover:text-white transition-colors duration-300 cursor-pointer"
             >
               View Expanded
-              <span className="inline-flex overflow-hidden max-w-0 opacity-0 transition-all duration-300 ease-out group-hover:max-w-[20px] group-hover:opacity-100">
+              <span className="inline-flex overflow-hidden max-w-0 opacity-0 transition-all duration-300 ease-out group-hover:max-w-5 group-hover:opacity-100">
                 <ArrowRight size={18} />
               </span>
             </motion.button>
@@ -666,7 +658,7 @@ function HobbiesSection() {
     >
       <div
         ref={auroraRef}
-        className="absolute inset-x-0 top-0 h-[100vh] z-[1] pointer-events-none overflow-hidden"
+        className="absolute inset-x-0 top-0 h-screen z-1 pointer-events-none overflow-hidden"
       >
         <Aurora colorStops={['#f7dd88', '#7147fc', '#ff0d96']} amplitude={isMobile ? 0.3 : 0.8} speed={0.4} blend={0.7} grainAmount={0.09}/>
       </div>
@@ -692,7 +684,7 @@ function HobbiesSection() {
         </div>
       </div>
 
-      <div ref={containerRef} className="relative z-[1] pt-32 pb-20">
+      <div ref={containerRef} className="relative z-1 pt-32 pb-20">
         <div className={`${HOBBIES_CONTENT_SHELL} mb-16`}>
           <HobbiesHeader isInViewOnce={isInViewOnce} isMobile={isMobile} />
         </div>

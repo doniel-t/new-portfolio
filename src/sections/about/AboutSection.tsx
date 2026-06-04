@@ -169,15 +169,15 @@ function ScrollFadeBlock({ children, className = "" }: { children?: React.ReactN
 
 function PortraitStamp() {
   return (
-    <figure className="relative w-full max-w-[210px] sm:max-w-[230px] lg:max-w-[246px]">
-      <div className="relative aspect-[3/4] overflow-hidden border border-[#d4cdc4]/25">
+    <figure className="relative w-full max-w-52.5 sm:max-w-57.5 lg:max-w-61.5">
+      <div className="relative aspect-3/4 overflow-hidden border border-[#d4cdc4]/25">
         <Image
           alt="Daniel Theil pixel portrait"
           src="/me crop pixel.png"
           fill
           priority={false}
           sizes="(min-width: 1024px) 246px, 230px"
-          className="object-cover object-center grayscale-[30%] saturate-[0.78] contrast-[1.08] brightness-[0.94]"
+          className="object-cover object-center grayscale-30 saturate-[0.78] contrast-[1.08] brightness-[0.94]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(13,11,8,0)_35%,rgba(13,11,8,0.68)_100%)]" />
         <div className="absolute inset-0 opacity-60 mix-blend-overlay" style={SCANLINE_STYLE} />
@@ -217,7 +217,7 @@ function VibeSignal() {
       </div>
       <div className="font-mono text-3xl font-semibold leading-none text-[#d4cdc4] sm:text-4xl lg:text-[2rem]">
         {displayedText}
-        <span className="ml-1 inline-block h-[1em] w-[3px] translate-y-1 bg-[#e6c3a8] align-baseline" />
+        <span className="ml-1 inline-block h-[1em] w-0.75 translate-y-1 bg-[#e6c3a8] align-baseline" />
       </div>
       <div className="mt-3 flex flex-wrap gap-x-2 gap-y-1.5 font-mono text-[10px] text-[#d4cdc4]/30">
         {VIBE_EMOJIS.map((emoji) => (
@@ -346,7 +346,7 @@ function ProfileSummaryPanel() {
           <span className="text-[#d4cdc4]/58"> I&apos;ve been coding for 7+ years and building professionally for 2+ years.</span>
         </p>
 
-        <dl className="grid grid-cols-2 gap-3 sm:max-w-[34rem] sm:gap-4">
+        <dl className="grid grid-cols-2 gap-3 sm:max-w-136 sm:gap-4">
           {PROFILE_STATS.map((stat) => (
             <div key={stat.label} className="relative min-w-0 border border-[#d4cdc4]/14 bg-[#0d0b08]/18 p-4 sm:p-5">
               <span className="pointer-events-none absolute left-0 top-0 h-1.5 w-1.5 bg-[#e6c3a8]/70" />
@@ -409,7 +409,7 @@ function ExperiencePanel() {
     <ProfileSheetRow icon={FaBriefcase} label="Experience" className="py-10 md:py-11">
       <div className="relative pl-9 sm:pl-12">
         <span
-          className="absolute bottom-8 left-[6px] top-2 w-px bg-[linear-gradient(180deg,rgba(230,195,168,0.86),rgba(212,205,196,0.22)_52%,rgba(212,205,196,0.04))]"
+          className="absolute bottom-8 left-1.5 top-2 w-px bg-[linear-gradient(180deg,rgba(230,195,168,0.86),rgba(212,205,196,0.22)_52%,rgba(212,205,196,0.04))]"
           aria-hidden
         />
         {EXPERIENCE_ITEMS.map((item, index) => (
@@ -418,13 +418,13 @@ function ExperiencePanel() {
             className="relative pb-10 last:pb-0"
           >
             <span
-              className={`absolute left-[-38px] top-1 h-[13px] w-[13px] border border-[#0d0b08] sm:left-[-50px] ${
+              className={`absolute -left-9.5 top-1 h-3.25 w-3.25 border border-[#0d0b08] sm:-left-12.5 ${
                 index === 0 ? "bg-[#e6c3a8] shadow-[0_0_0_5px_rgba(230,195,168,0.12)]" : "bg-[#d4cdc4]/48"
               }`}
               aria-hidden
             />
             <span
-              className="absolute left-[-31px] top-[7px] hidden h-px w-7 bg-[#d4cdc4]/20 sm:left-[-43px] sm:block"
+              className="absolute -left-7.75 top-1.75 hidden h-px w-7 bg-[#d4cdc4]/20 sm:-left-10.75 sm:block"
               aria-hidden
             />
 
@@ -441,7 +441,7 @@ function ExperiencePanel() {
                 <p className="font-mono text-xs text-[#d4cdc4]/58">
                   {item.company}
                 </p>
-                <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.1em] text-[#d4cdc4]/34">
+                <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-[#d4cdc4]/34">
                   {item.duration}
                 </p>
               </div>
@@ -505,7 +505,7 @@ function SoftwareEngineerView() {
     <FadeInView id="about-software-engineer" className="pt-6 lg:min-h-[92vh]">
       <ViewTitle title="Software Engineer" meta="view 01 / profile" />
 
-      <div className="relative max-w-[76rem]">
+      <div className="relative max-w-304">
         <span className="pointer-events-none absolute bottom-0 left-0 top-1 hidden w-px bg-[linear-gradient(180deg,rgba(230,195,168,0.48),rgba(212,205,196,0.12)_35%,transparent)] md:block" />
         <div className="md:pl-6 xl:pl-8">
           <ProfileSummaryPanel />
@@ -557,7 +557,7 @@ function ProjectVisual({ project, displayTitle, index }: { project: Project; dis
           fill
           priority={index < 2}
           sizes="(min-width: 1024px) 220px, 100vw"
-          className="object-cover grayscale-[12%] saturate-[0.9] contrast-[1.02] transition duration-500 group-hover/project:scale-[1.025] group-hover/project:grayscale-0"
+          className="object-cover grayscale-12 saturate-[0.9] contrast-[1.02] transition duration-500 group-hover/project:scale-[1.025] group-hover/project:grayscale-0"
         />
       ) : (
         <ProjectPlaceholder index={index} />
@@ -649,7 +649,7 @@ function RecentProjectsView({ onOpenProject }: { onOpenProject: (projectId: stri
     <FadeInView id="about-projects">
       <ViewTitle title="Recent Projects" meta={`view 02 / ${PROJECTS.length} records`} />
 
-      <FloatingPanel className="max-w-[72rem] px-5 py-8 sm:px-8 sm:py-10 xl:ml-6">
+      <FloatingPanel className="max-w-6xl px-5 py-8 sm:px-8 sm:py-10 xl:ml-6">
         <div className="mb-6 flex flex-col gap-4 border-b border-[#d4cdc4]/12 pb-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <SectionLabel icon={FaBriefcase}>Recent projects</SectionLabel>
@@ -693,7 +693,7 @@ function AboutTechChip({ tech }: { tech: TechItem }) {
   return (
     <div
       tabIndex={0}
-      className="about-tech-card group relative min-h-[142px] cursor-default overflow-hidden border border-[#A69F8D]/30 bg-[#0d0b08]/24 p-4 text-[#A69F8D] transition-colors duration-200 hover:border-[#A69F8D]/80 hover:bg-[#A69F8D] hover:text-[#0d0b08] focus-visible:border-[#A69F8D] focus-visible:bg-[#A69F8D] focus-visible:text-[#0d0b08] focus-visible:outline-none"
+      className="about-tech-card group relative min-h-35.5 cursor-default overflow-hidden border border-[#A69F8D]/30 bg-[#0d0b08]/24 p-4 text-[#A69F8D] transition-colors duration-200 hover:border-[#A69F8D]/80 hover:bg-[#A69F8D] hover:text-[#0d0b08] focus-visible:border-[#A69F8D] focus-visible:bg-[#A69F8D] focus-visible:text-[#0d0b08] focus-visible:outline-none"
     >
       <div className="absolute left-0 top-0 h-1 w-1 bg-[#A69F8D] transition-colors group-hover:bg-[#0d0b08] group-focus-visible:bg-[#0d0b08]" />
       <div className="absolute right-0 top-0 h-1 w-1 bg-[#A69F8D] transition-colors group-hover:bg-[#0d0b08] group-focus-visible:bg-[#0d0b08]" />
@@ -758,7 +758,7 @@ function AboutTechStackView() {
     <FadeInView id="about-tech-stack" className="pb-2">
       <ViewTitle title="Tech Stack" meta={`view 03 / ${TECH_STACK_ITEMS.length} installed chips`} />
 
-      <div className="relative max-w-[72rem] xl:ml-auto">
+      <div className="relative max-w-6xl xl:ml-auto">
         <div className="mb-9 grid gap-5 border-t border-[#A69F8D]/26 pt-5 sm:grid-cols-[minmax(150px,0.34fr)_minmax(0,1fr)] sm:items-end">
           <SectionLabel icon={FaCode}>Installed chips</SectionLabel>
           <div className="flex flex-col gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#A69F8D]/58 sm:items-end sm:text-right">
@@ -900,7 +900,7 @@ function SectionDitherBackdrop() {
   return (
     <div
       ref={layerRef}
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-[1] h-[clamp(7rem,16svh,11rem)] opacity-0"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-1 h-[clamp(7rem,16svh,11rem)] opacity-0"
       style={{
         clipPath: "inset(50% 0px 50% 0px)",
         WebkitClipPath: "inset(50% 0px 50% 0px)",
@@ -1209,7 +1209,7 @@ export default function AboutSection() {
               "linear-gradient(to bottom, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) 0 calc(100% - 36px) / 100% 1px no-repeat",
           }}
         />
-        <div className="relative z-10 mx-auto w-full max-w-[92rem] px-6 sm:px-8 lg:px-10">
+        <div className="relative z-10 mx-auto w-full max-w-368 px-6 sm:px-8 lg:px-10">
           <InViewAboutBlock />
         </div>
 

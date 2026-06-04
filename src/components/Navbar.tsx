@@ -372,7 +372,7 @@ export default function Navbar() {
                           {/* Label */}
                           <span className="relative z-10 flex items-center gap-2">
                             <span
-                              className={`w-[5px] h-[5px] transition-all duration-300 ${
+                              className={`w-1.25 h-1.25 transition-all duration-300 ${
                                 isActive ? accentBg : `${accentBgMuted} group-hover:${accentBgHover}`
                               }`}
                             />
@@ -401,7 +401,7 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className={`relative w-12 h-full min-h-[44px] border-2 ${!showContent ? "bg-transparent border-transparent shadow-none" : `${bgColor} ${borderColor} ${shadowColor}`} flex items-center justify-center transition-colors duration-300`}
+              className={`relative w-12 h-full min-h-11 border-2 ${!showContent ? "bg-transparent border-transparent shadow-none" : `${bgColor} ${borderColor} ${shadowColor}`} flex items-center justify-center transition-colors duration-300`}
               aria-label="Toggle menu"
             >
               {/* Pixel transition overlay */}
@@ -563,7 +563,7 @@ export default function Navbar() {
                       <span className="text-[9px] text-white/30">
                         {String(index + 1).padStart(2, "0")}
                       </span>
-                      <span className={`w-[5px] h-[5px] ${isActive ? "bg-white" : "bg-white/20"}`} />
+                      <span className={`w-1.25 h-1.25 ${isActive ? "bg-white" : "bg-white/20"}`} />
                       {item.label}
                     </a>
                   );

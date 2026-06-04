@@ -230,7 +230,7 @@ export default function PixelDissolveOverlay({
   }, [active, holdMs, revealMs, darkColor, stop]);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-[200] pointer-events-none" style={{ display: "none" }}>
+    <div ref={containerRef} className="fixed inset-0 z-200 pointer-events-none" style={{ display: "none" }}>
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
       <div
         ref={labelRef}
