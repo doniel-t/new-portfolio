@@ -37,7 +37,7 @@ export default function FooterSection() {
         >
           
             <PixelDivider
-              color="#ffffff"
+              color="#F6F4EF"
               pixelSize={isMobile ? 12 : 24}
               durationSec={8}
               rise="-200%"
