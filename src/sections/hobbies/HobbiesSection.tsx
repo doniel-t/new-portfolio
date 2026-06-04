@@ -9,11 +9,12 @@ import DecodingWord from "@/components/DecodingWord";
 import HorizontalPixelDivider from "@/components/HorizontalPixelDivider";
 import PixelDivider from "@/components/PixelDivider";
 import PixelDissolveOverlay from "@/components/PixelDissolveOverlay";
+import { HOBBIES } from "@/data/hobbies/cards";
+import { HOBBIES_CONTENT } from "@/data/hobbies/content";
+import type { HobbyCard as HobbyCardType } from "@/data/hobbies/types";
 import { useSectionScroll } from "@/hooks/useSectionScroll";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import ExpandedHobbyModal from "./ExpandedHobbyModal";
-import { HOBBIES } from "./data";
-import type { HobbyCard as HobbyCardType } from "./types";
 
 const Aurora = dynamic(() => import("@/components/Aurora"), {
   ssr: false,
@@ -48,7 +49,7 @@ function ScrollSpy({
             <div className="flex flex-col gap-3.5">
               {HOBBIES.map((hobby, index) => {
                 const isActive = activeIndex === index;
-                const spyLabel = hobby.title === "Dungeons & Dragons" ? "DnD" : hobby.title;
+                const spyLabel = hobby.shortTitle ?? hobby.title;
 
                 return (
                   <a
@@ -193,7 +194,7 @@ const HobbiesHeader = React.memo(function HobbiesHeader({
         }}
         className="flex flex-wrap items-center gap-3 mb-3"
       >
-        <span className="font-mono text-sm tracking-widest text-foreground/55">[LIFE_LOGS]</span>
+        <span className="font-mono text-sm tracking-widest text-foreground/55">{HOBBIES_CONTENT.eyebrow}</span>
 
       </motion.div>
 
@@ -208,7 +209,7 @@ const HobbiesHeader = React.memo(function HobbiesHeader({
         }}
         className="font-display text-5xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight text-foreground drop-shadow-md mb-6"
       >
-        {"Hobbies & Interests".split(" ").map((word, i, arr) => (
+        {HOBBIES_CONTENT.title.split(" ").map((word, i, arr) => (
           <span key={`hobby-title-${i}`} className="inline-block">
             <DecodingWord word={word} />
             {i < arr.length - 1 ? "\u00A0" : ""}
@@ -231,7 +232,7 @@ const HobbiesHeader = React.memo(function HobbiesHeader({
         }}
         className="text-lg sm:text-xl text-foreground/70 font-medium max-w-prose"
       >
-        Outside work, this is the part of the UI where my brain actually reloads.
+        {HOBBIES_CONTENT.intro}
       </motion.p>
     </motion.div>
   );

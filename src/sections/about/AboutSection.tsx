@@ -15,12 +15,13 @@ import {
   type TechCategoryDef,
   type TechItem,
 } from "@/components/techStackData";
+import { ABOUT_CONTENT } from "@/data/about/profile";
+import { PROJECTS } from "@/data/work/projects";
+import type { Project } from "@/data/work/types";
 import { useGPUDetection } from "@/hooks/useGPUDetection";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useScrollFade } from "@/hooks/useScrollFade";
 import ExpandedProjectModal from "@/sections/work/ExpandedProjectModal";
-import { PROJECTS } from "@/sections/work/data";
-import type { Project } from "@/sections/work/types";
 import LocalTimeClient from "./LocalTime";
 import type { IconType } from "react-icons";
 import {
@@ -38,61 +39,9 @@ const Dither = dynamic(() => import("@/components/Dither"), {
   loading: () => null,
 });
 
-const VIBE_EMOJIS = [
-  "=w=",
-  "o_o",
-  "(●ω●)",
-  "⊙﹏⊙∥",
-  "( •̀ ω •́ )✧",
-  "¯\\_(ツ)_/¯",
-  "(⌐■_■)",
-  "￣へ￣",
-];
-
-const PROFILE_STATS = [
-  { value: "7+", label: "Programming Exp" },
-  { value: "2+", label: "Years Professional Exp" },
-] as const;
-
-const CORE_STACK_NAMES = ["Next.js", "TypeScript", "Tailwind", "Go"] as const;
-
-const CORE_STACK_ITEMS = CORE_STACK_NAMES.map((name) =>
+const CORE_STACK_ITEMS = ABOUT_CONTENT.coreStackNames.map((name) =>
   TECH_STACK_ITEMS.find((item) => item.name === name)
 ).filter((item): item is TechItem => item !== undefined);
-
-const PERSONAL_STATS_ITEMS = [
-  ["Age", "25"],
-  ["Gender", "Male"],
-  ["Status", "Open"],
-  ["Languages", "GB\u00A0/\u00A0DE"],
-] as const;
-
-const EXPERIENCE_ITEMS = [
-  {
-    role: "Fullstack Engineer",
-    company: "Komma-D",
-    duration: "1.5 years",
-    status: "ONGOING",
-    badge: "ACTIVE",
-    focus: ["Multi-tenant NextJS", "DevOps", "LLM-Chatbots"],
-  },
-  {
-    role: "Intern Software Engineer",
-    company: "ASAP",
-    duration: "0.5 years",
-    status: "COMPLETED",
-    badge: "LOGGED",
-    focus: ["Image Detection", "Kotlin App"],
-  },
-  {
-    role: "Working Student Software Engineer",
-    company: "eSolutions",
-    duration: "0.5 years",
-    status: "COMPLETED",
-    badge: "LOGGED",
-    focus: ["Internal Tooling", "Go", "Angular"],
-  },
-] as const;
 
 const SCANLINE_STYLE: React.CSSProperties = {
   backgroundImage:
@@ -104,7 +53,7 @@ const DESKTOP_RAIL_TOP = 96;
 
 type RailStyle = React.CSSProperties | undefined;
 
-function useTypewriter(texts: string[], typeSpeed = 80, pauseDuration = 1500) {
+function useTypewriter(texts: readonly string[], typeSpeed = 80, pauseDuration = 1500) {
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [displayedText, setDisplayedText] = React.useState("");
   const [isTyping, setIsTyping] = React.useState(true);
@@ -172,7 +121,7 @@ function PortraitStamp() {
     <figure className="relative w-full max-w-52.5 sm:max-w-57.5 lg:max-w-61.5">
       <div className="relative aspect-3/4 overflow-hidden border border-[#d4cdc4]/25">
         <Image
-          alt="Daniel Theil pixel portrait"
+          alt={ABOUT_CONTENT.portrait.alt}
           src="/me crop pixel.png"
           fill
           priority={false}
@@ -184,8 +133,8 @@ function PortraitStamp() {
         <FrameTicks />
       </div>
       <ScrollFadeBlock className="mt-2 flex items-center justify-between gap-3 pb-2 font-mono text-[10px] uppercase text-[#d4cdc4]/60 sm:border-b sm:border-[#d4cdc4]/20">
-        <span>PORTRAIT_FEED</span>
-        <span>2025.01.21</span>
+        <span>{ABOUT_CONTENT.portrait.feedLabel}</span>
+        <span>{ABOUT_CONTENT.portrait.capturedAt}</span>
       </ScrollFadeBlock>
     </figure>
   );
@@ -196,31 +145,31 @@ function StickyIntroLabel() {
     <ScrollFadeBlock className="pb-4 font-mono text-[11px] uppercase text-[#e6c3a8] sm:border-b sm:border-[#d4cdc4]/50">
       <p className="flex items-center gap-2 text-[12px] font-bold">
         <FaRegAddressCard className="h-3.5 w-3.5" aria-hidden />
-        <span>[01] Introduction</span>
+        <span>{ABOUT_CONTENT.intro.label}</span>
       </p>
-      <p className="mt-2 font-semibold text-[#d4cdc4]/40">profile_index / about</p>
+      <p className="mt-2 font-semibold text-[#d4cdc4]/40">{ABOUT_CONTENT.intro.meta}</p>
     </ScrollFadeBlock>
   );
 }
 
 function VibeSignal() {
-  const { displayedText, isTyping } = useTypewriter(VIBE_EMOJIS, 100, 2000);
+  const { displayedText, isTyping } = useTypewriter(ABOUT_CONTENT.vibe.emojis, 100, 2000);
 
   return (
     <ScrollFadeBlock className="py-3 lg:mt-4">
       <div className="mb-3 flex items-center justify-between gap-4 font-mono text-[10px] uppercase text-[#d4cdc4]/40">
         <span className="inline-flex items-center gap-2 text-[12px] font-bold">
           <FaSignal className={`h-3 w-3 ${isTyping ? "animate-pulse text-[#e6c3a8]" : "text-[#d4cdc4]/25"}`} aria-hidden />
-          VIBE SIGNAL
+          {ABOUT_CONTENT.vibe.label}
         </span>
-        <span>{VIBE_EMOJIS.length} states</span>
+        <span>{ABOUT_CONTENT.vibe.emojis.length} states</span>
       </div>
       <div className="font-mono text-3xl font-semibold leading-none text-[#d4cdc4] sm:text-4xl lg:text-[2rem]">
         {displayedText}
         <span className="ml-1 inline-block h-[1em] w-0.75 translate-y-1 bg-[#e6c3a8] align-baseline" />
       </div>
       <div className="mt-3 flex flex-wrap gap-x-2 gap-y-1.5 font-mono text-[10px] text-[#d4cdc4]/30">
-        {VIBE_EMOJIS.map((emoji) => (
+        {ABOUT_CONTENT.vibe.emojis.map((emoji) => (
           <span key={emoji} className={displayedText === emoji ? "text-[#e6c3a8]" : undefined}>
             {emoji}
           </span>
@@ -234,10 +183,10 @@ function RailNamePlate() {
   return (
     <ScrollFadeBlock className="py-3 sm:border-b sm:border-[#d4cdc4]/20">
       <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#d4cdc4]/36">
-        operator
+        {ABOUT_CONTENT.rail.eyebrow}
       </p>
       <p className="mt-2 max-w-[9ch] font-display text-4xl uppercase leading-[0.9] text-[#d4cdc4] sm:text-5xl lg:text-[3.35rem]">
-        Daniel Theil
+        {ABOUT_CONTENT.rail.name}
       </p>
     </ScrollFadeBlock>
   );
@@ -339,15 +288,15 @@ function ProfileSheetRow({
 
 function ProfileSummaryPanel() {
   return (
-    <ProfileSheetRow icon={FaUser} label="Profile" className="border-t-0 pt-0">
+    <ProfileSheetRow icon={FaUser} label={ABOUT_CONTENT.summary.sectionLabel} className="border-t-0 pt-0">
       <div className="space-y-7">
         <p className="max-w-3xl text-lg leading-8 text-[#d4cdc4]/82 sm:text-xl">
-          I&apos;m a fullstack engineer creating software for the love of the game.
-          <span className="text-[#d4cdc4]/58"> I&apos;ve been coding for 7+ years and building professionally for 2+ years.</span>
+          {ABOUT_CONTENT.summary.lead}
+          <span className="text-[#d4cdc4]/58"> {ABOUT_CONTENT.summary.detail}</span>
         </p>
 
         <dl className="grid grid-cols-2 gap-3 sm:max-w-136 sm:gap-4">
-          {PROFILE_STATS.map((stat) => (
+          {ABOUT_CONTENT.profileStats.map((stat) => (
             <div key={stat.label} className="relative min-w-0 border border-[#d4cdc4]/14 bg-[#0d0b08]/18 p-4 sm:p-5">
               <span className="pointer-events-none absolute left-0 top-0 h-1.5 w-1.5 bg-[#e6c3a8]/70" />
               <span className="pointer-events-none absolute bottom-0 right-0 h-1.5 w-1.5 bg-[#d4cdc4]/24" />
@@ -367,7 +316,7 @@ function ProfileSummaryPanel() {
 
 function CoreStackPanel() {
   return (
-    <ProfileSheetRow icon={FaCode} label="Core stack">
+    <ProfileSheetRow icon={FaCode} label={ABOUT_CONTENT.sections.coreStack}>
       <div className="grid grid-cols-2 gap-x-8 gap-y-4 xl:grid-cols-4">
         {CORE_STACK_ITEMS.map((item, index) => (
           <span
@@ -386,16 +335,16 @@ function CoreStackPanel() {
 
 function PersonalStatsPanel() {
   return (
-    <ProfileSheetRow icon={FaChartBar} label="Stats">
+    <ProfileSheetRow icon={FaChartBar} label={ABOUT_CONTENT.sections.stats}>
       <div className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-4">
-        {PERSONAL_STATS_ITEMS.map(([label, value]) => (
-          <div key={label} className="min-w-0">
+        {ABOUT_CONTENT.personalStats.map((stat) => (
+          <div key={stat.label} className="min-w-0">
             <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/40">
-              {label}
+              {stat.label}
             </p>
             <p className="flex items-center gap-2 font-mono text-base font-semibold text-[#d4cdc4]">
-              {label === "Status" ? <span className="h-2 w-2 rounded-full bg-[#e6c3a8]" /> : null}
-              <span className="whitespace-nowrap">{value}</span>
+              {stat.isHighlighted ? <span className="h-2 w-2 rounded-full bg-[#e6c3a8]" /> : null}
+              <span className="whitespace-nowrap">{stat.value}</span>
             </p>
           </div>
         ))}
@@ -406,13 +355,13 @@ function PersonalStatsPanel() {
 
 function ExperiencePanel() {
   return (
-    <ProfileSheetRow icon={FaBriefcase} label="Experience" className="py-10 md:py-11">
+    <ProfileSheetRow icon={FaBriefcase} label={ABOUT_CONTENT.sections.experience} className="py-10 md:py-11">
       <div className="relative pl-9 sm:pl-12">
         <span
           className="absolute bottom-8 left-1.5 top-2 w-px bg-[linear-gradient(180deg,rgba(230,195,168,0.86),rgba(212,205,196,0.22)_52%,rgba(212,205,196,0.04))]"
           aria-hidden
         />
-        {EXPERIENCE_ITEMS.map((item, index) => (
+        {ABOUT_CONTENT.experience.map((item, index) => (
           <article
             key={`${item.company}-${item.role}`}
             className="relative pb-10 last:pb-0"
@@ -481,17 +430,17 @@ function ExperiencePanel() {
 
 function LocationPanel() {
   return (
-    <ProfileSheetRow icon={FaMapMarkerAlt} label="Location" className="pb-0">
+    <ProfileSheetRow icon={FaMapMarkerAlt} label={ABOUT_CONTENT.sections.location} className="pb-0">
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/40">
-            Region
+            {ABOUT_CONTENT.location.regionLabel}
           </p>
-          <p className="font-mono text-sm font-semibold text-[#d4cdc4]">Bavaria, Germany</p>
+          <p className="font-mono text-sm font-semibold text-[#d4cdc4]">{ABOUT_CONTENT.location.region}</p>
         </div>
         <div>
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/40">
-            Local time
+            {ABOUT_CONTENT.location.localTimeLabel}
           </p>
           <LocalTimeClient className="font-mono text-sm font-semibold text-[#d4cdc4]" />
         </div>
@@ -503,7 +452,7 @@ function LocationPanel() {
 function SoftwareEngineerView() {
   return (
     <FadeInView id="about-software-engineer" className="pt-6 lg:min-h-[92vh]">
-      <ViewTitle title="Software Engineer" meta="view 01 / profile" />
+      <ViewTitle title={ABOUT_CONTENT.views.profile.title} meta={ABOUT_CONTENT.views.profile.meta} />
 
       <div className="relative max-w-304">
         <span className="pointer-events-none absolute bottom-0 left-0 top-1 hidden w-px bg-[linear-gradient(180deg,rgba(230,195,168,0.48),rgba(212,205,196,0.12)_35%,transparent)] md:block" />
@@ -647,14 +596,14 @@ function ProjectListCard({
 function RecentProjectsView({ onOpenProject }: { onOpenProject: (projectId: string) => void }) {
   return (
     <FadeInView id="about-projects">
-      <ViewTitle title="Recent Projects" meta={`view 02 / ${PROJECTS.length} records`} />
+      <ViewTitle title={ABOUT_CONTENT.views.projects.title} meta={`view 02 / ${PROJECTS.length} records`} />
 
       <FloatingPanel className="max-w-6xl px-5 py-8 sm:px-8 sm:py-10 xl:ml-6">
         <div className="mb-6 flex flex-col gap-4 border-b border-[#d4cdc4]/12 pb-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <SectionLabel icon={FaBriefcase}>Recent projects</SectionLabel>
+            <SectionLabel icon={FaBriefcase}>{ABOUT_CONTENT.views.projects.sectionLabel}</SectionLabel>
             <p className="mt-3 max-w-2xl font-mono text-[12px] leading-6 text-[#d4cdc4]/56">
-              Selected work, client builds, and personal experiments folded into the profile stream.
+              {ABOUT_CONTENT.views.projects.description}
             </p>
           </div>
           <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/42">
@@ -756,7 +705,7 @@ function AboutTechCategory({ category }: { category: TechCategoryDef }) {
 function AboutTechStackView() {
   return (
     <FadeInView id="about-tech-stack" className="pb-2">
-      <ViewTitle title="Tech Stack" meta={`view 03 / ${TECH_STACK_ITEMS.length} installed chips`} />
+      <ViewTitle title={ABOUT_CONTENT.views.techStack.title} meta={`view 03 / ${TECH_STACK_ITEMS.length} installed chips`} />
 
       <div className="relative max-w-6xl xl:ml-auto">
         <div className="mb-9 grid gap-5 border-t border-[#A69F8D]/26 pt-5 sm:grid-cols-[minmax(150px,0.34fr)_minmax(0,1fr)] sm:items-end">

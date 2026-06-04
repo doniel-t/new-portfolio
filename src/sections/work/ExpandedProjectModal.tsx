@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ArrowLeft, ExternalLink, Github } from "lucide-react";
 import Dither from "@/components/Dither";
 import { LoadTransitionOverlay } from "@/components/InitialLoadTransition";
-import type { Project } from "./types";
+import type { Project } from "@/data/work/types";
 
 type ExpandedProjectModalProps = {
   projects: Project[];

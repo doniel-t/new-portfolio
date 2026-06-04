@@ -17,6 +17,11 @@ import {
   SiTailwindcss,
   SiTypescript,
 } from "react-icons/si";
+import {
+  TECH_STACK_CATEGORIES_DATA,
+  type TechIconKey,
+  type TechStackDataItem,
+} from "@/data/about/tech-stack";
 
 export type TechItem = {
   name: string;
@@ -32,7 +37,7 @@ export type TechCategoryDef = {
   items: TechItem[];
 };
 
-const ICONS = {
+const ICONS: Record<TechIconKey, React.ReactNode> = {
   nextjs: <SiNextdotjs size={24} />,
   react: <SiReact size={24} />,
   typescript: <SiTypescript size={24} />,
@@ -51,52 +56,21 @@ const ICONS = {
   figma: <SiFigma size={24} />,
 };
 
-export const TECH_STACK_CATEGORIES: TechCategoryDef[] = [
-  {
-    key: "frontend",
-    label: "FRONTEND",
-    tag: "SYS.UI",
-    items: [
-      { name: "Next.js", cost: 12, icon: ICONS.nextjs, description: "Server-side Rendering" },
-      { name: "React", cost: 10, icon: ICONS.react, description: "UI Components" },
-      { name: "TypeScript", cost: 8, icon: ICONS.typescript, description: "Type Safety" },
-      { name: "Tailwind", cost: 6, icon: ICONS.tailwind, description: "Utility-first" },
-    ],
-  },
-  {
-    key: "backend",
-    label: "BACKEND",
-    tag: "SYS.CORE",
-    items: [
-      { name: "Go", cost: 14, icon: ICONS.go, description: "High Performance" },
-      { name: "Python", cost: 10, icon: ICONS.python, description: "Automation & AI" },
-      { name: "Postgres", cost: 11, icon: ICONS.postgres, description: "Relational DB" },
-      { name: "Nginx", cost: 8, icon: ICONS.nginx, description: "Reverse Proxy" },
-    ],
-  },
-  {
-    key: "cms",
-    label: "CMS",
-    tag: "SYS.DATA",
-    items: [
-      { name: "Strapi", cost: 9, icon: ICONS.strapi, description: "Headless CMS" },
-      { name: "Payload", cost: 9, icon: ICONS.payload, description: "Code-first CMS" },
-    ],
-  },
-  {
-    key: "tooling",
-    label: "TOOLING",
-    tag: "SYS.OPS",
-    items: [
-      { name: "Docker", cost: 15, icon: ICONS.docker, description: "Containerization" },
-      { name: "Podman", cost: 12, icon: ICONS.podman, description: "Daemonless" },
-      { name: "Git", cost: 4, icon: ICONS.git, description: "Version Control" },
-      { name: "GitHub Actions", cost: 13, icon: ICONS.github, description: "Automation Workflows" },
-      { name: "GitLab CI", cost: 13, icon: ICONS.gitlab, description: "DevOps Pipelines" },
-      { name: "Figma", cost: 7, icon: ICONS.figma, description: "UI/UX Design" },
-    ],
-  },
-];
+function withIcon(item: TechStackDataItem): TechItem {
+  return {
+    cost: item.cost,
+    description: item.description,
+    icon: ICONS[item.iconKey],
+    name: item.name,
+  };
+}
+
+export const TECH_STACK_CATEGORIES: TechCategoryDef[] = TECH_STACK_CATEGORIES_DATA.map(
+  (category) => ({
+    ...category,
+    items: category.items.map(withIcon),
+  })
+);
 
 export const TECH_STACK_ITEMS = TECH_STACK_CATEGORIES.flatMap((category) => category.items);
 export const TECH_STACK_TOTAL_MEMORY = TECH_STACK_ITEMS.reduce((acc, item) => acc + item.cost, 0);

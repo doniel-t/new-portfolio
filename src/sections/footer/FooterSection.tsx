@@ -3,6 +3,7 @@
 import React from "react";
 import { Mail, Github, Linkedin, Send } from "lucide-react";
 import PixelDivider from "@/components/PixelDivider";
+import { FOOTER_CONTENT } from "@/data/footer/content";
 import { useSectionScroll } from "@/hooks/useSectionScroll";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import FooterDecorations from "./FooterDecorations";
@@ -62,12 +63,12 @@ export default function FooterSection() {
             <div>
               <div className="flex items-center gap-4 mb-2">
                 <div className="w-8 h-px bg-white/30" />
-                <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Get in touch</span>
+                <span className="font-mono text-xs tracking-widest text-white/40 uppercase">{FOOTER_CONTENT.labels.eyebrow}</span>
               </div>
-              <h2 className="font-display text-5xl sm:text-6xl tracking-tight text-white mb-8">Contact</h2>
+              <h2 className="font-display text-5xl sm:text-6xl tracking-tight text-white mb-8">{FOOTER_CONTENT.labels.title}</h2>
 
               <a
-                href="mailto:daniel.theil.g@gmail.com"
+                href={`mailto:${FOOTER_CONTENT.contactEmail}`}
                 className="group relative inline-flex w-full items-center justify-center gap-3 overflow-hidden border border-white/20 bg-white/5 px-6 py-4 font-mono text-sm uppercase tracking-widest text-white transition-all duration-300 hover:border-white/35 hover:bg-white/8 sm:w-auto sm:min-w-64"
               >
                 <div className="absolute inset-0 translate-y-full bg-white/10 transition-transform duration-300 ease-out group-hover:translate-y-0" />
@@ -90,7 +91,7 @@ export default function FooterSection() {
               <div>
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-2 h-2 rotate-45 bg-white/20" />
-                  <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Navigate</span>
+                  <span className="font-mono text-xs tracking-widest text-white/40 uppercase">{FOOTER_CONTENT.labels.navigate}</span>
                 </div>
                 <nav className="flex flex-col gap-3">
                   <a
@@ -132,11 +133,11 @@ export default function FooterSection() {
               <div>
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-2 h-2 rotate-45 bg-white/20" />
-                  <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Connect</span>
+                  <span className="font-mono text-xs tracking-widest text-white/40 uppercase">{FOOTER_CONTENT.labels.connect}</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <a
-                    href="https://linkedin.com/in/danieltheil"
+                    href={FOOTER_CONTENT.socialLinks.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group relative w-12 h-12 flex items-center justify-center border border-white/10 text-white/50 hover:text-white hover:border-white/30 transition-all duration-300"
@@ -147,7 +148,7 @@ export default function FooterSection() {
                     <Linkedin size={18} />
                   </a>
                   <a
-                    href="https://github.com/danieltheil"
+                    href={FOOTER_CONTENT.socialLinks.github}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group relative w-12 h-12 flex items-center justify-center border border-white/10 text-white/50 hover:text-white hover:border-white/30 transition-all duration-300"
@@ -158,7 +159,7 @@ export default function FooterSection() {
                     <Github size={18} />
                   </a>
                   <a
-                    href="mailto:daniel.theil.g@gmail.com"
+                    href={`mailto:${FOOTER_CONTENT.contactEmail}`}
                     className="group relative w-12 h-12 flex items-center justify-center border border-white/10 text-white/50 hover:text-white hover:border-white/30 transition-all duration-300"
                     aria-label="Email"
                   >
@@ -175,7 +176,7 @@ export default function FooterSection() {
                   <div className="w-2 h-2 rounded-full bg-green-500" />
                   <div className="absolute inset-0 w-2 h-2 rounded-full bg-green-500 animate-ping opacity-75" />
                 </div>
-                <span className="font-mono text-xs tracking-wider text-white/40 uppercase">Available for work</span>
+                <span className="font-mono text-xs tracking-wider text-white/40 uppercase">{FOOTER_CONTENT.availability}</span>
               </div>
             </div>
           
@@ -188,27 +189,27 @@ export default function FooterSection() {
             <div className="pt-8 border-t border-white/10">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-2 h-2 rotate-45 border border-white/30" />
-                <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Legal</span>
+                <span className="font-mono text-xs tracking-widest text-white/40 uppercase">{FOOTER_CONTENT.labels.legal}</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <h3 className="font-display text-2xl text-white mb-4">Impressum</h3>
+                  <h3 className="font-display text-2xl text-white mb-4">{FOOTER_CONTENT.labels.impressum}</h3>
                   <div className="text-white/50 space-y-2 font-mono text-sm">
-                    <p className="text-white/70">Daniel Theil</p>
-                    <p>Sonnenstra&#223;e 24</p>
-                    <p>85080 Gaimersheim</p>
-                    <p>Germany</p>
+                    <p className="text-white/70">{FOOTER_CONTENT.legal.name}</p>
+                    <p>{FOOTER_CONTENT.legal.street}</p>
+                    <p>{FOOTER_CONTENT.legal.city}</p>
+                    <p>{FOOTER_CONTENT.legal.country}</p>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-display text-2xl text-white mb-4">Contact</h3>
+                  <h3 className="font-display text-2xl text-white mb-4">{FOOTER_CONTENT.labels.title}</h3>
                   <div className="text-white/50 space-y-2 font-mono text-sm">
                     <p>
-                      <span className="text-white/30 mr-2">Email:</span>
-                      <a href="mailto:daniel.theil.g@gmail.com" className="hover:text-white transition-colors">
-                        daniel.theil.g@gmail.com
+                      <span className="text-white/30 mr-2">{FOOTER_CONTENT.labels.email}</span>
+                      <a href={`mailto:${FOOTER_CONTENT.contactEmail}`} className="hover:text-white transition-colors">
+                        {FOOTER_CONTENT.contactEmail}
                       </a>
                     </p>
                   </div>
@@ -223,7 +224,7 @@ export default function FooterSection() {
           <div className="mt-16 pt-8 border-t border-white/5">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
               <div className="font-mono text-xs text-white/30">
-                &#169; {new Date().getFullYear()} Daniel Theil. All rights reserved.
+                &#169; {new Date().getFullYear()} {FOOTER_CONTENT.copyrightName}. {FOOTER_CONTENT.copyrightSuffix}
               </div>
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
@@ -231,7 +232,7 @@ export default function FooterSection() {
                   <div className="w-1 h-1 bg-white/20" />
                   <div className="w-1 h-1 bg-white/20" />
                 </div>
-                <span className="font-mono text-xs text-white/20">Built with Next.js</span>
+                <span className="font-mono text-xs text-white/20">{FOOTER_CONTENT.builtWith}</span>
               </div>
             </div>
           </div>
@@ -240,7 +241,7 @@ export default function FooterSection() {
 
       {/* Full-width grainy name */}
       
-        <FooterName name="DANIEL THEIL" footerRef={footerRef} />
+        <FooterName name={FOOTER_CONTENT.footerName} footerRef={footerRef} />
       
     </footer>
   );

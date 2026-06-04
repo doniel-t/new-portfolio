@@ -5,7 +5,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import Dither from "@/components/Dither";
 import PixelDivider from "@/components/PixelDivider";
-import type { HobbyCard } from "./types";
+import type { HobbyCard } from "@/data/hobbies/types";
 
 type ExpandedHobbyModalProps = {
   card: HobbyCard;

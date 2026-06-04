@@ -61,6 +61,7 @@ export const HOBBIES: HobbyCard[] = [
   },
   {
     title: "Dungeons & Dragons",
+    shortTitle: "DnD",
     items: ["Roleplay", "Character building"],
     image: "/dnd-bg.png",
     description:

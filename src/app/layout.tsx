@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Staatliches } from "next/font/google";
 import "./globals.css";
 import InitialLoadTransition from "@/components/InitialLoadTransition";
+import { SITE_METADATA_CONTENT } from "@/data/site/metadata";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,34 +21,21 @@ const staatliches = Staatliches({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://daniel-theil.dev";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || SITE_METADATA_CONTENT.url;
 const metadataBase = siteUrl.startsWith("http")
   ? new URL(siteUrl)
   : new URL(`https://${siteUrl}`);
 
 export const metadata: Metadata = {
   metadataBase,
-  title: {
-    default: "Daniel Theils Portfolio",
-    template: "%s | Daniel Theils Portfolio",
-  },
-  description:
-    "I like building unique stuff",
-  applicationName: "Daniel Theils Portfolio",
-  category: "technology",
-  keywords: [
-    "Daniel Theils",
-    "Daniel Theils Portfolio",
-    "German full-stack developer",
-    "UI design",
-    "Web development",
-    "Next.js",
-    "React",
-    "TypeScript",
-  ],
-  authors: [{ name: "Daniel Theils" }],
-  creator: "Daniel Theils",
-  publisher: "Daniel Theils",
+  title: SITE_METADATA_CONTENT.title,
+  description: SITE_METADATA_CONTENT.description,
+  applicationName: SITE_METADATA_CONTENT.applicationName,
+  category: SITE_METADATA_CONTENT.category,
+  keywords: [...SITE_METADATA_CONTENT.keywords],
+  authors: [{ name: SITE_METADATA_CONTENT.authorName }],
+  creator: SITE_METADATA_CONTENT.authorName,
+  publisher: SITE_METADATA_CONTENT.authorName,
   alternates: {
     canonical: "/",
   },
@@ -82,25 +70,23 @@ export const metadata: Metadata = {
     shortcut: ["/favicon.ico"],
   },
   openGraph: {
-    type: "website",
-    locale: "de_DE",
+    type: SITE_METADATA_CONTENT.openGraph.type,
+    locale: SITE_METADATA_CONTENT.openGraph.locale,
     url: "/",
-    title: "Daniel Theils Portfolio",
-    description:
-      "I like building unique stuff",
-    siteName: "Daniel Theils Portfolio",
+    title: SITE_METADATA_CONTENT.title.default,
+    description: SITE_METADATA_CONTENT.description,
+    siteName: SITE_METADATA_CONTENT.openGraph.siteName,
     images: [
       {
-        url: "/me-dithered.png",
-        alt: "Portrait of Daniel Theils, German full-stack developer and UI design enthusiast",
+        url: SITE_METADATA_CONTENT.openGraph.image.url,
+        alt: SITE_METADATA_CONTENT.openGraph.image.alt,
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Daniel Theils Portfolio",
-    description:
-      "I like building unique stuff",
+    card: SITE_METADATA_CONTENT.twitter.card,
+    title: SITE_METADATA_CONTENT.title.default,
+    description: SITE_METADATA_CONTENT.description,
     images: ["/me-dithered.png"],
   },
 };

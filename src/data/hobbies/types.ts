@@ -1,5 +1,6 @@
 export type HobbyCard = {
   title: string;
+  shortTitle?: string;
   items: string[];
   image: string;
   description: string;

@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { motion, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import DecodingWord from "@/components/DecodingWord";
+import { HERO_CONTENT } from "@/data/hero/content";
 import { useSectionScroll } from "@/hooks/useSectionScroll";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useParallax } from "./useParallax";
@@ -16,14 +17,12 @@ const Dither = dynamic(() => import("@/components/Dither"), {
   loading: () => null,
 });
 
-const HEADING_TEXT = "Modern web experiences with a refined, understated aesthetic.";
-
 export default function HeroSection() {
   const isMobile = useIsMobile();
   const scrollToSection = useSectionScroll();
   const sectionRef = React.useRef<HTMLElement | null>(null);
   const scrollScale = isMobile ? 0.9 : 1.2;
-  const headingWords = HEADING_TEXT.split(" ");
+  const headingWords = HERO_CONTENT.heading.split(" ");
   const { gridContainer, leftSection, childItem, rightSection } = getHeroVariants(isMobile);
   const { scrollProgress } = useParallax(isMobile, sectionRef);
 
@@ -77,7 +76,7 @@ export default function HeroSection() {
           <motion.div variants={leftSection} style={{ x: leftContentX, y: leftContentY }}>
             <motion.div variants={childItem}>
               <p className="text-sm tracking-widest text-muted font-bold mb-3">
-                PORTFOLIO
+                {HERO_CONTENT.eyebrow}
               </p>
             </motion.div>
             <motion.div variants={childItem}>
@@ -98,7 +97,7 @@ export default function HeroSection() {
               <p
                 className="text-lg sm:text-xl text-foreground/80 font-medium mb-8 max-w-prose"
               >
-                I design and build performant, accessible interfaces with Next.js and a thoughtful component system.
+                {HERO_CONTENT.intro}
               </p>
             </motion.div>
             <motion.div variants={childItem}>
