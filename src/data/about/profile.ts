@@ -6,7 +6,7 @@ export const ABOUT_CONTENT = {
   },
   intro: {
     label: "[01] Introduction",
-    meta: "profile_index / about",
+    meta: "profile_index / about me ",
   },
   vibe: {
     label: "VIBE SIGNAL",
@@ -26,12 +26,12 @@ export const ABOUT_CONTENT = {
     name: "Daniel Theil",
   },
   profileStats: [
-    { value: "7+", label: "Programming Exp" },
-    { value: "2+", label: "Years Professional Exp" },
+    { value: "7+", label: "Programming Experience (years)" },
+    { value: "2+", label: "Professional Experience (years)" },
   ],
   coreStackNames: ["Next.js", "TypeScript", "Tailwind", "Go"],
   personalStats: [
-    { label: "Age", value: "25", isHighlighted: false },
+    { label: "Age", value: "26", isHighlighted: false },
     { label: "Gender", value: "Male", isHighlighted: false },
     { label: "Status", value: "Open", isHighlighted: true },
     { label: "Languages", value: "GB\u00A0/\u00A0DE", isHighlighted: false },
@@ -87,7 +87,7 @@ export const ABOUT_CONTENT = {
       title: "Recent Projects",
       sectionLabel: "Recent projects",
       description:
-        "Selected work, client builds, and personal experiments folded into the profile stream.",
+        "Selected work, client builds, and personal experiments folded into one quick overview.",
     },
     techStack: {
       title: "Tech Stack",

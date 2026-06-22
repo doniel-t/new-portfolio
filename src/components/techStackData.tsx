@@ -14,6 +14,7 @@ import {
   SiPython,
   SiReact,
   SiStrapi,
+  SiSupabase,
   SiTailwindcss,
   SiTypescript,
 } from "react-icons/si";
@@ -45,6 +46,7 @@ const ICONS: Record<TechIconKey, React.ReactNode> = {
   go: <SiGo size={24} />,
   python: <SiPython size={24} />,
   postgres: <SiPostgresql size={24} />,
+  supabase: <SiSupabase size={24} />,
   strapi: <SiStrapi size={24} />,
   payload: <SiPayloadcms size={24} />,
   docker: <SiDocker size={24} />,

@@ -101,7 +101,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${staatliches.variable} antialiased`}
       >
-        <InitialLoadTransition />
+        {/* <InitialLoadTransition /> */}
         {children}
       </body>
     </html>

@@ -110,31 +110,52 @@ This project is less about replacing the human table memory and more about suppo
     slug: "uwu-bot",
     title: "PROJECT_UWU_BOT",
     image: "/uwu-bot.png",
-    repoUrl: "https://github.com/username/project-delta",
-    liveUrl: "https://project-delta.demo",
-    techStack: ["Node.js", "Express", "Redis", "Docker"],
+    repoUrl: "https://github.com/doniel-t/uwu-botv2",
+    techStack: ["Node.js", "Discord.js", "Ai-SDK", "Postgres"],
     description:
-      "High-performance backend service handling millions of requests with sub-100ms response times. Features intelligent caching and horizontal scaling capabilities.",
+      "It started out as a joke in our Discord server during university and became a useful tool for my friendgroup. The latest version added a Vector DB and LLM chat feature where it remembers everyones messages and personality on my discord server. It is mostly used to roast us via the \"@uwu-bot roast Daniel about his sleeping habits.\"",
     challenges:
-      "Implementing distributed caching strategies and designing fault-tolerant microservices architecture.",
-    blogContent: `UwU Bot started as a joke in our Discord server and turned into a serious exercise in backend engineering. The premise is absurd: a Discord bot that "uwu-ifies" text, replacing certain letter patterns and adding emoticons. But when your joke bot gets added to 2,000+ servers and starts handling thousands of messages per second, suddenly you need real infrastructure.
+      "-",
+    blogContent: `
 
-The original version was a single Node.js process running on a $5 VPS. It worked fine for our server. Then someone posted it on a bot listing site, and within a week it was in hundreds of servers. The single process started choking — message processing latency spiked from 20ms to over 2 seconds. Time to architect properly.
+UwU Bot started as a joke during my first semester at university.
 
-I rebuilt the bot using a worker-based architecture. The main process handles the Discord gateway connection (WebSocket) and distributes incoming messages to a pool of worker threads using Node's worker_threads module. Each worker runs the text transformation logic independently. This alone brought latency back down to ~50ms under load.
+At the time, I had just reached the dangerous point every beginner programmer eventually reaches: “Hey, I can code!” Since my friend group and I were really into anime, I decided to create a Discord bot command that could “uwufy” a sentence.
 
-But the real scalability challenge came from the caching layer. The bot has configurable settings per server (prefix, enabled channels, intensity level, custom replacements), and looking these up for every single message was hammering the database. Enter Redis. I implemented a write-through cache where settings are loaded from PostgreSQL on first access and cached in Redis with a 5-minute TTL. Cache invalidation happens via a pub/sub channel — when a server admin changes a setting, a message is published and all bot instances update their local cache.
+For example:
 
-Docker was essential for the deployment story. I created a multi-stage Dockerfile that produces a lean production image (~80MB). The bot runs as a Docker Compose stack: the bot service (with auto-scaling replicas), Redis, PostgreSQL, and a small admin API for the web dashboard. Deployment is a single \`docker compose up -d --scale bot=3\` command.
+> “Hello, how are you today?”
 
-The most interesting engineering challenge was rate limiting. Discord has strict rate limits on API calls, and different endpoints have different limits. I built a token bucket rate limiter backed by Redis that's shared across all bot instances. Before making any Discord API call, the bot checks the bucket for that endpoint. If the bucket is empty, the request is queued and retried with exponential backoff. This completely eliminated the 429 (rate limit) errors that were causing message drops.
+> “Hewwo, how awe you today? :3”
 
-Monitoring was another area I invested in heavily. Each bot instance exports Prometheus metrics: message processing latency (p50, p95, p99), cache hit rates, Redis connection pool utilization, and Discord gateway heartbeat intervals. A Grafana dashboard gives me a real-time view of the system's health. I even set up PagerDuty alerts for when p99 latency exceeds 200ms or cache hit rate drops below 80%.
+That was the beginning. But over time, UwU Bot slowly turned into a playground.
 
-The text transformation itself is more sophisticated than you might expect. It's not just regex replacements — there's a context-aware parser that avoids transforming URLs, code blocks, and mentions. The "intensity" setting controls how aggressively the transformation is applied, from subtle letter replacements at level 1 to full uwu-speak with kaomoji at level 5. Each level has its own transformation pipeline, and they're composable so new transformations can be added without touching existing ones.
+A friend from university and I worked on the repository together and kept adding small, stupid commands that connected to the games and services we used: League of Legends, osu!, and various third-party APIs. It became the project that made me genuinely comfortable with programming.
 
-The whole thing runs on three $10 VPS instances and handles peak loads of ~5,000 messages/second with p99 latency under 100ms. Not bad for a joke bot. The project taught me that scaling isn't about big servers — it's about smart architecture, good caching, and knowing where your bottlenecks are before they become problems.`,
-    year: "2023",
+We added a fake currency betting system, a food recipe suggester, Hangman, and even a fully working 2048 game. At some point, the project had grown enough that we decided to rewrite the whole thing in TypeScript. That rewrite became UwU Bot v2.
+
+With v2, we tried to apply everything we had learned during our first few semesters of university and from our private programming projects. The main idea was to create an opinionated, unified command system that made adding new commands easier and more consistent.
+
+And honestly, it worked pretty well.
+
+Looking back, I probably would not build it with the same class-based approach today. I would likely keep it much simpler, using plain objects with handler functions and command types. But at the time, it felt like a proper, well-structured system, and it taught me a lot.
+
+After graduation, development sadly slowed down quite a bit. But then LLMs became more accessible, and suddenly I found a new use case for the bot.
+
+I wanted UwU Bot to feel less like a tool and more like a “real” member of our Discord server.
+
+To make that happen, I added a vector database running on my VPS, along with a hook that embeds every message. I also built a system that tracks message context for each user, allowing the bot to learn about people’s personalities and respond to them more appropriately.
+
+That sounds useful, right?
+
+Well, mostly we use it to roast each other.
+
+But it also works surprisingly well as a search interface for old Discord messages and shared context. It can remember inside jokes, bring up past conversations, and generally make the server feel more alive.
+
+UwU Bot has given us countless laughs over the years. What started as a dumb anime joke became one of the projects that taught me the most about programming, collaboration, rewriting code, APIs, TypeScript, and now even LLMs.
+
+It is stupid, messy, and weirdly useful.`,
+    year: "2021-today",
   },
   {
     id: "project-epsilon",

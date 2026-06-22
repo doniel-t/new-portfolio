@@ -6,6 +6,7 @@ export type TechIconKey =
   | "go"
   | "python"
   | "postgres"
+  | "supabase"
   | "strapi"
   | "payload"
   | "docker"
@@ -50,6 +51,7 @@ export const TECH_STACK_CATEGORIES_DATA: TechStackDataCategory[] = [
       { name: "Go", cost: 14, iconKey: "go", description: "High Performance" },
       { name: "Python", cost: 10, iconKey: "python", description: "Automation & AI" },
       { name: "Postgres", cost: 11, iconKey: "postgres", description: "Relational DB" },
+      { name: "Supabase", cost: 12, iconKey: "supabase", description: "Backend Platform" },
       { name: "Nginx", cost: 8, iconKey: "nginx", description: "Reverse Proxy" },
     ],
   },
