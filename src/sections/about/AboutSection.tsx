@@ -784,10 +784,10 @@ function AboutTechCursor() {
 
 function Scene() {
   return (
-    <div className="shader-frame h-full w-full opacity-10">
+    <div className="shader-frame h-full w-full opacity-10 scale-x-200">
       <PortalFieldCollection
         variant="flow-field"
-        speed={0.2}
+        speed={0.5}
         size={1.5}
         length={4}
         density={10}
