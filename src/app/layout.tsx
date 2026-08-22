@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Staatliches } from "next/font/google";
+import "@designcodeio/threeui/style.css";
 import "./globals.css";
 import InitialLoadTransition from "@/components/InitialLoadTransition";
 import { SITE_METADATA_CONTENT } from "@/data/site/metadata";

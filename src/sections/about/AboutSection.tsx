@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, ExternalLink, Github } from "lucide-react";
-import BackgroundLineArt from "@/components/BackgroundLineArt";
 import PixelDivider from "@/components/PixelDivider";
 import TargetCursor from "@/components/TargetCursor";
 import {
@@ -34,10 +33,16 @@ import {
   FaUser,
 } from "react-icons/fa";
 
-const Dither = dynamic(() => import("@/components/Dither"), {
-  ssr: false,
-  loading: () => null,
-});
+const PortalFieldCollection = dynamic(
+  () =>
+    import("@designcodeio/threeui/components/PortalFieldCollection").then(
+      (module) => module.PortalFieldCollection
+    ),
+  {
+    ssr: false,
+    loading: () => <div className="h-full w-full bg-[#0a0a0a]" />,
+  }
+);
 
 const CORE_STACK_ITEMS = ABOUT_CONTENT.coreStackNames.map((name) =>
   TECH_STACK_ITEMS.find((item) => item.name === name)
@@ -777,11 +782,26 @@ function AboutTechCursor() {
   );
 }
 
-function SectionDitherBackdrop() {
-  const prefersReducedMotion = useReducedMotion();
+function Scene() {
+  return (
+    <div className="shader-frame h-full w-full opacity-10">
+      <PortalFieldCollection
+        variant="flow-field"
+        speed={0.2}
+        size={1.5}
+        length={4}
+        density={10}
+        opacity={1}
+        hue={9}
+        saturation={0.2}
+        brightness={0.05}
+      />
+    </div>
+  );
+}
+
+function SectionPortalBackdrop() {
   const layerRef = React.useRef<HTMLDivElement>(null);
-  const ditherStartedRef = React.useRef(false);
-  const [hasDitherStarted, setHasDitherStarted] = React.useState(false);
 
   React.useEffect(() => {
     const layer = layerRef.current;
@@ -797,39 +817,24 @@ function SectionDitherBackdrop() {
       frameId = 0;
 
       const sectionRect = aboutSection.getBoundingClientRect();
-      const layerRect = layer.getBoundingClientRect();
-      const visibleTop = Math.max(sectionRect.top, layerRect.top);
-      const visibleBottom = Math.min(sectionRect.bottom, layerRect.bottom);
-      const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+      const visibleTop = Math.max(0, sectionRect.top);
+      const visibleBottom = Math.min(window.innerHeight, sectionRect.bottom);
 
-      if (visibleHeight <= 1 || sectionRect.top >= window.innerHeight || sectionRect.bottom <= 0) {
+      if (visibleBottom <= visibleTop) {
         layer.style.opacity = "0";
         layer.style.clipPath = "inset(50% 0px 50% 0px)";
-        layer.style.setProperty("-webkit-clip-path", "inset(50% 0px 50% 0px)");
         return;
       }
 
-      if (!ditherStartedRef.current) {
-        ditherStartedRef.current = true;
-        setHasDitherStarted(true);
-      }
-
-      const topClip = Math.max(0, visibleTop - layerRect.top);
-      const bottomClip = Math.max(0, layerRect.bottom - visibleBottom);
-      const opacity = Math.min(1, (visibleHeight / layerRect.height) * 1.2) * 0.11;
-      const clipValue = `inset(${topClip.toFixed(1)}px 0px ${bottomClip.toFixed(1)}px 0px)`;
-
-      layer.style.opacity = opacity.toFixed(3);
-      layer.style.clipPath = clipValue;
-      layer.style.setProperty("-webkit-clip-path", clipValue);
+      const bottomClip = Math.max(0, window.innerHeight - visibleBottom);
+      layer.style.opacity = "1";
+      layer.style.clipPath = `inset(${visibleTop.toFixed(1)}px 0px ${bottomClip.toFixed(1)}px 0px)`;
     };
 
     const scheduleUpdate = () => {
-      if (frameId !== 0) {
-        return;
+      if (frameId === 0) {
+        frameId = window.requestAnimationFrame(updateBounds);
       }
-
-      frameId = window.requestAnimationFrame(updateBounds);
     };
 
     updateBounds();
@@ -849,28 +854,14 @@ function SectionDitherBackdrop() {
   return (
     <div
       ref={layerRef}
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-1 h-[clamp(7rem,16svh,11rem)] opacity-0"
+      className="pointer-events-none fixed inset-0 z-0 opacity-0"
       style={{
         clipPath: "inset(50% 0px 50% 0px)",
-        WebkitClipPath: "inset(50% 0px 50% 0px)",
-        maskImage: "linear-gradient(to bottom, transparent 0%, black 44%, black 100%)",
-        WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 44%, black 100%)",
         willChange: "clip-path, opacity",
       }}
       aria-hidden
     >
-      {hasDitherStarted ? (
-        <Dither
-          waveColor={[166 / 255, 159 / 255, 141 / 255]}
-          disableAnimation={Boolean(prefersReducedMotion)}
-          enableMouseInteraction={false}
-          enableOnMobile
-          colorNum={2}
-          waveAmplitude={0.08}
-          waveFrequency={2}
-          waveSpeed={0.05}
-        />
-      ) : null}
+      <Scene />
     </div>
   );
 }
@@ -1135,35 +1126,13 @@ export default function AboutSection() {
         data-snap-section="work"
         data-navbar-variant="bright"
         aria-labelledby="about-software-engineer"
-        className="relative w-full overflow-x-clip py-24 sm:py-32"
+        className="relative isolate w-full bg-[#0a0a0a] py-24 sm:py-32"
       >
-        <div className="absolute inset-0 -z-10 bg-[#0d0b08]" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(115deg,rgba(212,205,196,0.08),transparent_28%,rgba(166,159,141,0.08)_72%,transparent)]" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-56 bg-[linear-gradient(180deg,#0d0b08_0%,rgba(13,11,8,0.94)_26%,rgba(13,11,8,0)_100%)]" aria-hidden />
-        <div className="absolute inset-0 -z-10 opacity-45" style={SCANLINE_STYLE} />
-        <BackgroundLineArt className="opacity-55" />
+        <SectionPortalBackdrop />
 
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 hidden sm:block"
-          style={{
-            background:
-              "linear-gradient(to right, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) 12px 0 / 1px 100% no-repeat, " +
-              "linear-gradient(to right, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) calc(100% - 12px) 0 / 1px 100% no-repeat, " +
-              "linear-gradient(to bottom, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) 0 12px / 100% 1px no-repeat, " +
-              "linear-gradient(to bottom, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) 0 calc(100% - 12px) / 100% 1px no-repeat, " +
-              "linear-gradient(to right, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) 36px 0 / 1px 100% no-repeat, " +
-              "linear-gradient(to right, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) calc(100% - 36px) 0 / 1px 100% no-repeat, " +
-              "linear-gradient(to bottom, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) 0 36px / 100% 1px no-repeat, " +
-              "linear-gradient(to bottom, rgba(166,159,141,0.20), rgba(166,159,141,0.20)) 0 calc(100% - 36px) / 100% 1px no-repeat",
-          }}
-        />
         <div className="relative z-10 mx-auto w-full max-w-368 px-6 sm:px-8 lg:px-10">
           <InViewAboutBlock />
         </div>
-
-        <SectionDitherBackdrop />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-40 bg-[linear-gradient(180deg,rgba(13,11,8,0)_0%,#0d0b08_100%)]" aria-hidden />
       </section>
     </>
   );

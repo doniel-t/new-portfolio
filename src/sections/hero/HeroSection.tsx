@@ -51,7 +51,6 @@ export default function HeroSection() {
     >
       {/* Dither effect background for hero section */}
       <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
-        
           <Dither
             waveColor={[165 / 100, 158 / 100, 141 / 100]}
             disableAnimation={false}
