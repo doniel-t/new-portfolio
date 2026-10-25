@@ -583,12 +583,25 @@ function HobbiesSection() {
   const scrollToSection = useSectionScroll();
   const [expandedCard, setExpandedCard] = React.useState<number | null>(null);
   const [dissolveActive, setDissolveActive] = React.useState(false);
+  const [shouldRenderAurora, setShouldRenderAurora] = React.useState(false);
   const pendingCardRef = React.useRef<number | null>(null);
   const isClosingRef = React.useRef(false);
   const hobbyRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const auroraRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
+    const desktopQuery = window.matchMedia("(min-width: 769px)");
+    const syncAuroraVisibility = () => setShouldRenderAurora(desktopQuery.matches);
+
+    syncAuroraVisibility();
+    desktopQuery.addEventListener("change", syncAuroraVisibility);
+
+    return () => desktopQuery.removeEventListener("change", syncAuroraVisibility);
+  }, []);
+
+  React.useEffect(() => {
+    if (!shouldRenderAurora) return;
+
     const section = sectionRef.current;
     const aurora = auroraRef.current;
     if (!section || !aurora) return;
@@ -615,7 +628,7 @@ function HobbiesSection() {
       window.removeEventListener("scroll", onScroll);
       if (rafId) window.cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [shouldRenderAurora]);
 
   const handleExpandCard = React.useCallback((index: number) => {
     pendingCardRef.current = index;
@@ -655,15 +668,23 @@ function HobbiesSection() {
       id="hobbies"
       data-snap-section="hobbies"
       ref={sectionRef}
-      className="relative bg-[#f6f4ef]"
+      className="hobbies-section relative bg-[#f6f4ef]"
     >
-      <div
-        ref={auroraRef}
-        className="absolute inset-x-0 top-0 h-screen z-1 pointer-events-none overflow-hidden"
-      >
-        <Aurora colorStops={['#f7dd88', '#7147fc', '#ff0d96']} amplitude={isMobile ? 0.3 : 0.8} speed={0.4} blend={0.7} grainAmount={0.09}/>
-      </div>
-      <div className="absolute inset-0 work-section-noise pointer-events-none z-0 opacity-30" />
+      {shouldRenderAurora ? (
+        <div
+          ref={auroraRef}
+          className="pointer-events-none absolute inset-x-0 top-0 z-1 hidden h-screen overflow-hidden md:block"
+        >
+          <Aurora
+            colorStops={['#f7dd88', '#7147fc', '#ff0d96']}
+            amplitude={0.8}
+            speed={0.4}
+            blend={0.7}
+            grainAmount={0.09}
+          />
+        </div>
+      ) : null}
+      <div className="work-section-noise pointer-events-none absolute inset-0 z-0 hidden opacity-30 md:block" />
 
       <HobbiesScrollSpyLayer
         sectionRef={sectionRef}
