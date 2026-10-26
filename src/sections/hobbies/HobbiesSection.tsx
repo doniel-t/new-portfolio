@@ -201,7 +201,23 @@ const HobbyLane = React.memo(function HobbyLane({
   }, [cardIndex, registerRef]);
 
   return (
-    <article id={`hobby-${cardIndex}`} data-hobby-index={cardIndex} ref={setRef}
+    <motion.article id={`hobby-${cardIndex}`} data-hobby-index={cardIndex} ref={setRef}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.1, margin: "-8% 0px -16% 0px" }}
+      variants={{
+        hidden: {
+          opacity: reducedMotion ? 1 : 0.15,
+          filter: reducedMotion ? "blur(0px)" : "blur(12px)",
+          y: reducedMotion ? 0 : 20,
+        },
+        show: {
+          opacity: 1,
+          filter: "blur(0px)",
+          y: 0,
+          transition: { duration: reducedMotion ? 0 : 0.85, ease: EASE_OUT },
+        },
+      }}
       className={`hobby-story ${cardIndex % 2 ? "hobby-story--reverse" : ""}`}
       aria-labelledby={`hobby-title-${cardIndex}`}>
       {!reducedMotion ? <>
@@ -216,9 +232,7 @@ const HobbyLane = React.memo(function HobbyLane({
             direction={cardIndex % 2 ? "right" : "left"} fadeTo={cardIndex % 2 ? "right" : "left"} />
         </div>
       </> : null}
-      <motion.figure className="hobby-print" initial={false}
-        whileInView={reducedMotion ? undefined : { y: [20, 0] }}
-        viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.7, ease: EASE_OUT }}>
+      <figure className="hobby-print">
         <div className="hobby-print-backing" aria-hidden="true" />
         <button type="button" onClick={onExpand} className="hobby-print-image"
           aria-label={`View ${card.title} details`} aria-haspopup="dialog">
@@ -227,7 +241,7 @@ const HobbyLane = React.memo(function HobbyLane({
           <span className="hobby-print-open" aria-hidden="true"><ArrowUpRight size={22} /></span>
         </button>
         {card.quote ? <figcaption className="hobby-print-caption">{card.quote}</figcaption> : null}
-      </motion.figure>
+      </figure>
 
       <div className="hobby-story-copy">
         <h3 id={`hobby-title-${cardIndex}`}>{card.title}</h3>
@@ -245,7 +259,7 @@ const HobbyLane = React.memo(function HobbyLane({
           More about this<ArrowUpRight size={19} aria-hidden="true" />
         </button>
       </div>
-    </article>
+    </motion.article>
   );
 });
 
