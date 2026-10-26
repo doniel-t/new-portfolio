@@ -23,6 +23,7 @@ import ExpandedProjectModal from "@/sections/work/ExpandedProjectModal";
 import LocalTimeClient from "./LocalTime";
 import ProjectToolIcons from "./ProjectToolIcons";
 import TouchGrassPrint from "./TouchGrassPrint";
+import "./about-editorial.css";
 
 const PortalFieldCollection = dynamic(
   () =>
@@ -31,7 +32,7 @@ const PortalFieldCollection = dynamic(
     ),
   {
     ssr: false,
-    loading: () => <div className="h-full w-full bg-[#0a0a0a]" />,
+    loading: () => <div className="h-full w-full bg-[#0d0b08]" />,
   }
 );
 
@@ -75,8 +76,8 @@ function useTypewriter(texts: readonly string[], typeSpeed = 80, pauseDuration =
 
 function PortraitStamp() {
   return (
-    <figure className="relative w-full max-w-52.5 sm:max-w-57.5 lg:max-w-61.5">
-      <div className="relative aspect-3/4 overflow-hidden rounded-xl">
+    <figure className="about-portrait relative w-full max-w-52.5 sm:max-w-57.5 lg:max-w-61.5">
+      <div className="about-portrait__image relative aspect-3/4 overflow-hidden">
         <Image
           alt={ABOUT_CONTENT.portrait.alt}
           src="/me crop pixel.png"
@@ -102,7 +103,7 @@ function VibeSignal() {
 
 function RailNamePlate() {
   return (
-    <div className="py-2 lg:pt-6">
+    <div className="about-nameplate py-2 lg:pt-6">
       <p className="font-display text-4xl uppercase leading-none text-[#f4eee3] sm:text-5xl">
         {ABOUT_CONTENT.rail.name}
       </p>
@@ -179,20 +180,20 @@ function useCardReveal() {
   return { textReveal, cardReveal };
 }
 
-const ABOUT_CARD_CLASS_NAME = "max-w-3xl rounded-xl bg-[#121210]/85 px-6 py-8 sm:p-10 xl:p-12";
+const ABOUT_CARD_CLASS_NAME = "about-editorial-panel max-w-3xl";
 
 function SoftwareEngineerView() {
   const { textReveal, cardReveal } = useCardReveal();
   return (
     <FadeInView id="about-software-engineer" className="relative pt-0" revealOnce>
       <motion.div variants={cardReveal} className={ABOUT_CARD_CLASS_NAME}>
-        <motion.h2 variants={textReveal} className="font-display text-5xl uppercase leading-none text-[#f4eee3] sm:text-6xl xl:text-7xl">
-          {ABOUT_CONTENT.views.profile.title}
+        <motion.h2 variants={textReveal} aria-label={ABOUT_CONTENT.views.profile.title} className="about-profile-title font-display uppercase leading-none">
+          <span>Software</span>{" "}<span className="about-paper-label">Engineer</span>
         </motion.h2>
-        <motion.p variants={textReveal} className="mt-6 max-w-2xl text-xl leading-relaxed tracking-[-0.015em] text-[#d4cdc4] sm:text-2xl">
+        <motion.p variants={textReveal} className="about-profile-lead mt-6 max-w-2xl text-xl leading-relaxed tracking-[-0.015em] text-[#d4cdc4] sm:text-2xl">
           {ABOUT_CONTENT.summary.lead}
         </motion.p>
-        <motion.dl variants={textReveal} className="mt-7 grid max-w-sm grid-cols-2 gap-6">
+        <motion.dl variants={textReveal} className="about-experience-stats mt-7 grid max-w-sm grid-cols-2 gap-6">
           {ABOUT_CONTENT.profileStats.map((stat, index) => (
             <div key={stat.label} className="flex flex-col">
               <dt className="mt-1 text-xs text-[#d4cdc4]/65">{index === 0 ? "Years coding" : "Years professional"}</dt>
@@ -215,7 +216,7 @@ function SoftwareEngineerView() {
           </ul>
         </motion.div>
 
-        <motion.section variants={textReveal} aria-labelledby="about-experience-title" className="mt-8 sm:mt-10">
+        <motion.section variants={textReveal} aria-labelledby="about-experience-title" className="about-experience mt-8 sm:mt-10">
           <h3 id="about-experience-title" className="mb-5 text-sm font-medium text-[#d4cdc4]/65">Experience</h3>
           <div className="space-y-6">
             {ABOUT_CONTENT.experience.map((item, index) => (
@@ -832,7 +833,7 @@ export default function AboutSection() {
         data-snap-section="work"
         data-navbar-variant="bright"
         aria-labelledby="about-software-engineer"
-        className="relative isolate w-full bg-[#0a0a0a] font-sans py-24 sm:py-32"
+        className="about-editorial relative isolate w-full bg-[#0d0b08] font-sans py-24 sm:py-32"
       >
         <SectionPortalBackdrop />
         <div className="about-background-grain" aria-hidden="true" />

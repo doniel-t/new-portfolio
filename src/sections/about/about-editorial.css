@@ -1,0 +1,114 @@
+/* The hero's printed-paper language, carried onto a dark photographic surface. */
+.about-editorial {
+  --about-paper: #f5f3ef;
+  --about-pink: #f6a7e4;
+  --about-blue: #1900ed;
+  color: var(--about-paper);
+}
+
+.about-editorial ::selection { color: #1900ed; background: var(--about-pink); }
+.about-editorial .about-background-grain {
+  opacity: .055;
+  filter: none;
+  /* Meet the solid pixel dividers without a visible texture seam. */
+  mask-image: linear-gradient(to bottom, transparent, #000 160px, #000 calc(100% - 160px), transparent);
+}
+.about-editorial-panel { position: relative; padding: 0 0 44px; }
+.about-editorial-panel > h2 {
+  color: var(--about-paper);
+  font-size: clamp(48px, 4.8vw, 74px);
+  letter-spacing: -.025em;
+}
+.about-profile-title { padding-top: 8px; }
+.about-profile-title > span { display: table; }
+.about-paper-label {
+  position: relative;
+  margin: 10px 0 0 -7px;
+  padding: 3px 12px 0;
+  color: #1900ed;
+  background: var(--about-pink);
+  transform: rotate(-3deg);
+}
+.about-profile-lead {
+  margin-top: 36px;
+  max-width: 32ch;
+  color: var(--about-paper);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(24px, 2.2vw, 32px);
+  font-style: italic;
+  line-height: 1.35;
+}
+.about-experience-stats { margin-top: 32px; padding-block: 22px; border-block: 1px solid #f5f3ef30; }
+.about-experience-stats dd { color: var(--about-pink); }
+.about-experience h3 { color: var(--about-paper); }
+.about-experience article + article { border-top: 1px solid #f5f3ef20; padding-top: 20px; }
+.about-experience article > span { color: var(--about-pink); }
+.about-editorial-panel > h2:not(.about-profile-title) { border-top: 1px solid #f5f3ef40; padding-top: 30px; }
+
+.about-portrait { margin: 8px 0 0 6px; transform: rotate(-4deg); }
+.about-portrait::before {
+  content: "";
+  position: absolute;
+  inset: -8px 10px 8px -10px;
+  background: var(--about-paper);
+  transform: rotate(7deg);
+}
+.about-portrait__image {
+  background: #101010;
+  box-shadow: -3px 0 0 #6552ff, 3px 0 0 #f6a7e4, -10px 18px 32px #0006;
+}
+.about-portrait__image img { filter: grayscale(1) contrast(1.2); }
+.about-portrait::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: url('/about-grain.png') repeat;
+  background-size: 192px;
+  opacity: .18;
+}
+.about-nameplate { margin-top: 18px; }
+.about-nameplate > p:first-child {
+  display: table;
+  padding: 5px 8px 2px;
+  margin-left: -4px;
+  background: var(--about-paper);
+  color: #1900ed;
+  transform: rotate(-2deg);
+}
+.about-nameplate dl { max-width: 260px; border-top: 1px solid #f5f3ef30; padding-top: 20px; }
+.about-nameplate dd { color: var(--about-paper); }
+.about-nameplate > div:last-child { color: var(--about-pink); }
+.about-editorial .about-tech-card { border-radius: 0; }
+.about-editorial .about-tech-card:hover { background: #f6a7e40c; }
+.about-editorial .about-tech-card:focus-visible { outline-color: var(--about-pink); }
+
+.about-editorial .touch-grass-print__paper::before { background: var(--about-pink); }
+.about-editorial .touch-grass-print__paper { box-shadow: -12px 22px 38px #0008; }
+.about-editorial .touch-grass-print__image { filter: saturate(.65) contrast(1.12); }
+
+@media (min-width: 1280px) {
+  .about-editorial .about-content-column { padding-right: 280px; }
+  .about-editorial .touch-grass-print { top: 160px; right: -290px; width: 250px; transform: rotate(7deg); }
+}
+@media (min-width: 1024px) {
+  .about-editorial > .relative.z-10 { padding-inline: clamp(40px, 5vw, 80px); }
+}
+@media (min-width: 640px) and (max-width: 1279px) {
+  .about-editorial #about-software-engineer { padding-bottom: 100px; }
+  .about-editorial .touch-grass-print { top: auto; bottom: -40px; width: 130px; }
+}
+@media (max-width: 639px) {
+  .about-editorial { padding-top: 72px; }
+  .about-editorial-panel > h2 { font-size: clamp(46px, 12vw, 64px); }
+  .about-nameplate { margin-top: 0; }
+  .about-nameplate > p:first-child { font-size: 29px; }
+  .about-nameplate dl { gap: 12px; margin-top: 16px; padding-top: 14px; }
+  .about-nameplate > div:last-child { font-size: 18px; margin-top: 12px; }
+  .about-profile-lead { max-width: 30ch; font-size: 25px; }
+  .about-editorial #about-software-engineer { padding-bottom: 150px; }
+  .about-editorial .touch-grass-print { top: auto; bottom: -26px; right: 12px; width: 130px; }
+  .about-experience article { flex-wrap: wrap; gap: 10px; }
+  .about-experience article > div { flex-basis: calc(100% - 36px); }
+  .about-experience article > p { padding-left: 28px; }
+}
