@@ -3,11 +3,10 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { AnimatePresence, motion, useInView } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
-import DecodingWord from "@/components/DecodingWord";
-import HorizontalPixelDivider from "@/components/HorizontalPixelDivider";
 import PixelDivider from "@/components/PixelDivider";
+import HorizontalPixelDivider from "@/components/HorizontalPixelDivider";
 import PixelDissolveOverlay from "@/components/PixelDissolveOverlay";
 import { HOBBIES } from "@/data/hobbies/cards";
 import { HOBBIES_CONTENT } from "@/data/hobbies/content";
@@ -15,6 +14,7 @@ import type { HobbyCard as HobbyCardType } from "@/data/hobbies/types";
 import { useSectionScroll } from "@/hooks/useSectionScroll";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import ExpandedHobbyModal from "./ExpandedHobbyModal";
+import "./hobbies-editorial.css";
 
 const Aurora = dynamic(() => import("@/components/Aurora"), {
   ssr: false,
@@ -23,7 +23,7 @@ const Aurora = dynamic(() => import("@/components/Aurora"), {
 
 const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const HOBBIES_CONTENT_SHELL =
-  "pl-[5%] pr-[5%] lg:pl-[10%] min-[2000px]:mx-auto min-[2000px]:max-w-[1600px] min-[2000px]:px-0";
+  "hobbies-shell";
 
 function ScrollSpy({
   activeIndex,
@@ -165,374 +165,112 @@ const HobbiesScrollSpyLayer = React.memo(function HobbiesScrollSpyLayer({
   );
 });
 
-const HobbiesHeader = React.memo(function HobbiesHeader({
-  isInViewOnce,
-  isMobile,
-}: {
-  isInViewOnce: boolean;
-  isMobile: boolean;
-}) {
+function HobbiesHeader({ onNavigate }: { onNavigate: (targetId: string) => void }) {
   return (
-    <motion.div
-      initial="hidden"
-      animate={isInViewOnce ? "show" : "hidden"}
-      variants={{
-        hidden: {},
-        show: {
-          transition: { staggerChildren: isMobile ? 0 : 0.15, delayChildren: isMobile ? 0 : 0.05 },
-        },
-      }}
-    >
-      <motion.div
-        variants={{
-          hidden: { opacity: 0, y: isMobile ? 0 : 12 },
-          show: {
-            opacity: 1,
-            y: 0,
-            transition: { duration: isMobile ? 0.3 : 0.5, ease: [0.16, 1, 0.3, 1] },
-          },
-        }}
-        className="flex flex-wrap items-center gap-3 mb-3"
-      >
-        <span className="font-mono text-sm tracking-widest text-foreground/55">{HOBBIES_CONTENT.eyebrow}</span>
-
-      </motion.div>
-
-      <motion.h2
-        variants={{
-          hidden: { opacity: 0, y: isMobile ? 0 : 12 },
-          show: {
-            opacity: 1,
-            y: 0,
-            transition: { duration: isMobile ? 0.3 : 0.6, ease: [0.16, 1, 0.3, 1] },
-          },
-        }}
-        className="font-display text-5xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight text-foreground drop-shadow-md mb-6"
-      >
-        {HOBBIES_CONTENT.title.split(" ").map((word, i, arr) => (
-          <span key={`hobby-title-${i}`} className="inline-block">
-            <DecodingWord word={word} />
-            {i < arr.length - 1 ? "\u00A0" : ""}
-          </span>
+    <header className="hobbies-header">
+      <div className="hobbies-heading-row">
+        <h2 id="hobbies-title">Hobbies <span>& Interests</span></h2>
+        <p>{HOBBIES_CONTENT.intro}</p>
+      </div>
+      <nav className="hobbies-index" aria-label="Explore my interests">
+        {HOBBIES.map((hobby, index) => (
+          <a key={hobby.title} href={`#hobby-${index}`} onClick={(event) => {
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            event.preventDefault();
+            onNavigate(`hobby-${index}`);
+          }}>
+            {hobby.shortTitle ?? hobby.title}<ArrowUpRight size={15} aria-hidden="true" />
+          </a>
         ))}
-      </motion.h2>
-
-      <motion.p
-        variants={{
-          hidden: { opacity: 0, y: isMobile ? 0 : 12 },
-          show: {
-            opacity: 1,
-            y: 0,
-            transition: {
-              duration: isMobile ? 0.3 : 0.6,
-              ease: [0.16, 1, 0.3, 1],
-              delay: isMobile ? 0 : 0.1,
-            },
-          },
-        }}
-        className="text-lg sm:text-xl text-foreground/70 font-medium max-w-prose"
-      >
-        {HOBBIES_CONTENT.intro}
-      </motion.p>
-    </motion.div>
+      </nav>
+    </header>
   );
-});
+}
 
 const HobbyLane = React.memo(function HobbyLane({
-  card,
-  cardIndex,
-  totalCards,
-  isMobile,
-  onExpand,
-  registerRef,
+  card, cardIndex, onExpand, registerRef,
 }: {
   card: HobbyCardType;
   cardIndex: number;
-  totalCards: number;
-  isMobile: boolean;
   onExpand: () => void;
   registerRef: (index: number, element: HTMLDivElement | null) => void;
 }) {
-  const laneRef = React.useRef<HTMLDivElement | null>(null);
-  const isInView = useInView(laneRef, {
-    once: true,
-    margin: isMobile ? "0px 0px -8% 0px" : "0px 0px 12% 0px",
-  });
-  const imageRight = !isMobile && cardIndex % 2 !== 0;
-  const spawnFromRight = cardIndex % 2 !== 0;
-
-  const laneVariants = React.useMemo(
-    () => ({
-      hidden: {
-        opacity: 0,
-        x: spawnFromRight ? (isMobile ? 36 : 96) : (isMobile ? -36 : -96),
-        filter: "blur(18px)",
-      },
-      show: {
-        opacity: 1,
-        x: 0,
-        filter: "blur(0px)",
-        transition: {
-          duration: isMobile ? 0.56 : 0.72,
-          ease: EASE_OUT,
-          opacity: { duration: isMobile ? 0.32 : 0.44, ease: "linear" },
-          filter: { duration: isMobile ? 0.44 : 0.58, ease: EASE_OUT },
-        },
-      },
-    }),
-    [isMobile, spawnFromRight],
-  );
-
-  const imageVariants = React.useMemo(
-    () => ({
-      hidden: { opacity: 1 },
-      show: {
-        opacity: 1,
-      },
-    }),
-    [],
-  );
-
-  const titleVariants = React.useMemo(
-    () => ({
-      hidden: { opacity: 1 },
-      show: {
-        opacity: 1,
-      },
-    }),
-    [],
-  );
-
-  const infoVariants = React.useMemo(
-    () => ({
-      hidden: { opacity: 1 },
-      show: {
-        opacity: 1,
-      },
-    }),
-    [],
-  );
-
-  const statsVariants = React.useMemo(
-    () => ({
-      hidden: { opacity: 1 },
-      show: {
-        opacity: 1,
-      },
-    }),
-    [],
-  );
-
-  const quoteVariants = React.useMemo(
-    () => ({
-      hidden: { opacity: 1 },
-      show: {
-        opacity: 1,
-      },
-    }),
-    [],
-  );
-
-  const setRefs = React.useCallback(
-    (element: HTMLDivElement | null) => {
-      laneRef.current = element;
-      registerRef(cardIndex, element);
-    },
-    [cardIndex, registerRef],
-  );
-
-  const titleWords = React.useMemo(() => card.title.split(" "), [card.title]);
+  const reducedMotion = useReducedMotion();
+  const setRef = React.useCallback((element: HTMLDivElement | null) => {
+    registerRef(cardIndex, element);
+  }, [cardIndex, registerRef]);
 
   return (
-    <motion.article
-      id={`hobby-${cardIndex}`}
-      data-hobby-index={cardIndex}
-      ref={setRefs}
-      variants={laneVariants}
-      initial="hidden"
-      animate={isInView ? "show" : "hidden"}
-      className="relative py-10 sm:py-14 will-change-[transform,opacity,filter]"
-    >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-8 sm:h-10 opacity-70">
-        <HorizontalPixelDivider
-          color={imageRight ? "#6c673b" : "#0d0b08"}
-          pixelSize={isMobile ? 20 : 30}
-          durationSec={6.8}
-          travel="220%"
-          streamsPerRow={1}
-          direction={imageRight ? "left" : "right"}
-          fadeTo={imageRight ? "left" : "right"}
-        />
-      </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 sm:h-10 opacity-60">
-        <HorizontalPixelDivider
-          color={imageRight ? "#0d0b08" : "#6c673b"}
-          pixelSize={isMobile ? 20 : 30}
-          durationSec={7.1}
-          travel="220%"
-          streamsPerRow={1}
-          direction={imageRight ? "right" : "left"}
-          fadeTo={imageRight ? "right" : "left"}
-        />
-      </div>
-
-      <div
-        aria-hidden
-        className={`absolute top-1/2 -translate-y-1/2 font-display leading-none text-[5.5rem] sm:text-[8rem] lg:text-[10rem] text-foreground/6 ${
-          imageRight ? "left-3 sm:left-8" : "right-3 sm:right-8"
-        }`}
-      >
-        {String(cardIndex + 1).padStart(2, "0")}
-      </div>
-
-      <div className="relative px-5 sm:px-8 lg:px-10">
-        <div className="mb-6 sm:mb-8 flex items-center gap-3">
-          <span className="font-mono text-[10px] sm:text-xs tracking-[0.18em] text-foreground/50">
-            [NODE_{String(cardIndex + 1).padStart(2, "0")}] / {String(totalCards).padStart(2, "0")}
-          </span>
-          <span className="h-px flex-1 bg-linear-to-r from-foreground/35 to-transparent" />
-          <span className="hidden sm:inline font-mono text-[10px] tracking-[0.18em] uppercase text-[#7a9a5a]/75">
-            ACTIVE FEED
-          </span>
+    <article id={`hobby-${cardIndex}`} data-hobby-index={cardIndex} ref={setRef}
+      className={`hobby-story ${cardIndex % 2 ? "hobby-story--reverse" : ""}`}
+      aria-labelledby={`hobby-title-${cardIndex}`}>
+      {!reducedMotion ? <>
+        <div className="hobby-pixels hobby-pixels--top" aria-hidden="true">
+          <HorizontalPixelDivider color={cardIndex % 2 ? "#6c673b" : "#0d0b08"}
+            pixelSize={24} durationSec={6.8} travel="220%" streamsPerRow={1}
+            direction={cardIndex % 2 ? "left" : "right"} fadeTo={cardIndex % 2 ? "left" : "right"} />
         </div>
-
-        <div className={`grid items-start gap-7 lg:gap-12 ${imageRight ? "lg:grid-cols-[0.92fr_1.08fr]" : "lg:grid-cols-[1.08fr_0.92fr]"}`}>
-          <motion.div variants={imageVariants} className={`relative ${imageRight ? "order-2" : "order-1"}`}>
-            <motion.button
-              type="button"
-              onClick={onExpand}
-              whileHover={isMobile ? {} : { scale: 1.01 }}
-              whileTap={isMobile ? {} : { scale: 0.99 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="group/image relative block w-full h-62.5 sm:h-82.5 lg:h-102.5 overflow-hidden rounded-xl bg-[#121210] cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e6c3a8]"
-              aria-label={`View ${card.title} details`}
-            >
-              <Image
-                src={card.image}
-                alt={card.title}
-                fill
-                className="object-cover transition-transform duration-500 ease-out group-hover/image:scale-[1.035] motion-reduce:transform-none motion-reduce:transition-none"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 680px"
-                loading="lazy"
-              />
-              <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-transparent" />
-            </motion.button>
-
-            <p className="mt-4 font-mono text-[10px] sm:text-xs uppercase tracking-[0.14em] text-foreground/55">
-              {card.items.join(" // ")}
-            </p>
-          </motion.div>
-
-          <div className={`relative ${imageRight ? "order-1" : "order-2"}`}>
-            <motion.h3 variants={titleVariants} className="font-display text-4xl sm:text-5xl lg:text-6xl leading-[0.96] tracking-tight text-foreground mb-6">
-              {titleWords.map((word, index) => (
-                <span key={`${card.title}-${word}-${index}`} className="inline-block mr-3">
-                  <DecodingWord word={word} />
-                </span>
-              ))}
-            </motion.h3>
-
-            <motion.div variants={infoVariants} className="mb-7 max-w-xl">
-              <p className="text-base sm:text-lg leading-relaxed text-foreground/75">
-                {card.description}
-              </p>
-            </motion.div>
-
-            <motion.div variants={statsVariants} className="space-y-4 mb-8">
-              {card.stats.map((stat) => (
-                <div key={stat.label} className="flex items-end gap-3 sm:gap-4">
-                  <span className="min-w-29.5 sm:min-w-36 font-mono text-[10px] sm:text-xs uppercase tracking-[0.15em] text-foreground/55">
-                    {stat.label}
-                  </span>
-                  <span className="h-px flex-1 bg-foreground/20 mb-1.75" />
-                  <span className="font-display text-xl sm:text-2xl text-foreground leading-none">
-                    <DecodingWord word={stat.value} />
-                  </span>
-                </div>
-              ))}
-            </motion.div>
-
-            {card.quote ? (
-              <motion.blockquote
-                variants={quoteVariants}
-                className="mb-8 border-l border-foreground/45 pl-4 font-mono text-sm sm:text-base italic text-foreground/58"
-              >
-                {card.quote}
-              </motion.blockquote>
-            ) : null}
-
-            <motion.button
-              variants={quoteVariants}
-              type="button"
-              onClick={onExpand}
-              whileHover={isMobile ? {} : { y: -2 }}
-              whileTap={isMobile ? {} : { scale: 0.98 }}
-              className="group inline-flex min-h-12 items-center justify-between gap-6 rounded-xl bg-[#121210] px-5 py-3 font-sans text-sm font-medium text-[#f4eee3] transition-colors duration-200 hover:bg-[#292824] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e6c3a8] cursor-pointer"
-            >
-              View Expanded
-              <ArrowUpRight size={18} aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transform-none" />
-            </motion.button>
-          </div>
+        <div className="hobby-pixels hobby-pixels--bottom" aria-hidden="true">
+          <HorizontalPixelDivider color={cardIndex % 2 ? "#0d0b08" : "#6c673b"}
+            pixelSize={24} durationSec={7.1} travel="220%" streamsPerRow={1}
+            direction={cardIndex % 2 ? "right" : "left"} fadeTo={cardIndex % 2 ? "right" : "left"} />
         </div>
+      </> : null}
+      <motion.figure className="hobby-print" initial={false}
+        whileInView={reducedMotion ? undefined : { y: [20, 0] }}
+        viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.7, ease: EASE_OUT }}>
+        <div className="hobby-print-backing" aria-hidden="true" />
+        <button type="button" onClick={onExpand} className="hobby-print-image"
+          aria-label={`View ${card.title} details`} aria-haspopup="dialog">
+          <Image src={card.image} alt={card.title} fill
+            className="object-cover" sizes="(max-width: 767px) 90vw, 48vw" loading="lazy" />
+          <span className="hobby-print-open" aria-hidden="true"><ArrowUpRight size={22} /></span>
+        </button>
+        {card.quote ? <figcaption className="hobby-print-caption">{card.quote}</figcaption> : null}
+      </motion.figure>
+
+      <div className="hobby-story-copy">
+        <h3 id={`hobby-title-${cardIndex}`}>{card.title}</h3>
+        <p className="hobby-description">{card.description}</p>
+        <dl className="hobby-facts">
+          {card.stats.map((stat) => (
+            <div key={stat.label}><dt>{stat.label}</dt><dd>{stat.value}</dd></div>
+          ))}
+        </dl>
+        <ul className="hobby-favorites" aria-label={`${card.title} favorites`}>
+          {card.items.map((item) => <li key={item}>{item}</li>)}
+        </ul>
+        <button type="button" onClick={onExpand} className="hobby-read-more" aria-haspopup="dialog"
+          aria-label={`More about ${card.title}`}>
+          More about this<ArrowUpRight size={19} aria-hidden="true" />
+        </button>
       </div>
-    </motion.article>
+    </article>
   );
 });
 
-const HobbiesRunway = React.memo(function HobbiesRunway({
-  isInViewOnce,
-  isMobile,
-  hobbyRefs,
-  onExpandCard,
-}: {
-  isInViewOnce: boolean;
-  isMobile: boolean;
+const HobbiesRunway = React.memo(function HobbiesRunway({ hobbyRefs, onExpandCard }: {
   hobbyRefs: HobbyRefs;
   onExpandCard: (index: number) => void;
 }) {
-  const setHobbyRef = React.useCallback(
-    (index: number, element: HTMLDivElement | null) => {
-      hobbyRefs.current[index] = element;
-    },
-    [hobbyRefs],
-  );
-
+  const setHobbyRef = React.useCallback((index: number, element: HTMLDivElement | null) => {
+    hobbyRefs.current[index] = element;
+  }, [hobbyRefs]);
   const expandHandlers = React.useMemo(
-    () => HOBBIES.map((_, index) => () => onExpandCard(index)),
-    [onExpandCard],
+    () => HOBBIES.map((_, index) => () => onExpandCard(index)), [onExpandCard],
   );
-
   return (
-    <motion.div
-      initial="hidden"
-      animate={isInViewOnce ? "show" : "hidden"}
-      variants={{
-        hidden: {},
-        show: {
-          transition: { staggerChildren: isMobile ? 0 : 0.12, delayChildren: isMobile ? 0 : 0.04 },
-        },
-      }}
-      className="relative"
-    >
+    <div className="hobbies-stories">
       {HOBBIES.map((card, cardIndex) => (
-        <HobbyLane
-          key={card.title}
-          card={card}
-          cardIndex={cardIndex}
-          totalCards={HOBBIES.length}
-          isMobile={isMobile}
-          onExpand={expandHandlers[cardIndex]}
-          registerRef={setHobbyRef}
-        />
+        <HobbyLane key={card.title} card={card} cardIndex={cardIndex}
+          onExpand={expandHandlers[cardIndex]} registerRef={setHobbyRef} />
       ))}
-    </motion.div>
+    </div>
   );
 });
 
 function HobbiesSection() {
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
   const sectionRef = React.useRef<HTMLElement | null>(null);
-  const isInViewOnce = useInView(containerRef, { once: true, margin: "0px 0px -20% 0px" });
   const isMobile = useIsMobile();
   const scrollToSection = useSectionScroll();
   const [expandedCard, setExpandedCard] = React.useState<number | null>(null);
@@ -621,6 +359,7 @@ function HobbiesSection() {
     <section
       id="hobbies"
       data-snap-section="hobbies"
+      aria-labelledby="hobbies-title"
       ref={sectionRef}
       className="hobbies-section relative bg-white md:bg-[#f6f4ef]"
     >
@@ -638,7 +377,7 @@ function HobbiesSection() {
           />
         </div>
       ) : null}
-      <div className="work-section-noise pointer-events-none absolute inset-0 z-0 hidden opacity-30 md:block" />
+      <div className="hobbies-background-grain" aria-hidden="true" />
 
       <HobbiesScrollSpyLayer
         sectionRef={sectionRef}
@@ -660,15 +399,13 @@ function HobbiesSection() {
         </div>
       </div>
 
-      <div ref={containerRef} className="relative z-1 pt-32 pb-20">
-        <div className={`${HOBBIES_CONTENT_SHELL} mb-16`}>
-          <HobbiesHeader isInViewOnce={isInViewOnce} isMobile={isMobile} />
+      <div className="hobbies-body relative z-1">
+        <div className={HOBBIES_CONTENT_SHELL}>
+          <HobbiesHeader onNavigate={handleHobbyNavigate} />
         </div>
 
         <div className={HOBBIES_CONTENT_SHELL}>
           <HobbiesRunway
-            isInViewOnce={isInViewOnce}
-            isMobile={isMobile}
             hobbyRefs={hobbyRefs}
             onExpandCard={handleExpandCard}
           />
