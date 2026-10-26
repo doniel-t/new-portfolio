@@ -5,12 +5,12 @@ export const PROJECTS: Project[] = [
     id: "project-live",
     slug: "ingolstadt-live",
     title: "PROJECT_LIVE",
-    previewDescription: "A real-time web app with accessible interfaces and fluid animations.",
+    previewDescription: "A CMS based Webapp that covers various topics around Ingolstadt",
     image: "/ingolstadt-project-dark.png",
     liveUrl: "https://ingolstadt.live",
     techStack: ["TypeScript", "Next.js", "React" , "Tailwind CSS"],
     description:
-      "A modern web application featuring real-time data synchronization and advanced UI animations. Built with performance and accessibility in mind.",
+      "A CMS based modern web application featuring real-time data synchronization and complex cache busting. Built with performance and accessibility in mind.",
     challenges:
       "Implementing efficient state management for real-time updates while maintaining smooth 60fps animations across all devices.",
     blogContent: `Ingolstadt Live started as a side project born out of frustration. I was looking for a single place to find what was happening around the city — events, news, local updates — and nothing really fit the bill. So I decided to build it myself.
@@ -31,7 +31,7 @@ Looking back, this project taught me more about performance optimization than an
   {
     id: "project-emsi",
     slug: "ems-platform",
-    title: "PROJECT_EMS",
+    title: "PROJECT_EMSi",
     previewDescription: "A full-stack web-app for event creation.",
     image: "/ingolstadt-project-dark.png",
     liveUrl: "https://ems.ingostadt.live",
@@ -61,7 +61,7 @@ This project reinforced my belief that type safety across the full stack isn't j
     id: "project-dnd",
     slug: "dnd-voting",
     title: "PROJECT_DND Campaign Tracker",
-    previewDescription: "An interactive 3D experience with custom shaders and procedural animation.",
+    previewDescription: "A website where me and my fellow players can give (in character) votes and it visualizes these stats.",
     image: "/dnd-voting.png",
     thumbnailImage: "/dnd-campaign-thumbnail-pixel.webp",
     repoUrl: "https://github.com/username/project-gamma",
@@ -168,11 +168,11 @@ It is stupid, messy, and weirdly useful.`,
     id: "project-epsilon",
     slug: "ri-rag",
     title: "PROJECT_RI_RAG",
-    previewDescription: "A cross-platform mobile app with offline support and real-time sync.",
+    previewDescription: "A realtime reaction image embedding engine that automatically makes each image (anime or photo) queryable with natural language using local models",
     image: "/ri-rag.png",
     thumbnailImage: "/ri-rag-thumbnail-pixel.webp",
     repoUrl: "https://github.com/username/project-epsilon",
-    techStack: ["React Native", "Expo", "Firebase", "TypeScript"],
+    techStack: ["Rust", "Ai-SDK", "CLI"],
     description:
       "Cross-platform mobile application with offline-first architecture and real-time synchronization. Delivers native-like performance on both iOS and Android.",
     challenges:
@@ -194,6 +194,6 @@ Bundle size optimization was an ongoing battle. React Native bundles can balloon
 The search interface uses a hybrid retrieval approach: first, a vector similarity search finds the top-k most relevant chunks, then a re-ranking step using BM25 scoring on the original text refines the results. This hybrid approach consistently outperforms either method alone, especially for queries that mix semantic meaning with specific keywords.
 
 Building this app changed how I think about mobile development. The constraints of mobile — limited memory, intermittent connectivity, battery concerns — force you to be thoughtful about every architectural decision. There's no room for the "just throw more resources at it" mentality that backend development sometimes enables. Every byte of memory and every CPU cycle matters, and that discipline makes you a better engineer.`,
-    year: "2022",
+    year: "2026",
   },
 ];

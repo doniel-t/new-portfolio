@@ -1,8 +1,8 @@
-import { Code2, DatabaseZap, Network, Sparkles, type LucideIcon } from "lucide-react";
+import { Code2, DatabaseZap, Network, Sparkles, Terminal, type LucideIcon } from "lucide-react";
 import type { IconType } from "react-icons";
 import {
   SiDiscord, SiExpo, SiFirebase, SiFramer, SiNextdotjs, SiNodedotjs,
-  SiPostgresql, SiPrisma, SiReact, SiSupabase, SiTailwindcss,
+  SiPostgresql, SiPrisma, SiReact, SiRust, SiSupabase, SiTailwindcss,
   SiThreedotjs, SiTrpc, SiTypescript, SiWebgl,
 } from "react-icons/si";
 
@@ -25,6 +25,8 @@ const TOOL_ICONS: Record<string, IconType | LucideIcon> = {
   "Node.js": SiNodedotjs,
   "Discord.js": SiDiscord,
   "Ai-SDK": Sparkles,
+  Rust: SiRust,
+  CLI: Terminal,
   Postgres: SiPostgresql,
   "React Native": SiReact,
   Expo: SiExpo,

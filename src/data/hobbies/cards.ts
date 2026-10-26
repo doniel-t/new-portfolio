@@ -32,15 +32,15 @@ export const HOBBIES: HobbyCard[] = [
   },
   {
     title: "Cycling",
-    items: ["Urban exploration", "Night rides", "Nature"],
+    items: ["Urban exploration", "Movement", "Nature", "Offline Time"],
     image: "/bike-bento-bg.png",
     description:
       "Riding the bike is a way for me to connect to nature. I use my gravel bike to ride alongside country roads near my home. Its the perfect way to unwind and challenge my body.",
     expandedText:
       "Cycling gives me the same focus loop that coding does, just without a screen. I map routes around quiet streets, river paths, and open stretches where I can keep a steady cadence. Night rides are my favorite because the city feels different when it is almost empty. If I am stuck on a problem, a ride usually helps me come back with a cleaner approach.",
     stats: [
-      { label: "Weekly Avg", value: "~80km" },
-      { label: "Favorite Time", value: "2-4 AM" },
+      { label: "Weekly Avg", value: "Too little T-T" },
+      { label: "Favorite Time", value: "Around 20:00" },
     ],
     quote: '"Life is movement"'
   },
