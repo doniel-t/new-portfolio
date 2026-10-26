@@ -92,6 +92,34 @@
 .about-editorial .about-tech-card:hover { background: #f6a7e40c; }
 .about-editorial .about-tech-card:focus-visible { outline-color: var(--about-pink); }
 
+.about-project-card {
+  position: relative;
+  isolation: isolate;
+  cursor: pointer;
+  border-radius: 16px;
+  margin: -12px -8px;
+  padding: 12px 8px;
+  transition: background-color 200ms;
+}
+.about-project-card:hover,
+.about-project-card:focus-within { background: #f6a7e40c; }
+.about-project-card h3 { transition: color 200ms; }
+.about-project-card:hover h3,
+.about-project-card:focus-within h3,
+.about-project-card:hover .about-project-read,
+.about-project-card:focus-within .about-project-read,
+.about-project-read:hover,
+.about-project-read:focus-visible { color: var(--about-pink); }
+.about-project-read { cursor: pointer; }
+.about-project-read::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.about-project-card a { position: relative; z-index: 1; }
+.about-project-read:focus-visible { outline-color: var(--about-pink); }
+
 .about-editorial .touch-grass-print__paper::before { background: var(--about-blue); }
 .about-editorial .touch-grass-print__paper { box-shadow: -12px 22px 38px #0008; }
 .about-editorial .touch-grass-print__image { filter: saturate(.65) contrast(1.12); }

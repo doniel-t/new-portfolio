@@ -1,0 +1,58 @@
+.project-detail {
+  --project-paper: #f5f3ef;
+  --project-muted: #bcb8b2;
+  --project-pink: #f6a7e4;
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #0d0b08;
+  color: var(--project-paper);
+  font-family: var(--font-geist-sans), sans-serif;
+  scrollbar-width: thin;
+  scrollbar-color: #f5f3ef40 #0d0b08;
+}
+.project-detail ::selection { color: #1900ed; background: var(--project-pink); }
+.project-detail :is(a, button):focus-visible { outline: 2px solid var(--project-pink); outline-offset: 6px; }
+.project-detail-dither {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .05;
+  mask-image: linear-gradient(to bottom, transparent, #000 15%, #000 40%, transparent 85%);
+}
+.project-detail-shell { position: relative; width: min(100%, 856px); margin-inline: auto; padding: 24px 48px 64px; }
+.project-detail-topbar { display: flex; align-items: center; min-height: 48px; }
+.project-detail-back { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--project-muted); font-size: 13px; cursor: pointer; }
+.project-detail :is(a, button) { transition: color 160ms ease-out; }
+.project-detail :is(a, button):hover { color: var(--project-pink); }
+.project-detail-intro { padding-block: 72px 40px; border-bottom: 1px solid #f5f3ef30; }
+.project-detail-intro h1 { max-width: 100%; font-family: var(--font-geist-pixel-grid), monospace; font-size: clamp(42px, 5.5vw, 68px); line-height: 1.08; letter-spacing: -.03em; font-weight: 400; text-wrap: balance; overflow-wrap: anywhere; outline: none; }
+.project-detail-lead { margin-top: 24px; max-width: 44ch; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(23px, 2.4vw, 29px); font-style: italic; line-height: 1.45; color: var(--project-paper); }
+.project-detail-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 16px 28px; margin-top: 28px; color: var(--project-muted); font-size: 12px; line-height: 1.8; }
+.project-detail-meta > span { flex-shrink: 0; }
+.project-detail-meta ul { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.project-detail-links { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 20px; }
+.project-detail-links a { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-size: 13px; text-decoration: underline; text-decoration-color: #f6a7e470; text-underline-offset: 6px; }
+.project-detail-story { padding-top: 40px; color: #d1cec8; font-size: 16px; line-height: 1.9; overflow-wrap: anywhere; }
+.project-detail-story > * + * { margin-top: 24px; }
+.project-detail-story blockquote { padding-inline: 24px; font-family: Georgia, 'Times New Roman', serif; font-size: 21px; line-height: 1.6; font-style: italic; color: var(--project-pink); }
+.project-detail-pagination { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 64px; padding-top: 24px; border-top: 1px solid #f5f3ef30; }
+.project-detail-pagination button { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-height: 60px; text-align: left; cursor: pointer; }
+.project-detail-pagination span { display: inline-flex; align-items: center; gap: 8px; color: var(--project-muted); font-size: 12px; }
+.project-detail-pagination strong { font-size: 16px; line-height: 1.45; font-weight: 400; overflow-wrap: anywhere; }
+.project-detail-pagination .project-detail-next { align-items: flex-end; text-align: right; }
+@media (max-width: 639px) {
+  .project-detail-shell { padding: 16px 24px 40px; }
+  .project-detail-intro { padding-block: 48px 28px; }
+  .project-detail-intro h1 { font-size: clamp(38px, 10vw, 54px); }
+  .project-detail-lead { margin-top: 20px; font-size: 23px; }
+  .project-detail-meta { margin-top: 24px; gap: 10px 24px; }
+  .project-detail-meta ul { flex-basis: 100%; }
+  .project-detail-story { padding-top: 28px; font-size: 15px; line-height: 1.85; }
+  .project-detail-pagination { margin-top: 48px; gap: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-detail :is(a, button) { transition: none; }
+}

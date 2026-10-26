@@ -284,7 +284,7 @@ function ProjectVisual({ project, displayTitle, index }: { project: Project; dis
           fill
           priority={false}
           sizes="(min-width: 640px) 176px, calc(100vw - 96px)"
-          className={`${image === "/ingolstadt-project-dark.png" ? "object-contain bg-[#0d0b08]" : "object-cover"} grayscale-12 saturate-[0.9] contrast-[1.02] transition duration-500 group-hover/project:scale-[1.025] group-hover/project:grayscale-0`}
+          className={`${image === "/ingolstadt-project-dark.png" ? "object-contain bg-[#0d0b08]" : "object-cover"} transition-transform duration-200 ease-out group-hover/project:scale-[1.025] motion-reduce:transition-none`}
         />
       ) : (
         <ProjectPlaceholder index={index} />
@@ -306,7 +306,7 @@ function ProjectListCard({
   const displayTitle = formatProjectTitle(project.title);
 
   return (
-    <article className="group/project grid gap-5 sm:grid-cols-[176px_minmax(0,1fr)] sm:gap-6">
+    <article className="about-project-card group/project grid gap-5 sm:grid-cols-[176px_minmax(0,1fr)] sm:gap-6">
       <ProjectVisual project={project} displayTitle={displayTitle} index={index} />
 
       <div className="flex min-w-0 flex-col">
@@ -329,7 +329,8 @@ function ProjectListCard({
           <button
             type="button"
             onClick={() => onOpen(project.id)}
-            className="inline-flex min-h-11 items-center gap-2 text-sm text-[#e6c3a8] underline-offset-4 transition-colors hover:text-[#f4eee3] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e6c3a8]"
+            aria-label={`Read about ${displayTitle}`}
+            className="about-project-read inline-flex min-h-11 items-center gap-2 text-sm text-[#e6c3a8] underline-offset-4 transition-colors hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e6c3a8]"
           >
             Read
             <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
