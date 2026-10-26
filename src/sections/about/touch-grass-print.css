@@ -1,0 +1,85 @@
+.touch-grass-print {
+  position: absolute;
+  z-index: 1;
+  top: calc(100% - 60px);
+  right: 22px;
+  width: 120px;
+  max-width: calc(100% - 32px);
+  margin: 0;
+  transform: rotate(6deg);
+}
+
+.touch-grass-print__paper {
+  position: relative;
+  background: #171715;
+  box-shadow: -10px 20px 36px #0007;
+}
+
+.touch-grass-print__paper::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 8px -9px -8px 9px;
+  background: #1900ed;
+  transform: rotate(-3deg);
+}
+
+.touch-grass-print__paper::after {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 34%;
+  width: 30%;
+  height: 22px;
+  background: #d4cdc4;
+  opacity: .65;
+  transform: rotate(-11deg);
+  clip-path: polygon(2% 0, 98% 3%, 96% 24%, 100% 43%, 97% 65%, 100% 98%, 0 100%, 3% 72%, 0 49%, 3% 23%);
+}
+
+.touch-grass-print__image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.touch-grass-print__caption {
+  margin-top: 16px;
+  color: #d4cdc4;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-size: 13px;
+  text-align: right;
+  transform: rotate(-3deg);
+}
+
+/* Keep the print in a side gutter, rather than giving it a row of its own. */
+@media (min-width: 1280px) {
+  .about-content-column {
+    padding-right: 250px;
+  }
+
+  .touch-grass-print {
+    top: calc(100% - 160px);
+    right: -250px;
+    width: 230px;
+    max-width: none;
+    margin: 0 16px 0 0;
+  }
+
+  .touch-grass-print__caption {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 639px) {
+  .touch-grass-print {
+    width: 110px;
+    right: 18px;
+    transform: rotate(5deg);
+  }
+
+  .touch-grass-print__caption {
+    display: none;
+  }
+}

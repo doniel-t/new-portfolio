@@ -291,6 +291,7 @@ function DitheredWaves({
   mouseRadius
 }: DitheredWavesProps) {
   const mouseRef = useRef(new THREE.Vector2());
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
   const { viewport, size, gl, invalidate } = useThree();
 
   const waveUniformsRef = useRef<WaveUniforms>({
@@ -309,7 +310,8 @@ function DitheredWaves({
     const dpr = gl.getPixelRatio();
     const newWidth = Math.floor(size.width * dpr);
     const newHeight = Math.floor(size.height * dpr);
-    const currentRes = waveUniformsRef.current.resolution.value;
+    const currentRes = materialRef.current?.uniforms.resolution.value;
+    if (!currentRes) return;
     if (currentRes.x !== newWidth || currentRes.y !== newHeight) {
       currentRes.set(newWidth, newHeight);
     }
@@ -369,7 +371,10 @@ function DitheredWaves({
   }, [enableMouseInteraction, gl, invalidate]);
 
   useFrame(({ clock }) => {
-    const u = waveUniformsRef.current;
+    // Fiber copies uniform entries when applying props. Animate the live
+    // material uniforms so scalar values such as time reach the shader.
+    const u = materialRef.current?.uniforms as WaveUniforms | undefined;
+    if (!u) return;
 
     if (!disableAnimation) {
       u.time.value = Math.floor(clock.getElapsedTime() * ANIMATION_FPS) / ANIMATION_FPS;
@@ -396,6 +401,7 @@ function DitheredWaves({
       <mesh scale={[viewport.width, viewport.height, 1]}>
         <planeGeometry args={[1, 1]} />
         <shaderMaterial
+          ref={materialRef}
           vertexShader={waveVertexShader}
           fragmentShader={waveFragmentShader}
           uniforms={waveUniformsRef.current}
