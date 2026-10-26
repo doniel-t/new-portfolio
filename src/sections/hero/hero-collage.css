@@ -9,7 +9,7 @@
   color: var(--paper);
 }
 .hero-collage ::selection { color: var(--ink); background: var(--pink); }
-.hero-collage .hero-dither { position: absolute; inset: 0; z-index: -2; opacity: .24; mix-blend-mode: multiply; pointer-events: none; }
+.hero-collage .hero-dither { position: absolute; inset: 0; z-index: -2; opacity: .34; mix-blend-mode: multiply; pointer-events: none; }
 .hero-collage .hero-action:focus-visible { outline: 2px solid var(--pink); outline-offset: 6px; }
 .hero-collage .hero-shell { max-width: 1520px; padding: 30px clamp(24px, 5vw, 80px) 24px; }
 .hero-collage .hero-masthead { position: relative; z-index: 3; }
@@ -94,10 +94,10 @@
 }
 
 /* Second paste-up: deliberately broken alignment and overlapping print layers. */
-.hero-collage .hero-shell { max-width: 1600px; }
+.hero-collage .hero-shell { width: min(100%, 1600px); max-width: 1600px; container-type: inline-size; }
 .hero-collage .hero-composition { grid-template-columns: 1.15fr 1fr; gap: 0; padding-block: 92px 110px; }
 .hero-collage .hero-copy { z-index: 3; gap: 32px; }
-.hero-collage .hero-heading-lead { position: relative; max-width: 100%; width: max-content; font-family: var(--font-geist-pixel-grid), monospace; font-weight: 700; font-size: clamp(80px, 9vw, 144px); line-height: .9; letter-spacing: -.055em; word-spacing: -.12em; }
+.hero-collage .hero-heading-lead { position: relative; max-width: 100%; width: max-content; font-family: var(--font-geist-pixel-grid), monospace; font-weight: 700; font-size: clamp(80px, 10.1cqw, 144px); line-height: .9; letter-spacing: -.055em; word-spacing: -.12em; }
 .hero-collage .hero-heading-lead .hero-word-0 { transform: none; }
 .hero-collage .hero-heading-lead .hero-word-1 { position: relative; z-index: 1; margin-left: 0; padding: 0; color: var(--pink); font-style: normal; transform: none; }
 .hero-collage .hero-heading-lead .hero-word-2 { display: block; margin-top: 0; margin-left: 0; transform: none; font-size: .82em; }

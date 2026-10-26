@@ -13,7 +13,10 @@ const TARGET_RENDER_HEIGHT = 1080;
 const ANIMATION_FPS = 30;
 
 function useCappedRenderDpr(ref: React.RefObject<HTMLElement | null>) {
-  const [renderDpr, setRenderDpr] = useState(1);
+  // Bound the very first frame too, before ResizeObserver measures the container.
+  const [renderDpr, setRenderDpr] = useState(() => typeof window === 'undefined' ? 1 : Math.min(
+    1, TARGET_RENDER_WIDTH / window.innerWidth, TARGET_RENDER_HEIGHT / window.innerHeight
+  ));
 
   useEffect(() => {
     const element = ref.current;
@@ -205,11 +208,15 @@ vec3 dither(vec2 uv, vec3 color) {
   int x = int(mod(scaledCoord.x, 8.0));
   int y = int(mod(scaledCoord.y, 8.0));
   float threshold = bayerMatrix8x8[y * 8 + x] - 0.25;
-  float step = 1.0 / (colorNum - 1.0);
+  // Fractional levels are part of the hero's inverted Bayer treatment.
+  // Guard only the singularity at 1; rounding changes the artwork.
+  float levelRange = colorNum - 1.0;
+  if (abs(levelRange) < 0.001) levelRange = 0.001;
+  float step = 1.0 / levelRange;
   color += threshold * step;
   float bias = 0.2;
   color = clamp(color - bias, 0.0, 1.0);
-  return floor(color * (colorNum - 1.0) + 0.5) / (colorNum - 1.0);
+  return clamp(floor(color * levelRange + 0.5) / levelRange, 0.0, 1.0);
 }
 
 void mainImage(in vec4 inputColor, in vec2 uv, out vec4 outputColor) {
@@ -293,6 +300,7 @@ function DitheredWaves({
   const mouseRef = useRef(new THREE.Vector2());
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const { viewport, size, gl, invalidate } = useThree();
+  const dpr = useThree((state) => state.viewport.dpr);
 
   const waveUniformsRef = useRef<WaveUniforms>({
     time: new THREE.Uniform(0),
@@ -307,7 +315,6 @@ function DitheredWaves({
   });
 
   useEffect(() => {
-    const dpr = gl.getPixelRatio();
     const newWidth = Math.floor(size.width * dpr);
     const newHeight = Math.floor(size.height * dpr);
     const currentRes = materialRef.current?.uniforms.resolution.value;
@@ -316,7 +323,7 @@ function DitheredWaves({
       currentRes.set(newWidth, newHeight);
     }
     invalidate();
-  }, [size, gl, invalidate]);
+  }, [size, dpr, invalidate]);
 
   const prevColor = useRef([...waveColor]);
   useEffect(() => {
@@ -408,7 +415,7 @@ function DitheredWaves({
         />
       </mesh>
 
-      <EffectComposer>
+      <EffectComposer multisampling={0}>
         <RetroEffect colorNum={colorNum} pixelSize={pixelSize} />
       </EffectComposer>
 
@@ -439,13 +446,13 @@ interface DitherProps {
 }
 
 function FallbackDither({ waveColor }: { waveColor: [number, number, number] }) {
-  const colorCss = `rgb(${Math.round(waveColor[0] * 255)}, ${Math.round(waveColor[1] * 255)}, ${Math.round(waveColor[2] * 255)})`;
+  const colorChannels = waveColor.map((channel) => Math.round(Math.min(1, Math.max(0, channel)) * 255)).join(', ');
   
   return (
     <div 
       className="w-full h-full"
       style={{
-        background: `radial-gradient(circle at 50% 50%, ${colorCss}22, ${colorCss}0a)`,
+        background: `radial-gradient(ellipse at 30% 40%, rgba(${colorChannels}, 0.4), transparent 65%)`,
       }}
     />
   );
@@ -480,7 +487,7 @@ export default function Dither({
   const canUseCanvas = gpuReady && !mobileDisabled && hasBeenVisible;
   // Keep canvas mounted but pause animation when not visible
   const shouldAnimate = isPageVisible && isVisible;
-  const isDisabled = disableAnimation || !shouldAnimate;
+  const isDisabled = disableAnimation || !shouldAnimate || gpuSupport === 'limited';
 
   return (
     <div ref={containerRef} className="w-full h-full relative">
@@ -490,7 +497,7 @@ export default function Dither({
           camera={{ position: [0, 0, 6] }}
           dpr={renderDpr}
           frameloop={shouldAnimate ? "demand" : "never"}
-          gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+          gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
           style={{ imageRendering: renderDpr < 0.999 ? 'pixelated' : 'auto' }}
           onCreated={({ gl }) => {
             gl.setClearColor(0x000000, 0);

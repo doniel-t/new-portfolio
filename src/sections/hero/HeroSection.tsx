@@ -3,7 +3,7 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowDown, ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { HERO_CONTENT } from "@/data/hero/content";
 import { useSectionScroll } from "@/hooks/useSectionScroll";
 import HeroCollage from "./HeroCollage";
@@ -41,9 +41,9 @@ export default function HeroSection() {
 
   return (
     <main id="home" data-snap-section="home" className="hero-section hero-collage">
-      <motion.div className="hero-dither" aria-hidden="true" {...heroReveal(0, prefersReducedMotion, 0.34)}>
+      <div className="hero-dither" aria-hidden="true">
         <Dither
-          waveColor={[2,2,2]}
+          waveColor={[2, 2, 2]}
           disableAnimation={prefersReducedMotion ?? true}
           enableMouseInteraction={false}
           colorNum={0.01}
@@ -53,7 +53,7 @@ export default function HeroSection() {
           waveSpeed={0.05}
           enableOnMobile
         />
-      </motion.div>
+      </div>
       <div className="hero-shell">
         <header className="hero-masthead">
           <motion.a {...heroReveal(1, prefersReducedMotion)} className="hero-identity hero-action" href="#home" onClick={(event) => handleSectionLinkClick(event, "#home")}>
