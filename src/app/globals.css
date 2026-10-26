@@ -1002,6 +1002,19 @@ body::after {
   scrollbar-color: rgba(212, 205, 196, 0.15) transparent;
 }
 
+/* Static paper grain stays behind the About cards and decorative print. */
+.about-background-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("/about-grain.png");
+  background-repeat: repeat;
+  background-size: 192px 192px;
+  opacity: .025;
+  filter: contrast(.65);
+}
+
 /* Work section animated static noise background */
 @media (max-width: 768px) {
   .hobbies-section {

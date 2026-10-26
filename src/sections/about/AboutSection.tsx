@@ -22,6 +22,7 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import ExpandedProjectModal from "@/sections/work/ExpandedProjectModal";
 import LocalTimeClient from "./LocalTime";
 import ProjectToolIcons from "./ProjectToolIcons";
+import TouchGrassPrint from "./TouchGrassPrint";
 
 const PortalFieldCollection = dynamic(
   () =>
@@ -183,7 +184,7 @@ const ABOUT_CARD_CLASS_NAME = "max-w-3xl rounded-xl bg-[#121210]/85 px-6 py-8 sm
 function SoftwareEngineerView() {
   const { textReveal, cardReveal } = useCardReveal();
   return (
-    <FadeInView id="about-software-engineer" className="pt-0" revealOnce>
+    <FadeInView id="about-software-engineer" className="relative pt-0" revealOnce>
       <motion.div variants={cardReveal} className={ABOUT_CARD_CLASS_NAME}>
         <motion.h2 variants={textReveal} className="font-display text-5xl uppercase leading-none text-[#f4eee3] sm:text-6xl xl:text-7xl">
           {ABOUT_CONTENT.views.profile.title}
@@ -238,6 +239,7 @@ function SoftwareEngineerView() {
 
 
       </motion.div>
+      <TouchGrassPrint />
     </FadeInView>
   );
 }
@@ -781,7 +783,7 @@ function ModernAboutLayout() {
           </div>
         </aside>
 
-        <div className="relative min-w-0 xl:pr-2">
+        <div className="about-content-column relative min-w-0 xl:pr-2">
           <div className="space-y-6 lg:space-y-8">
             <SoftwareEngineerView />
             <RecentProjectsView onOpenProject={handleOpenProject} />
@@ -832,6 +834,7 @@ export default function AboutSection() {
         className="relative isolate w-full bg-[#0a0a0a] font-sans py-24 sm:py-32"
       >
         <SectionPortalBackdrop />
+        <div className="about-background-grain" aria-hidden="true" />
 
         <div className="relative z-10 mx-auto w-full max-w-368 px-6 sm:px-8 lg:px-10">
           <InViewAboutBlock />

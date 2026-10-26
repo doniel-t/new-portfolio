@@ -10,11 +10,10 @@ type ExpandedHobbyModalProps = {
   card: HobbyCard;
   cardIndex: number;
   totalCards: number;
-  isMobile: boolean;
   onClose: () => void;
 };
 
-function ExpandedHobbyModal({ card, isMobile, onClose }: ExpandedHobbyModalProps) {
+function ExpandedHobbyModal({ card, onClose }: ExpandedHobbyModalProps) {
   const dialogRef = React.useRef<HTMLDivElement>(null);
   const closeRef = React.useRef<HTMLButtonElement>(null);
   const titleId = React.useId();
@@ -56,19 +55,18 @@ function ExpandedHobbyModal({ card, isMobile, onClose }: ExpandedHobbyModalProps
       <div onClick={onClose} data-lenis-prevent aria-hidden="true" className="fixed inset-0 z-50 overflow-hidden">
         <Image src={card.image} alt="" fill className="object-cover scale-110 blur-3xl" sizes="384px" quality={25} />
         <div className="absolute inset-0 bg-[#0d0b08]/70" />
-        {!isMobile && (
-          <div className="absolute inset-0 opacity-[0.16] pointer-events-none">
-            <Dither
-              waveColor={[165 / 100, 158 / 100, 141 / 100]}
-              disableAnimation={false}
-              enableMouseInteraction={false}
-              colorNum={2}
-              waveAmplitude={0.002}
-              waveFrequency={1.5}
-              waveSpeed={0.05}
-            />
-          </div>
-        )}
+        <div className="absolute inset-0 opacity-[0.16] pointer-events-none">
+          <Dither
+            enableOnMobile
+            waveColor={[165 / 100, 158 / 100, 141 / 100]}
+            disableAnimation={false}
+            enableMouseInteraction={false}
+            colorNum={2}
+            waveAmplitude={0.002}
+            waveFrequency={1.5}
+            waveSpeed={0.05}
+          />
+        </div>
       </div>
 
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 pointer-events-none">
