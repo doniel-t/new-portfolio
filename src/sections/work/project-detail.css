@@ -1,3 +1,5 @@
+body:has(.project-detail)::after { display: none; }
+
 .project-detail {
   --project-paper: #f5f3ef;
   --project-muted: #bcb8b2;
@@ -25,6 +27,7 @@
 .project-detail-shell { position: relative; width: min(100%, 856px); margin-inline: auto; padding: 24px 48px 64px; }
 .project-detail-topbar { display: flex; align-items: center; min-height: 48px; }
 .project-detail-back { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--project-muted); font-size: 13px; cursor: pointer; }
+.project-detail-close { position: fixed; top: 24px; right: 24px; z-index: 30; display: grid; place-items: center; width: 44px; height: 44px; background: #0d0b08; color: var(--project-muted); cursor: pointer; }
 .project-detail :is(a, button) { transition: color 160ms ease-out; }
 .project-detail :is(a, button):hover { color: var(--project-pink); }
 .project-detail-intro { padding-block: 72px 40px; border-bottom: 1px solid #f5f3ef30; }
@@ -44,6 +47,7 @@
 .project-detail-pagination strong { font-size: 16px; line-height: 1.45; font-weight: 400; overflow-wrap: anywhere; }
 .project-detail-pagination .project-detail-next { align-items: flex-end; text-align: right; }
 @media (max-width: 639px) {
+  .project-detail-close { top: 16px; right: 16px; }
   .project-detail-shell { padding: 16px 24px 40px; }
   .project-detail-intro { padding-block: 48px 28px; }
   .project-detail-intro h1 { font-size: clamp(38px, 10vw, 54px); }

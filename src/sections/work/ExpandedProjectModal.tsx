@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ArrowLeft, ArrowRight, ExternalLink, Github } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, Github, X } from "lucide-react";
 import Dither from "@/components/Dither";
 import { LoadTransitionOverlay } from "@/components/InitialLoadTransition";
 import type { Project } from "@/data/work/types";
@@ -100,6 +100,9 @@ function ExpandedProjectModal({ projects, projectIndex, isMobile, onClose, onNav
         <header className="project-detail-topbar">
           <button onClick={onClose} className="project-detail-back">
             <ArrowLeft size={16} aria-hidden="true" /> Back to projects
+          </button>
+          <button type="button" onClick={onClose} className="project-detail-close" aria-label="Close project">
+            <X size={20} aria-hidden="true" />
           </button>
         </header>
 
