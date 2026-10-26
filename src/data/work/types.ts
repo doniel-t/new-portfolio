@@ -3,6 +3,8 @@ export type Project = {
   slug: string;
   title: string;
   image: string;
+  /** Optional 1:1 card image; expanded project views use image. */
+  thumbnailImage?: string;
   repoUrl?: string;
   liveUrl?: string;
   techStack: string[];

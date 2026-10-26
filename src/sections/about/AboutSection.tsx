@@ -271,18 +271,19 @@ function ProjectPlaceholder({ index }: { index: number }) {
 }
 
 function ProjectVisual({ project, displayTitle, index }: { project: Project; displayTitle: string; index: number }) {
-  const hasImage = project.image !== "/placeholder-project.jpg";
+  const image = project.thumbnailImage ?? project.image;
+  const hasImage = image !== "/placeholder-project.jpg";
 
   return (
-    <div className="relative aspect-video overflow-hidden rounded-xl bg-[#1b1b18] sm:aspect-auto sm:min-h-44">
+    <div className="relative aspect-square self-start overflow-hidden rounded-xl bg-[#1b1b18]">
       {hasImage ? (
         <Image
-          src={project.image}
+          src={image}
           alt={`${displayTitle} preview`}
           fill
           priority={false}
-          sizes="(min-width: 640px) 196px, calc(100vw - 96px)"
-          className={`${project.image === "/ingolstadt-project-dark.png" ? "object-contain bg-[#0d0b08]" : "object-cover"} grayscale-12 saturate-[0.9] contrast-[1.02] transition duration-500 group-hover/project:scale-[1.025] group-hover/project:grayscale-0`}
+          sizes="(min-width: 640px) 176px, calc(100vw - 96px)"
+          className={`${image === "/ingolstadt-project-dark.png" ? "object-contain bg-[#0d0b08]" : "object-cover"} grayscale-12 saturate-[0.9] contrast-[1.02] transition duration-500 group-hover/project:scale-[1.025] group-hover/project:grayscale-0`}
         />
       ) : (
         <ProjectPlaceholder index={index} />
