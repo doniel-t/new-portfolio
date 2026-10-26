@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Staatliches } from "next/font/google";
+import { GeistPixelGrid } from "geist/font/pixel";
+
 import "@designcodeio/threeui/style.css";
 import "./globals.css";
 import InitialLoadTransition from "@/components/InitialLoadTransition";
@@ -100,7 +102,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${staatliches.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${staatliches.variable} ${GeistPixelGrid.variable} antialiased`}
       >
         {/* <InitialLoadTransition /> */}
         {children}

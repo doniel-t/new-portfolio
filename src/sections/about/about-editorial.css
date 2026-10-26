@@ -16,18 +16,25 @@
 .about-editorial-panel { position: relative; padding: 0 0 44px; }
 .about-editorial-panel > h2 {
   color: var(--about-paper);
-  font-size: clamp(48px, 4.8vw, 74px);
+  font-family: var(--font-geist-pixel-grid), monospace;
+  font-size: clamp(44px, 4.5vw, 68px);
+  font-weight: 400;
+  text-transform: none;
+  line-height: 1.08;
   letter-spacing: -.025em;
 }
 .about-profile-title { padding-top: 8px; }
 .about-profile-title > span { display: table; }
+.about-profile-title > span:first-child {
+  font-family: var(--font-geist-pixel-grid), monospace;
+  font-size: .58em;
+  letter-spacing: -.03em;
+}
 .about-paper-label {
   position: relative;
-  margin: 10px 0 0 -7px;
-  padding: 3px 12px 0;
-  color: #1900ed;
-  background: var(--about-pink);
-  transform: rotate(-3deg);
+  margin-top: 5px;
+  color: var(--about-pink);
+  font-style: normal;
 }
 .about-profile-lead {
   margin-top: 36px;
@@ -69,12 +76,14 @@
 }
 .about-nameplate { margin-top: 18px; }
 .about-nameplate > p:first-child {
-  display: table;
-  padding: 5px 8px 2px;
-  margin-left: -4px;
-  background: var(--about-paper);
-  color: #1900ed;
-  transform: rotate(-2deg);
+  font-family: var(--font-geist-pixel-grid), monospace;
+  font-size: clamp(24px, 2vw, 30px);
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.15;
+  letter-spacing: -.03em;
+  text-transform: none;
+  color: var(--about-paper);
 }
 .about-nameplate dl { max-width: 260px; border-top: 1px solid #f5f3ef30; padding-top: 20px; }
 .about-nameplate dd { color: var(--about-paper); }
@@ -102,7 +111,7 @@
   .about-editorial { padding-top: 72px; }
   .about-editorial-panel > h2 { font-size: clamp(46px, 12vw, 64px); }
   .about-nameplate { margin-top: 0; }
-  .about-nameplate > p:first-child { font-size: 29px; }
+  .about-nameplate > p:first-child { font-size: clamp(18px, 4.8vw, 24px); }
   .about-nameplate dl { gap: 12px; margin-top: 16px; padding-top: 14px; }
   .about-nameplate > div:last-child { font-size: 18px; margin-top: 12px; }
   .about-profile-lead { max-width: 30ch; font-size: 25px; }

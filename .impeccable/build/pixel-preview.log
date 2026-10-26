@@ -1,0 +1,27 @@
+   ▲ Next.js 15.5.28 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.178.40:3000
+   - Environments: .env
+   - Experiments (use with caution):
+     ✓ viewTransition
+
+ ✓ Starting...
+ ✓ Ready in 976ms
+ ○ Compiling / ...
+ ✓ Compiled / in 3s
+ GET / 200 in 3647ms
+ ✓ Compiled in 119ms
+ ✓ Compiled in 125ms
+ ✓ Compiled / in 39ms
+ GET / 200 in 111ms
+ ✓ Compiled in 113ms
+ ✓ Compiled in 128ms
+ ✓ Compiled in 108ms
+ ✓ Compiled in 110ms
+ ✓ Compiled in 118ms
+ ✓ Compiled in 121ms
+ ✓ Compiled in 119ms
+ ✓ Compiled in 253ms
+ ✓ Compiled in 142ms
+ ✓ Compiled in 128ms
+ ✓ Compiled in 128ms

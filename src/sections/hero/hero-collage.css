@@ -97,14 +97,27 @@
 .hero-collage .hero-shell { max-width: 1600px; }
 .hero-collage .hero-composition { grid-template-columns: 1.15fr 1fr; gap: 0; padding-block: 92px 110px; }
 .hero-collage .hero-copy { z-index: 3; gap: 32px; }
-.hero-collage .hero-heading-lead { position: relative; max-width: 840px; width: max-content; font-size: clamp(88px, 10.7vw, 166px); line-height: .88; }
-.hero-collage .hero-heading-lead .hero-word-0 { transform: rotate(-3deg); }
-.hero-collage .hero-heading-lead .hero-word-1 { position: relative; z-index: 1; margin-left: 6px; padding: 0 12px 3px; background: var(--pink); color: var(--ink); transform: rotate(5deg) translateY(-4px); }
-.hero-collage .hero-heading-lead .hero-word-2 { display: block; margin-top: 8px; margin-left: -5px; transform: rotate(-3deg); font-size: .88em; }
-.hero-collage .hero-heading-detail { position: relative; max-width: 405px; margin-top: 32px; padding: 8px 14px 10px; color: var(--ink); background: var(--paper); font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-size: clamp(25px, 2.3vw, 34px); line-height: 1.08; transform: rotate(-2deg); text-wrap: initial; }
+.hero-collage .hero-heading-lead { position: relative; max-width: 100%; width: max-content; font-family: var(--font-geist-pixel-grid), monospace; font-weight: 700; font-size: clamp(80px, 9vw, 144px); line-height: .9; letter-spacing: -.055em; word-spacing: -.12em; }
+.hero-collage .hero-heading-lead .hero-word-0 { transform: none; }
+.hero-collage .hero-heading-lead .hero-word-1 { position: relative; z-index: 1; margin-left: 0; padding: 0; color: var(--pink); font-style: normal; transform: none; }
+.hero-collage .hero-heading-lead .hero-word-2 { display: block; margin-top: 0; margin-left: 0; transform: none; font-size: .82em; }
+.hero-collage .hero-heading-detail { position: relative; max-width: 370px; margin-top: 30px; padding: 0; color: var(--paper); font-family: var(--font-geist-sans), sans-serif; font-weight: 400; font-size: clamp(23px, 2vw, 29px); line-height: 1.35; text-wrap: initial; }
 .hero-collage .hero-intro { max-width: 340px; }
-.hero-collage .hero-work-link { background: var(--pink); transform: rotate(-2deg); }
-.hero-collage .hero-work-link:hover { background: var(--paper); }
+.hero-collage .hero-work-link {
+  background: #c0c0c0;
+  transform: none;
+  border: 3px solid;
+  border-color: #ffffff #606060 #606060 #ffffff;
+  border-radius: 0;
+  font-family: var(--font-geist-mono), monospace;
+  font-weight: 500;
+  transition: background 120ms ease-out;
+}
+.hero-collage .hero-work-link:hover { background: #d0d0d0; }
+.hero-collage .hero-work-link:active {
+  border-color: #606060 #ffffff #ffffff #606060;
+  transform: translateY(2px);
+}
 .hero-print { height: clamp(470px, 43vw, 650px); margin-left: 16px; transform: rotate(2deg); }
 .print-paper { inset: -3% -1% -2% 8%; transform: rotate(9deg); clip-path: polygon(0 2%, 25% 0, 42% 2%, 65% 0, 82% 2%, 100% 0, 98% 25%, 100% 48%, 98% 72%, 100% 98%, 76% 100%, 55% 98%, 28% 100%, 0 98%); }
 .print-photo { inset: 0 5% 0 3%; transform: rotate(-7deg); }
@@ -112,7 +125,7 @@
 .print-photo-echo img { filter: grayscale(1) contrast(1.8); object-position: 40% 30%; }
 .print-mesh { position: absolute; width: 88%; height: 46%; right: -7%; top: -12%; transform: rotate(-3deg); background-image: repeating-linear-gradient(0deg, transparent 0 9px, var(--paper) 9px 10px), repeating-linear-gradient(90deg, transparent 0 9px, var(--paper) 9px 10px); opacity: .7; }
 .print-halftone { position: absolute; z-index: 2; left: -8%; bottom: -4%; width: 53%; height: 29%; background-color: var(--paper); background-image: radial-gradient(var(--ink) 1.2px, transparent 1.5px); background-size: 5px 5px; transform: rotate(8deg); clip-path: polygon(0 0, 100% 3%, 96% 28%, 100% 52%, 95% 74%, 100% 100%, 0 96%); mix-blend-mode: screen; }
-.print-cutout-label { position: absolute; z-index: 4; bottom: 1%; right: -3%; padding: 8px 14px; color: var(--ink); background: var(--paper); font-family: var(--font-staatliches), sans-serif; font-size: clamp(28px, 3.2vw, 44px); line-height: .86; transform: rotate(-7deg); }
+.print-cutout-label { position: absolute; z-index: 4; bottom: 1%; right: -3%; padding: 8px 14px; color: var(--ink); background: var(--paper); font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: clamp(20px, 2.2vw, 32px); line-height: 1.05; transform: rotate(-7deg); }
 .print-crosses { position: absolute; z-index: 3; left: -15%; top: -10%; display: flex; gap: 13px; transform: rotate(-8deg); }
 .print-crosses span { position: relative; width: 18px; height: 18px; }
 .print-crosses span::before, .print-crosses span::after { content: ''; position: absolute; background: var(--pink); }
@@ -123,22 +136,22 @@
 .print-caption { bottom: -55px; right: 6%; font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-size: 17px; }
 .hero-collage .hero-bottom { border-top: 0; }
 @media (max-width: 1100px) and (min-width: 701px) {
-  .hero-collage .hero-heading-lead { font-size: 10.4vw; }
+  .hero-collage .hero-heading-lead { font-size: 8.5vw; }
   .hero-collage .hero-heading-detail { max-width: 330px; font-size: 28px; }
   .hero-collage .hero-composition { padding-block: 100px; gap: 28px; }
   .hero-print { height: 480px; }
 }
 @media (max-width: 700px) {
   .hero-collage .hero-composition { grid-template-columns: minmax(0, 1fr); padding-block: 58px 90px; gap: 88px; }
-  .hero-collage .hero-heading-lead { max-width: 100%; font-size: clamp(52px, 16.5vw, 112px); }
-  .hero-collage .hero-heading-lead .hero-word-1 { margin-left: 2px; padding-inline: 7px; }
-  .hero-collage .hero-heading-lead .hero-word-2 { font-size: .98em; margin-top: 10px; }
-  .hero-collage .hero-heading-detail { max-width: 300px; margin-top: 28px; font-size: 27px; }
+  .hero-collage .hero-heading-lead { max-width: 100%; font-size: clamp(44px, 14vw, 96px); }
+  .hero-collage .hero-heading-lead .hero-word-1 { margin-left: 0; padding-inline: 0; }
+  .hero-collage .hero-heading-lead .hero-word-2 { font-size: .82em; margin-top: 0; }
+  .hero-collage .hero-heading-detail { max-width: 300px; margin-top: 24px; font-size: 23px; }
   .hero-collage .hero-copy { gap: 28px; }
   .hero-print { width: 82%; height: auto; margin-left: 18px; aspect-ratio: 4 / 5; }
   .print-mesh { right: -9%; }
   .print-spark-large { right: -13%; width: 65px; height: 65px; }
-  .print-cutout-label { font-size: 30px; right: -9%; }
+  .print-cutout-label { font-size: clamp(17px, 4.5vw, 26px); right: -9%; }
   .print-spark-small { width: 44px; height: 44px; }
   .print-caption { font-size: 15px; bottom: -48px; }
 }
