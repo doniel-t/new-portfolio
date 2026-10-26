@@ -20,6 +20,9 @@ importers:
       framer-motion:
         specifier: ^12.23.22
         version: 12.38.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      geist:
+        specifier: ^1.8.2
+        version: 1.8.2(next@15.5.28(react-dom@19.3.1(react@19.3.1))(react@19.3.1))
       gsap:
         specifier: ^3.13.0
         version: 3.14.2
@@ -1190,6 +1193,11 @@ packages:
 
   functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
+
+  geist@1.8.2:
+    resolution: {integrity: sha512-fRF4sbJ9qcCxPb35cVtKBAwYlTt1IbU9nkbPi0a+xyZqPIjCJ2BY8ekGhx6/SGSZKrR7/UuL57r/eeDQ1Xy11g==}
+    peerDependencies:
+      next: '>=13.2.0'
 
   generator-function@2.0.1:
     resolution: {integrity: sha512-SFdFmIJi+ybC0vjlHN0ZGVGHc3lgE0DxPAT0djjVg+kjOnSqclqmj0KQ7ykTOLP6YxoqOvuAODGdcHJn+43q3g==}
@@ -3227,6 +3235,10 @@ snapshots:
       is-callable: 1.2.7
 
   functions-have-names@1.2.3: {}
+
+  geist@1.8.2(next@15.5.28(react-dom@19.3.1(react@19.3.1))(react@19.3.1)):
+    dependencies:
+      next: 15.5.28(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
 
   generator-function@2.0.1: {}
 
