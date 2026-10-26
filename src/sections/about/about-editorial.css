@@ -50,7 +50,7 @@
   content: "";
   position: absolute;
   inset: -8px 10px 8px -10px;
-  background: var(--about-paper);
+  background: var(--about-blue);
   transform: rotate(7deg);
 }
 .about-portrait__image {
@@ -83,7 +83,7 @@
 .about-editorial .about-tech-card:hover { background: #f6a7e40c; }
 .about-editorial .about-tech-card:focus-visible { outline-color: var(--about-pink); }
 
-.about-editorial .touch-grass-print__paper::before { background: var(--about-pink); }
+.about-editorial .touch-grass-print__paper::before { background: var(--about-blue); }
 .about-editorial .touch-grass-print__paper { box-shadow: -12px 22px 38px #0008; }
 .about-editorial .touch-grass-print__image { filter: saturate(.65) contrast(1.12); }
 
