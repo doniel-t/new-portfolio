@@ -5,9 +5,10 @@ export const PROJECTS: Project[] = [
     id: "project-live",
     slug: "ingolstadt-live",
     title: "PROJECT_LIVE",
-    image: "/placeholder-project.jpg",
+    previewDescription: "A real-time web app with accessible interfaces and fluid animations.",
+    image: "/ingolstadt-project-dark.png",
     liveUrl: "https://ingolstadt.live",
-    techStack: ["React", "TypeScript", "Tailwind CSS", "Framer Motion"],
+    techStack: ["TypeScript", "Next.js", "React" , "Tailwind CSS"],
     description:
       "A modern web application featuring real-time data synchronization and advanced UI animations. Built with performance and accessibility in mind.",
     challenges:
@@ -31,9 +32,10 @@ Looking back, this project taught me more about performance optimization than an
     id: "project-emsi",
     slug: "ems-platform",
     title: "PROJECT_EMS",
-    image: "/placeholder-project.jpg",
+    previewDescription: "A full-stack web-app for event creation.",
+    image: "/ingolstadt-project-dark.png",
     liveUrl: "https://ems.ingostadt.live",
-    techStack: ["Next.js", "Prisma", "PostgreSQL", "tRPC"],
+    techStack: ["Next.js", "React", "PostgreSQL"],
     description:
       "Full-stack application with type-safe APIs and optimized database queries. Features authentication, role-based access control, and data visualization dashboards.",
     challenges:
@@ -58,13 +60,14 @@ This project reinforced my belief that type safety across the full stack isn't j
   {
     id: "project-dnd",
     slug: "dnd-voting",
-    title: "PROJECT_DND",
+    title: "PROJECT_DND Campaign Tracker",
+    previewDescription: "An interactive 3D experience with custom shaders and procedural animation.",
     image: "/dnd-voting.png",
     repoUrl: "https://github.com/username/project-gamma",
     liveUrl: "https://dnd-voting.vercel.app",
-    techStack: ["Three.js", "GLSL", "WebGL", "React Three Fiber"],
+    techStack: ["Next.js", "React", "PostgreSQL", "Supabase"],
     description:
-      "Interactive 3D experience with custom shaders and procedural animations. Pushes the boundaries of web-based graphics with optimized rendering pipelines.",
+      "An interactive DnD Stats Page for tracking our Sessions",
     challenges:
       "Writing performant GLSL shaders and managing GPU memory efficiently for complex particle systems and post-processing effects.",
     blogContent: `This project sits at the intersection of two things I love: Dungeons & Dragons and creative coding. The idea was to build an interactive voting system for our D&D campaign — a tool where party members could vote on decisions, with the results revealed through dramatic 3D animations. Think "fantasy war room meets WebGL."
@@ -88,6 +91,7 @@ The D&D group loves it. There's something deeply satisfying about watching your 
     id: "project-dnd-notes",
     slug: "dnd-notes",
     title: "PROJECT_DND_NOTES",
+    previewDescription: "Synced D&D campaign notes with AI-powered lore search.",
     image: "/placeholder-project.jpg",
     techStack: ["Next.js", "Supabase", "pgvector", "RAG"],
     description:
@@ -109,6 +113,7 @@ This project is less about replacing the human table memory and more about suppo
     id: "project-delta",
     slug: "uwu-bot",
     title: "PROJECT_UWU_BOT",
+    previewDescription: "A Discord bot that remembers our conversations and roasts the friend group.",
     image: "/uwu-bot.png",
     repoUrl: "https://github.com/doniel-t/uwu-botv2",
     techStack: ["Node.js", "Discord.js", "Ai-SDK", "Postgres"],
@@ -161,6 +166,7 @@ It is stupid, messy, and weirdly useful.`,
     id: "project-epsilon",
     slug: "ri-rag",
     title: "PROJECT_RI_RAG",
+    previewDescription: "A cross-platform mobile app with offline support and real-time sync.",
     image: "/placeholder-project.jpg",
     repoUrl: "https://github.com/username/project-epsilon",
     techStack: ["React Native", "Expo", "Firebase", "TypeScript"],

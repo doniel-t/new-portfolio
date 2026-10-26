@@ -2,170 +2,96 @@
 
 import React from "react";
 import dynamic from "next/dynamic";
-import { motion, useTransform } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import DecodingWord from "@/components/DecodingWord";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowDown, ArrowRight, ArrowUpRight } from "lucide-react";
 import { HERO_CONTENT } from "@/data/hero/content";
 import { useSectionScroll } from "@/hooks/useSectionScroll";
-import { useIsMobile } from "@/hooks/useIsMobile";
-import { useParallax } from "./useParallax";
-import { getHeroVariants } from "./variants";
-import HeroArtwork from "./HeroArtwork";
+import HeroCollage from "./HeroCollage";
+import { heroReveal } from "./heroMotion";
+import "./hero-collage.css";
 
 const Dither = dynamic(() => import("@/components/Dither"), {
   ssr: false,
   loading: () => null,
 });
 
+const HEADING_WORDS = HERO_CONTENT.heading.split(" ");
+
+function HeadingWords({ start, end, reducedMotion }: { start: number; end: number; reducedMotion: boolean | null }) {
+  return HEADING_WORDS.slice(start, end).map((word, i) => (
+    <React.Fragment key={`${word}-${i}`}>
+      <motion.span className={`hero-word hero-word-${start + i}`} {...heroReveal(3 + start + i, reducedMotion)}>{word}</motion.span>
+      {i < end - start - 1 ? " " : ""}
+    </React.Fragment>
+  ));
+}
+
 export default function HeroSection() {
-  const isMobile = useIsMobile();
   const scrollToSection = useSectionScroll();
-  const sectionRef = React.useRef<HTMLElement | null>(null);
-  const scrollScale = isMobile ? 0.9 : 1.2;
-  const headingWords = HERO_CONTENT.heading.split(" ");
-  const { gridContainer, leftSection, childItem, rightSection } = getHeroVariants(isMobile);
-  const { scrollProgress } = useParallax(isMobile, sectionRef);
-
-  // One translate for the whole left content group, one for the image.
-  // Previously each text block had its own staggered parallax — collapsed
-  // here to two transforms total to keep the per-frame work cheap.
-  const leftContentX = useTransform(scrollProgress, [0, 1], [0, -17 * scrollScale]);
-  const leftContentY = useTransform(scrollProgress, [0, 1], [0, -24 * scrollScale]);
-  const imageScrollX = useTransform(scrollProgress, [0, 1], [0, 21 * scrollScale]);
-  const imageScrollY = useTransform(scrollProgress, [0, 1], [0, -24 * scrollScale]);
-
-  const handleSectionLinkClick = React.useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-      event.preventDefault();
-      scrollToSection(href);
-    },
-    [scrollToSection]
-  );
+  const prefersReducedMotion = useReducedMotion();
+  const handleSectionLinkClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    // Preserve native modified-click behavior.
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    scrollToSection(href);
+  };
 
   return (
-    <main
-      id="home"
-      data-snap-section="home"
-      ref={sectionRef}
-      className="relative min-h-screen sm:min-h-screen flex items-center justify-center p-8 sm:p-16"
-    >
-      {/* Dither effect background for hero section */}
-      <div className="absolute inset-0 -z-10 opacity-25" aria-hidden>
-          <Dither
-            waveColor={[165 / 100, 158 / 100, 141 / 100]}
-            disableAnimation={false}
-            enableMouseInteraction={!isMobile}
-            mouseRadius={0.5}
-            colorNum={2}
-            waveAmplitude={0.002}
-            waveFrequency={2.2}
-            waveSpeed={0.09}
-            enableOnMobile={true}
-          />
-        
-      </div>
-
-      <motion.div
-        className="relative grid w-full max-w-6xl grid-cols-1 gap-10 lg:grid-cols-2 items-center"
-        variants={gridContainer}
-        initial="hidden"
-        animate="show"
-      >
-        
-          <motion.div variants={leftSection} style={{ x: leftContentX, y: leftContentY }}>
-            <motion.div variants={childItem}>
-              <p className="text-sm tracking-widest text-muted font-bold mb-3">
-                {HERO_CONTENT.eyebrow}
-              </p>
-            </motion.div>
-            <motion.div variants={childItem}>
-              <h1
-                className="font-display text-5xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight text-foreground drop-shadow-md mb-4"
-              >
-                <span className="inline-block">
-                  {headingWords.map((word, i) => (
-                    <span key={`${word}-${i}`} className="inline-block" style={{ display: "inline-block" }}>
-                      <DecodingWord word={word} />
-                      {i < headingWords.length - 1 ? "\u00A0" : ""}
-                    </span>
-                  ))}
-                </span>
-              </h1>
-            </motion.div>
-            <motion.div variants={childItem}>
-              <p
-                className="text-lg sm:text-xl text-foreground/80 font-medium mb-8 max-w-prose"
-              >
-                {HERO_CONTENT.intro}
-              </p>
-            </motion.div>
-            <motion.div variants={childItem}>
-              <div className="flex flex-wrap gap-3">
-                <motion.a
-                  className="group inline-flex items-center gap-2 rounded-md px-5 py-3 bg-[#0d0b08] text-background hover:opacity-90 transition-colors z-99"
-                  href="#about-projects"
-                  onClick={(event) => handleSectionLinkClick(event, "#about-projects")}
-                  whileHover={isMobile ? {} : { x: 4, scale: 1.01 }}
-                  whileTap={isMobile ? {} : { scale: 0.98 }}
-                >
-                  View Work
-                  <span
-                    className="
-                      inline-flex
-                      overflow-hidden
-                      max-w-0
-                      opacity-0
-                      transition-all
-                      duration-300
-                      ease-out
-                      group-hover:max-w-5
-                      group-hover:opacity-100
-                    "
-                  >
-                    <ArrowRight size={18} />
-                  </span>
-                </motion.a>
-                <motion.a
-                  className="group inline-flex items-center gap-2 rounded-md px-5 py-3 border border-muted/40 text-foreground hover:bg-[#0d0b08] hover:text-white transition-colors duration-300 z-99"
-                  href="#contact"
-                  onClick={(event) => handleSectionLinkClick(event, "#contact")}
-                  whileHover={isMobile ? {} : { x: 4, scale: 1.01 }}
-                  whileTap={isMobile ? {} : { scale: 0.98 }}
-                >
-                  Contact
-
-                  <span
-                    className="
-                      inline-flex
-                      overflow-hidden
-                      max-w-0
-                      opacity-0
-                      transition-all
-                      duration-300
-                      ease-out
-                      group-hover:max-w-5
-                      group-hover:opacity-100
-                    "
-                  >
-                    <ArrowRight size={18} />
-                  </span>
-                </motion.a>
-              </div>
-            </motion.div>
-          </motion.div>
-
-
-
-          <motion.div
-            variants={rightSection}
-            style={{ x: imageScrollX, y: imageScrollY }}
-          >
-            <div className="relative">
-              <HeroArtwork isMobile={isMobile} />
-            </div>
-          </motion.div>
-        
+    <main id="home" data-snap-section="home" className="hero-section hero-collage">
+      <motion.div className="hero-dither" aria-hidden="true" {...heroReveal(0, prefersReducedMotion, 0.34)}>
+        <Dither
+          waveColor={[2,2,2]}
+          disableAnimation={prefersReducedMotion ?? true}
+          enableMouseInteraction={false}
+          colorNum={0.01}
+          pixelSize={3}
+          waveAmplitude={0.5}
+          waveFrequency={2}
+          waveSpeed={0.05}
+          enableOnMobile
+        />
       </motion.div>
+      <div className="hero-shell">
+        <header className="hero-masthead">
+          <motion.a {...heroReveal(1, prefersReducedMotion)} className="hero-identity hero-action" href="#home" onClick={(event) => handleSectionLinkClick(event, "#home")}>
+            Daniel Theil<span>Fullstack Engineer</span>
+          </motion.a>
+          <motion.a {...heroReveal(2, prefersReducedMotion)} className="hero-contact hero-action" href="#contact" onClick={(event) => handleSectionLinkClick(event, "#contact")}>
+            Let’s talk <ArrowUpRight size={18} aria-hidden="true" />
+          </motion.a>
+        </header>
+
+        <div className="hero-composition">
+        <div data-hero-copy className="hero-copy">
+          <h1 className="hero-heading" aria-label={HERO_CONTENT.heading}>
+            <span aria-hidden="true">
+              <span className="hero-heading-lead"><HeadingWords start={0} end={3} reducedMotion={prefersReducedMotion} /></span>
+              {" "}
+              <motion.span className="hero-heading-detail" {...heroReveal(6, prefersReducedMotion)}>{HEADING_WORDS.slice(3).join(" ")}</motion.span>
+            </span>
+          </h1>
+          <div className="hero-support">
+            <motion.p className="hero-intro" {...heroReveal(7, prefersReducedMotion)}>{HERO_CONTENT.intro}</motion.p>
+            <div className="hero-links">
+              <motion.a {...heroReveal(8, prefersReducedMotion)} className="hero-action hero-work-link" href="#about-projects" onClick={(event) => handleSectionLinkClick(event, "#about-projects")}>
+                View Work <ArrowUpRight size={21} aria-hidden="true" />
+              </motion.a>
+              <motion.a {...heroReveal(9, prefersReducedMotion)} className="hero-action hero-secondary-link" href="#contact" onClick={(event) => handleSectionLinkClick(event, "#contact")}>
+                Contact <ArrowRight size={18} aria-hidden="true" />
+              </motion.a>
+            </div>
+          </div>
+        </div>
+        <HeroCollage />
+        </div>
+
+
+      </div>
     </main>
   );
 }
+
+

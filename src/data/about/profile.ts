@@ -26,8 +26,8 @@ export const ABOUT_CONTENT = {
     name: "Daniel Theil",
   },
   profileStats: [
-    { value: "7+", label: "Programming Experience (years)" },
-    { value: "2+", label: "Professional Experience (years)" },
+    { value: "8+", label: "Programming Experience (years)" },
+    { value: "3+", label: "Professional Experience (years)" },
   ],
   coreStackNames: ["Next.js", "TypeScript", "Tailwind", "Go"],
   personalStats: [
@@ -40,7 +40,7 @@ export const ABOUT_CONTENT = {
     {
       role: "Fullstack Engineer",
       company: "Komma-D",
-      duration: "1.5 years",
+      duration: "2.5 years",
       status: "ONGOING",
       badge: "ACTIVE",
       focus: ["Multi-tenant NextJS", "DevOps", "LLM-Chatbots"],

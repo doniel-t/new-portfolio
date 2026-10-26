@@ -1,0 +1,144 @@
+/* Electric-blue poster, cream lettering, and a pink paper offcut. */
+.hero-section.hero-collage {
+  --ink: #1900ed;
+  --paper: #f5f3ef;
+  --pink: #f6a7e4;
+  --foreground: var(--paper);
+  --background: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+.hero-collage ::selection { color: var(--ink); background: var(--pink); }
+.hero-collage .hero-dither { position: absolute; inset: 0; z-index: -2; opacity: .24; mix-blend-mode: multiply; pointer-events: none; }
+.hero-collage .hero-action:focus-visible { outline: 2px solid var(--pink); outline-offset: 6px; }
+.hero-collage .hero-shell { max-width: 1520px; padding: 30px clamp(24px, 5vw, 80px) 24px; }
+.hero-collage .hero-masthead { position: relative; z-index: 3; }
+.hero-collage .hero-identity { color: var(--paper); }
+.hero-collage .hero-identity span { color: #ddd7ff; }
+.hero-collage .hero-contact { color: var(--paper); }
+.hero-collage .hero-composition {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: center;
+  gap: clamp(40px, 5vw, 80px);
+  padding-block: 74px 84px;
+  flex: 1;
+}
+.hero-collage .hero-copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 30px;
+  padding: 0;
+}
+.hero-collage .hero-heading-lead {
+  max-width: 650px;
+  font-size: clamp(72px, 8.5vw, 128px);
+  line-height: .91;
+  letter-spacing: -.025em;
+  color: var(--paper);
+  text-wrap: initial;
+}
+.hero-collage .hero-heading-detail {
+  max-width: 440px;
+  margin-top: 26px;
+  color: var(--pink);
+  font-family: var(--font-geist-sans), sans-serif;
+  font-weight: 400;
+  font-size: clamp(26px, 2.65vw, 38px);
+  line-height: 1.16;
+  letter-spacing: -.03em;
+}
+.hero-collage .hero-support { gap: 26px; }
+.hero-collage .hero-intro { max-width: 370px; color: #e2ddff; font-size: 15px; line-height: 1.7; }
+.hero-collage .hero-work-link { min-width: 175px; color: var(--ink); background: var(--paper); border-radius: 0; }
+.hero-collage .hero-work-link:hover { background: var(--pink); }
+.hero-collage .hero-secondary-link { color: var(--paper); }
+.hero-collage .hero-bottom { position: relative; z-index: 2; color: #e2ddff; border-color: #f5f3ef55; }
+.hero-print { position: relative; min-width: 0; width: 100%; max-width: 560px; height: clamp(440px, 43vw, 630px); justify-self: center; pointer-events: none; }
+.print-paper { position: absolute; inset: 0 0 0 8%; background: var(--pink); transform: rotate(5deg); }
+.print-photo { position: absolute; inset: 0 6% 0 2%; overflow: hidden; background: #111b1b; transform: rotate(-4deg); }
+.print-portrait { object-fit: cover; object-position: center; }
+.print-photo::after { content: ''; position: absolute; inset: 55% 0 0; background: linear-gradient(transparent, #0009); pointer-events: none; }
+.portrait-corner-note, .portrait-quote { position: absolute; z-index: 1; color: var(--paper); font-family: Georgia, 'Times New Roman', serif; font-weight: 400; text-shadow: 0 1px 5px #0009; }
+.portrait-corner-note { top: 4%; right: 5%; font-size: clamp(12px, 1vw, 15px); }
+.portrait-quote { right: 6%; bottom: 25%; font-size: clamp(19px, 1.65vw, 25px); line-height: 1.2; letter-spacing: -.02em; }
+.print-spark { position: absolute; z-index: 2; color: var(--pink); }
+.print-spark-large { width: 108px; height: 108px; right: -8%; top: -8%; transform: rotate(12deg); }
+.print-spark-small { width: 64px; height: 64px; left: -6%; bottom: 1%; color: var(--paper); transform: rotate(-12deg); }
+.print-caption { position: absolute; right: 3%; bottom: -38px; color: var(--pink); font-size: 12px; letter-spacing: .01em; transform: rotate(-4deg); }
+@media (max-width: 1100px) {
+  .hero-collage .hero-composition { gap: 36px; padding-block: 64px 80px; }
+  .hero-collage .hero-heading-lead { font-size: clamp(70px, 9.2vw, 100px); }
+  .hero-collage .hero-heading-detail { font-size: 30px; }
+  .hero-print { height: 480px; }
+  .hero-collage .hero-identity { flex-direction: column; align-items: flex-start; gap: 3px; }
+  .print-spark-large { width: 80px; height: 80px; right: -4%; }
+}
+@media (max-width: 700px) {
+  .hero-collage .hero-shell { padding: 22px 24px 18px; }
+  .hero-collage .hero-composition { grid-template-columns: minmax(0, 1fr); gap: 64px; padding-block: 52px 68px; }
+  .hero-collage .hero-heading-lead { font-size: clamp(66px, 15vw, 104px); }
+  .hero-collage .hero-heading-detail { max-width: 360px; margin-top: 20px; font-size: 29px; }
+  .hero-collage .hero-copy { gap: 24px; }
+  .hero-collage .hero-intro { font-size: 14px; }
+  .hero-print { width: 86%; height: auto; aspect-ratio: 4 / 5; max-width: 420px; }
+  .print-spark-large { width: 76px; height: 76px; right: -10%; top: -6%; }
+  .print-spark-small { width: 48px; height: 48px; }
+  .hero-collage .hero-bottom { gap: 12px; }
+  .hero-collage .hero-bottom > span { max-width: 95px; }
+  .hero-collage .hero-scroll-link { font-size: 11px; }
+}
+
+/* Second paste-up: deliberately broken alignment and overlapping print layers. */
+.hero-collage .hero-shell { max-width: 1600px; }
+.hero-collage .hero-composition { grid-template-columns: 1.15fr 1fr; gap: 0; padding-block: 92px 110px; }
+.hero-collage .hero-copy { z-index: 3; gap: 32px; }
+.hero-collage .hero-heading-lead { position: relative; max-width: 840px; width: max-content; font-size: clamp(88px, 10.7vw, 166px); line-height: .88; }
+.hero-collage .hero-heading-lead .hero-word-0 { transform: rotate(-3deg); }
+.hero-collage .hero-heading-lead .hero-word-1 { position: relative; z-index: 1; margin-left: 6px; padding: 0 12px 3px; background: var(--pink); color: var(--ink); transform: rotate(5deg) translateY(-4px); }
+.hero-collage .hero-heading-lead .hero-word-2 { display: block; margin-top: 8px; margin-left: -5px; transform: rotate(-3deg); font-size: .88em; }
+.hero-collage .hero-heading-detail { position: relative; max-width: 405px; margin-top: 32px; padding: 8px 14px 10px; color: var(--ink); background: var(--paper); font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-size: clamp(25px, 2.3vw, 34px); line-height: 1.08; transform: rotate(-2deg); text-wrap: initial; }
+.hero-collage .hero-intro { max-width: 340px; }
+.hero-collage .hero-work-link { background: var(--pink); transform: rotate(-2deg); }
+.hero-collage .hero-work-link:hover { background: var(--paper); }
+.hero-print { height: clamp(470px, 43vw, 650px); margin-left: 16px; transform: rotate(2deg); }
+.print-paper { inset: -3% -1% -2% 8%; transform: rotate(9deg); clip-path: polygon(0 2%, 25% 0, 42% 2%, 65% 0, 82% 2%, 100% 0, 98% 25%, 100% 48%, 98% 72%, 100% 98%, 76% 100%, 55% 98%, 28% 100%, 0 98%); }
+.print-photo { inset: 0 5% 0 3%; transform: rotate(-7deg); }
+.print-photo-echo { position: absolute; z-index: 0; left: -12%; top: -5%; width: 41%; height: 70%; overflow: hidden; transform: rotate(-14deg); background: var(--paper); }
+.print-photo-echo img { filter: grayscale(1) contrast(1.8); object-position: 40% 30%; }
+.print-mesh { position: absolute; width: 88%; height: 46%; right: -7%; top: -12%; transform: rotate(-3deg); background-image: repeating-linear-gradient(0deg, transparent 0 9px, var(--paper) 9px 10px), repeating-linear-gradient(90deg, transparent 0 9px, var(--paper) 9px 10px); opacity: .7; }
+.print-halftone { position: absolute; z-index: 2; left: -8%; bottom: -4%; width: 53%; height: 29%; background-color: var(--paper); background-image: radial-gradient(var(--ink) 1.2px, transparent 1.5px); background-size: 5px 5px; transform: rotate(8deg); clip-path: polygon(0 0, 100% 3%, 96% 28%, 100% 52%, 95% 74%, 100% 100%, 0 96%); mix-blend-mode: screen; }
+.print-cutout-label { position: absolute; z-index: 4; bottom: 1%; right: -3%; padding: 8px 14px; color: var(--ink); background: var(--paper); font-family: var(--font-staatliches), sans-serif; font-size: clamp(28px, 3.2vw, 44px); line-height: .86; transform: rotate(-7deg); }
+.print-crosses { position: absolute; z-index: 3; left: -15%; top: -10%; display: flex; gap: 13px; transform: rotate(-8deg); }
+.print-crosses span { position: relative; width: 18px; height: 18px; }
+.print-crosses span::before, .print-crosses span::after { content: ''; position: absolute; background: var(--pink); }
+.print-crosses span::before { left: 7px; width: 4px; height: 18px; }
+.print-crosses span::after { top: 7px; width: 18px; height: 4px; }
+.print-spark-large { right: -9%; top: 28%; width: 90px; height: 90px; transform: rotate(20deg); }
+.print-spark-small { left: -16%; bottom: 18%; width: 58px; height: 58px; }
+.print-caption { bottom: -55px; right: 6%; font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-size: 17px; }
+.hero-collage .hero-bottom { border-top: 0; }
+@media (max-width: 1100px) and (min-width: 701px) {
+  .hero-collage .hero-heading-lead { font-size: 10.4vw; }
+  .hero-collage .hero-heading-detail { max-width: 330px; font-size: 28px; }
+  .hero-collage .hero-composition { padding-block: 100px; gap: 28px; }
+  .hero-print { height: 480px; }
+}
+@media (max-width: 700px) {
+  .hero-collage .hero-composition { grid-template-columns: minmax(0, 1fr); padding-block: 58px 90px; gap: 88px; }
+  .hero-collage .hero-heading-lead { max-width: 100%; font-size: clamp(52px, 16.5vw, 112px); }
+  .hero-collage .hero-heading-lead .hero-word-1 { margin-left: 2px; padding-inline: 7px; }
+  .hero-collage .hero-heading-lead .hero-word-2 { font-size: .98em; margin-top: 10px; }
+  .hero-collage .hero-heading-detail { max-width: 300px; margin-top: 28px; font-size: 27px; }
+  .hero-collage .hero-copy { gap: 28px; }
+  .hero-print { width: 82%; height: auto; margin-left: 18px; aspect-ratio: 4 / 5; }
+  .print-mesh { right: -9%; }
+  .print-spark-large { right: -13%; width: 65px; height: 65px; }
+  .print-cutout-label { font-size: 30px; right: -9%; }
+  .print-spark-small { width: 44px; height: 44px; }
+  .print-caption { font-size: 15px; bottom: -48px; }
+}

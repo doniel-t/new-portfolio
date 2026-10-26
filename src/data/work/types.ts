@@ -7,6 +7,7 @@ export type Project = {
   liveUrl?: string;
   techStack: string[];
   description: string;
+  previewDescription?: string;
   challenges: string;
   blogContent: string;
   year: string;
