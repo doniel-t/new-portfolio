@@ -4,7 +4,6 @@ import React from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
 import Dither from "@/components/Dither";
-import PixelDivider from "@/components/PixelDivider";
 import type { HobbyCard } from "@/data/hobbies/types";
 
 type ExpandedHobbyModalProps = {
@@ -15,39 +14,47 @@ type ExpandedHobbyModalProps = {
   onClose: () => void;
 };
 
-function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: ExpandedHobbyModalProps) {
+function ExpandedHobbyModal({ card, isMobile, onClose }: ExpandedHobbyModalProps) {
+  const dialogRef = React.useRef<HTMLDivElement>(null);
+  const closeRef = React.useRef<HTMLButtonElement>(null);
+  const titleId = React.useId();
+
   React.useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeRef.current?.focus({ preventScroll: true });
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+      if (event.key !== "Tab") return;
+      const controls = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button, a[href], input, select, textarea, [tabindex="0"]'
+      ) ?? []).filter((element) => element.getClientRects().length > 0);
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (!first) return;
+      if (event.shiftKey && (document.activeElement === first || !dialogRef.current?.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !dialogRef.current?.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
-    const previousOverflow = document.body.style.overflow;
-
-    document.addEventListener("keydown", handleEscape);
-    document.body.style.overflow = "hidden";
-
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = previousOverflow;
+      previousFocus?.focus({ preventScroll: true });
     };
   }, [onClose]);
 
   return (
     <>
-      {/* Background layer */}
-      <div
-        onClick={onClose}
-        data-lenis-prevent
-        className="fixed inset-0 z-50 overflow-hidden"
-      >
-        <Image
-          src={card.image}
-          alt=""
-          fill
-          className="object-cover scale-110 blur-3xl"
-          sizes="384px"
-          quality={25}
-        />
+      <div onClick={onClose} data-lenis-prevent aria-hidden="true" className="fixed inset-0 z-50 overflow-hidden">
+        <Image src={card.image} alt="" fill className="object-cover scale-110 blur-3xl" sizes="384px" quality={25} />
         <div className="absolute inset-0 bg-[#0d0b08]/70" />
         {!isMobile && (
           <div className="absolute inset-0 opacity-[0.16] pointer-events-none">
@@ -64,129 +71,50 @@ function ExpandedHobbyModal({ card, cardIndex, totalCards, isMobile, onClose }: 
         )}
       </div>
 
-      {/* Content panel */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 pointer-events-none">
         <div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
           data-lenis-prevent
-          className="relative w-full max-w-5xl h-[78vh] sm:h-[82vh] overflow-hidden border border-white/20 bg-[#0d0b08]/95 text-[#d4cdc4] pointer-events-auto"
+          className="relative isolate w-full max-w-3xl max-h-[88svh] overflow-y-auto overscroll-contain rounded-xl bg-[#0d0b08]/95 font-sans text-[#d4cdc4] shadow-[0_24px_80px_rgba(0,0,0,0.3)] pointer-events-auto [scrollbar-width:thin] [scrollbar-color:#56514b_transparent]"
         >
-          <div
-            aria-hidden
-            className="absolute top-0 left-0 right-0 h-[2px] bg-[#d4cdc4]/80 z-20"
-          />
-
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 z-30 w-10 h-10 flex items-center justify-center bg-[#d4cdc4]/10 hover:bg-[#d4cdc4]/18 text-[#d4cdc4] transition-colors border border-[#d4cdc4]/30"
-          >
-            <X size={18} />
-          </button>
-
-          <div className="absolute inset-0 z-0 pointer-events-none">
-            <Image
-              src={card.image}
-              alt={card.title}
-              fill
-              className="object-cover opacity-[0.14]"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
-              priority
-            />
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-xl">
+            <Image src={card.image} alt="" fill className="object-cover opacity-[0.14]" sizes="(max-width: 768px) 100vw, 768px" priority />
             <div className="absolute inset-0 bg-gradient-to-b from-[#0d0b08]/55 via-[#0d0b08]/82 to-[#0d0b08]/96" />
-            <div className="absolute inset-0 scanlines opacity-15" />
           </div>
 
-          <div className="relative z-10 h-full flex flex-col">
-            <div className="relative h-[130px] sm:h-[170px] lg:h-[195px] w-full overflow-hidden border-b border-[#d4cdc4]/20 bg-black">
-              <Image
-                src={card.image}
-                alt={card.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 920px"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0d0b08]/90 via-[#0d0b08]/45 to-[#0d0b08]/15" />
-              <div className="absolute inset-0 scanlines opacity-20" />
-            </div>
-
-            <div
-              data-lenis-prevent
-              className="relative flex-1 overflow-y-auto px-5 sm:px-8 lg:px-10 pt-6 pb-20"
+          <div className="sticky top-0 z-20 flex h-16 justify-end px-3 pt-3 sm:px-4 sm:pt-4 pointer-events-none">
+            <button
+              ref={closeRef}
+              type="button"
+              onClick={onClose}
+              aria-label="Close hobby details"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#121210] text-[#f4eee3] transition-colors hover:bg-[#292824] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e6c3a8] pointer-events-auto"
             >
-              <div className="mb-5 flex items-center gap-3">
-                <span className="font-mono text-[11px] tracking-[0.18em] text-[#d4cdc4]/55 uppercase">
-                  [NODE_{String(cardIndex + 1).padStart(2, "0")}] / {String(totalCards).padStart(2, "0")}
-                </span>
-                <span className="h-px flex-1 bg-gradient-to-r from-[#d4cdc4]/35 to-transparent" />
-                <span className="hidden sm:inline font-mono text-[10px] tracking-[0.18em] uppercase text-[#7a9a5a]/70">
-                  Expanded Feed
-                </span>
-              </div>
-
-              <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl leading-[0.95] tracking-tight text-[#d4cdc4] mb-4">
-                {card.title}
-              </h2>
-
-              <p className="text-base sm:text-lg text-[#d4cdc4]/78 leading-relaxed max-w-3xl">
-                {card.description}
-              </p>
-
-              <div className="mt-5 border-l border-[#d4cdc4]/35 pl-4 max-w-3xl">
-                <p className="font-mono text-[10px] tracking-[0.16em] uppercase text-[#d4cdc4]/48 mb-2">
-                  Expanded Notes
-                </p>
-                <p className="text-sm sm:text-base leading-relaxed text-[#d4cdc4]/72">
-                  {card.expandedText}
-                </p>
-              </div>
-
-              <div className="mt-6 flex flex-wrap gap-1.5 sm:gap-2">
-                {card.items.map((item) => (
-                  <span
-                    key={item}
-                    className="inline-flex items-center border border-white/80 bg-white/95 px-2.5 py-[3px] font-mono font-semibold text-[9px] tracking-[0.1em] uppercase text-[#0d0b08]"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-8 max-w-2xl">
-                <p className="font-mono font-semibold text-[10px] tracking-[0.18em] uppercase text-[#d4cdc4]/50 mb-3">
-                  Stats + Signals
-                </p>
-                <div className="space-y-3">
-                  {card.stats.map((stat) => (
-                    <div key={stat.label} className="flex items-end gap-3 sm:gap-4">
-                      <span className="min-w-[120px] sm:min-w-[150px] font-mono text-[10px] sm:text-xs tracking-[0.14em] uppercase text-[#d4cdc4]/58">
-                        {stat.label}
-                      </span>
-                      <span className="h-px w-24 sm:w-32 bg-[#d4cdc4]/22 mb-[6px]" />
-                      <span className="font-display text-lg sm:text-xl text-[#d4cdc4] leading-none">
-                        {stat.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {card.quote ? (
-                <blockquote className="mt-8 border-l border-[#d4cdc4]/45 pl-4 font-mono text-sm sm:text-base italic text-[#d4cdc4]/65">
-                  {card.quote}
-                </blockquote>
-              ) : null}
-            </div>
+              <X size={20} aria-hidden="true" />
+            </button>
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-20 z-10 overflow-hidden pointer-events-none opacity-45">
-            <PixelDivider
-              color="#d4cdc4"
-              pixelSize={isMobile ? 10 : 16}
-              durationSec={7.2}
-              rise="-170%"
-              streamsPerCol={2}
-              direction="up"
-            />
+          <div className="px-6 pb-8 sm:px-12 sm:pb-12">
+            <h2 id={titleId} className="pr-4 font-display text-4xl uppercase leading-none tracking-[-0.02em] text-[#f4eee3] sm:text-6xl">{card.title}</h2>
+            <p className="mt-6 text-sm leading-7 text-[#d4cdc4]/75 sm:text-base">{card.expandedText}</p>
+
+            <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs leading-5 text-[#e6c3a8]" aria-label="Favorites and interests">
+              {card.items.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+
+            <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3">
+              {card.stats.map((stat) => (
+                <div key={stat.label} className="min-w-0">
+                  <dt className="text-xs leading-5 text-[#d4cdc4]/65">{stat.label}</dt>
+                  <dd className="mt-1.5 text-sm font-medium leading-6 text-[#f4eee3]">{stat.value}</dd>
+                </div>
+              ))}
+            </dl>
+
+            {card.quote ? <blockquote className="mt-8 text-sm italic leading-6 text-[#e6c3a8]">{card.quote}</blockquote> : null}
           </div>
         </div>
       </div>

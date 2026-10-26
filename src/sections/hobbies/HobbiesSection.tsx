@@ -4,7 +4,7 @@ import React from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { AnimatePresence, motion, useInView } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import DecodingWord from "@/components/DecodingWord";
 import HorizontalPixelDivider from "@/components/HorizontalPixelDivider";
 import PixelDivider from "@/components/PixelDivider";
@@ -260,7 +260,6 @@ const HobbyLane = React.memo(function HobbyLane({
   });
   const imageRight = !isMobile && cardIndex % 2 !== 0;
   const spawnFromRight = cardIndex % 2 !== 0;
-  const [isImageHovered, setIsImageHovered] = React.useState(false);
 
   const laneVariants = React.useMemo(
     () => ({
@@ -344,13 +343,6 @@ const HobbyLane = React.memo(function HobbyLane({
 
   const titleWords = React.useMemo(() => card.title.split(" "), [card.title]);
 
-  const imageClipPath = React.useMemo(() => {
-    if (isMobile) return undefined;
-    return imageRight
-      ? "polygon(8% 0, 100% 0, 100% 100%, 0 100%)"
-      : "polygon(0 0, 92% 0, 100% 100%, 0 100%)";
-  }, [imageRight, isMobile]);
-
   return (
     <motion.article
       id={`hobby-${cardIndex}`}
@@ -409,58 +401,22 @@ const HobbyLane = React.memo(function HobbyLane({
             <motion.button
               type="button"
               onClick={onExpand}
-              onHoverStart={() => setIsImageHovered(true)}
-              onHoverEnd={() => setIsImageHovered(false)}
               whileHover={isMobile ? {} : { scale: 1.01 }}
               whileTap={isMobile ? {} : { scale: 0.99 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="group/image relative block w-full h-62.5 sm:h-82.5 lg:h-102.5 overflow-hidden cursor-pointer"
-              style={isMobile ? undefined : { clipPath: imageClipPath }}
+              className="group/image relative block w-full h-62.5 sm:h-82.5 lg:h-102.5 overflow-hidden rounded-xl bg-[#121210] cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e6c3a8]"
+              aria-label={`View ${card.title} details`}
             >
               <Image
                 src={card.image}
                 alt={card.title}
                 fill
-                className="object-cover scale-[1.04] transition-transform duration-150 ease-out group-hover/image:scale-110"
+                className="object-cover transition-transform duration-500 ease-out group-hover/image:scale-[1.035] motion-reduce:transform-none motion-reduce:transition-none"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 680px"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-linear-to-t from-[#0d0b08]/95 via-[#0d0b08]/45 to-[#0d0b08]/10" />
-              <div className="absolute inset-0 scanlines opacity-20 pointer-events-none" />
-
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 opacity-80">
-                <HorizontalPixelDivider
-                  color="#f6f4ef"
-                  pixelSize={isMobile ? 18 : 24}
-                  durationSec={6.2}
-                  travel="180%"
-                  streamsPerRow={1}
-                  direction={imageRight ? "left" : "right"}
-                  fadeTo={imageRight ? "left" : "right"}
-                />
-              </div>
-
-              <div className="absolute left-0 right-0 bottom-0 px-4 sm:px-5 pb-4 sm:pb-5">
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-[10px] sm:text-xs tracking-[0.16em] uppercase text-white/75">
-                    Expand Feed
-                  </span>
-                  <span className="h-px flex-1 bg-white/35" />
-                </div>
-              </div>
+              <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-transparent" />
             </motion.button>
-
-            <motion.div
-              aria-hidden
-              initial={false}
-              animate={
-                isImageHovered && !isMobile
-                  ? { scaleX: 1, opacity: 0.95 }
-                  : { scaleX: 0, opacity: 0 }
-              }
-              transition={{ duration: 0.45, ease: EASE_OUT }}
-              className={`mt-2 h-0.5 bg-foreground/60 ${imageRight ? "origin-right" : "origin-left"}`}
-            />
 
             <p className="mt-4 font-mono text-[10px] sm:text-xs uppercase tracking-[0.14em] text-foreground/55">
               {card.items.join(" // ")}
@@ -509,14 +465,12 @@ const HobbyLane = React.memo(function HobbyLane({
               variants={quoteVariants}
               type="button"
               onClick={onExpand}
-              whileHover={isMobile ? {} : { x: 4, scale: 1.01 }}
+              whileHover={isMobile ? {} : { y: -2 }}
               whileTap={isMobile ? {} : { scale: 0.98 }}
-              className="group inline-flex items-center gap-2 px-5 py-3 border border-muted/40 text-foreground hover:bg-[#0d0b08] hover:text-white transition-colors duration-300 cursor-pointer"
+              className="group inline-flex min-h-12 items-center justify-between gap-6 rounded-xl bg-[#121210] px-5 py-3 font-sans text-sm font-medium text-[#f4eee3] transition-colors duration-200 hover:bg-[#292824] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e6c3a8] cursor-pointer"
             >
               View Expanded
-              <span className="inline-flex overflow-hidden max-w-0 opacity-0 transition-all duration-300 ease-out group-hover:max-w-5 group-hover:opacity-100">
-                <ArrowRight size={18} />
-              </span>
+              <ArrowUpRight size={18} aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transform-none" />
             </motion.button>
           </div>
         </div>

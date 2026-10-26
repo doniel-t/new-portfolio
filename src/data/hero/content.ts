@@ -1,6 +1,6 @@
 export const HERO_CONTENT = {
   eyebrow: "PORTFOLIO",
-  heading: "Modern web experiences with a refined, understated aesthetic.",
+  heading: "Modern web experiences with an unique aesthetic",
   intro:
-    "I design and build performant, accessible interfaces with Next.js and a thoughtful component system.",
+    "I should put a good quote here",
 } as const;

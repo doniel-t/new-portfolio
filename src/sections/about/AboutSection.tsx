@@ -19,19 +19,9 @@ import { PROJECTS } from "@/data/work/projects";
 import type { Project } from "@/data/work/types";
 import { useGPUDetection } from "@/hooks/useGPUDetection";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { useScrollFade } from "@/hooks/useScrollFade";
 import ExpandedProjectModal from "@/sections/work/ExpandedProjectModal";
 import LocalTimeClient from "./LocalTime";
-import type { IconType } from "react-icons";
-import {
-  FaBriefcase,
-  FaChartBar,
-  FaCode,
-  FaMapMarkerAlt,
-  FaRegAddressCard,
-  FaSignal,
-  FaUser,
-} from "react-icons/fa";
+import ProjectToolIcons from "./ProjectToolIcons";
 
 const PortalFieldCollection = dynamic(
   () =>
@@ -43,15 +33,6 @@ const PortalFieldCollection = dynamic(
     loading: () => <div className="h-full w-full bg-[#0a0a0a]" />,
   }
 );
-
-const CORE_STACK_ITEMS = ABOUT_CONTENT.coreStackNames.map((name) =>
-  TECH_STACK_ITEMS.find((item) => item.name === name)
-).filter((item): item is TechItem => item !== undefined);
-
-const SCANLINE_STYLE: React.CSSProperties = {
-  backgroundImage:
-    "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(212,205,196,0.04) 2px, rgba(212,205,196,0.04) 4px)",
-};
 
 const viewEase = [0.16, 1, 0.3, 1] as const;
 const DESKTOP_RAIL_TOP = 96;
@@ -91,109 +72,54 @@ function useTypewriter(texts: readonly string[], typeSpeed = 80, pauseDuration =
   return { displayedText, isTyping };
 }
 
-function FrameTicks({ className = "border-[#d4cdc4]/50" }: { className?: string }) {
-  return (
-    <>
-      <span className={`absolute left-0 top-0 hidden h-5 w-5 border-l border-t sm:block ${className}`} />
-      <span className={`absolute right-0 top-0 hidden h-5 w-5 border-r border-t sm:block ${className}`} />
-      <span className={`absolute bottom-0 left-0 hidden h-5 w-5 border-b border-l sm:block ${className}`} />
-      <span className={`absolute bottom-0 right-0 hidden h-5 w-5 border-b border-r sm:block ${className}`} />
-    </>
-  );
-}
-
-function SectionLabel({ icon: Icon, children }: { icon: IconType; children: React.ReactNode }) {
-  return (
-    <p className="flex items-center gap-2 font-mono text-[12px] font-semibold uppercase text-[#d4cdc4]/40">
-      <Icon className="h-3.5 w-3.5 text-[#e6c3a8]" aria-hidden />
-      <span>{children}</span>
-    </p>
-  );
-}
-
-function ScrollFadeBlock({ children, className = "" }: { children?: React.ReactNode; className?: string }) {
-  const ref = useScrollFade<HTMLDivElement>();
-
-  return (
-    <div ref={ref} className={className} style={{ opacity: 0.2 }}>
-      {children}
-    </div>
-  );
-}
-
 function PortraitStamp() {
   return (
     <figure className="relative w-full max-w-52.5 sm:max-w-57.5 lg:max-w-61.5">
-      <div className="relative aspect-3/4 overflow-hidden border border-[#d4cdc4]/25">
+      <div className="relative aspect-3/4 overflow-hidden rounded-xl">
         <Image
           alt={ABOUT_CONTENT.portrait.alt}
           src="/me crop pixel.png"
           fill
           priority={false}
-          sizes="(min-width: 1024px) 246px, 230px"
+          sizes="(min-width: 1024px) 246px, (min-width: 640px) 230px, 42vw"
           className="object-cover object-center grayscale-30 saturate-[0.78] contrast-[1.08] brightness-[0.94]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(13,11,8,0)_35%,rgba(13,11,8,0.68)_100%)]" />
-        <div className="absolute inset-0 opacity-60 mix-blend-overlay" style={SCANLINE_STYLE} />
-        <FrameTicks />
       </div>
-      <ScrollFadeBlock className="mt-2 flex items-center justify-between gap-3 pb-2 font-mono text-[10px] uppercase text-[#d4cdc4]/60 sm:border-b sm:border-[#d4cdc4]/20">
-        <span>{ABOUT_CONTENT.portrait.feedLabel}</span>
-        <span>{ABOUT_CONTENT.portrait.capturedAt}</span>
-      </ScrollFadeBlock>
     </figure>
   );
 }
 
-function StickyIntroLabel() {
-  return (
-    <ScrollFadeBlock className="pb-4 font-mono text-[11px] uppercase text-[#e6c3a8] sm:border-b sm:border-[#d4cdc4]/50">
-      <p className="flex items-center gap-2 text-[12px] font-bold">
-        <FaRegAddressCard className="h-3.5 w-3.5" aria-hidden />
-        <span>{ABOUT_CONTENT.intro.label}</span>
-      </p>
-      <p className="mt-2 font-semibold text-[#d4cdc4]/40">{ABOUT_CONTENT.intro.meta}</p>
-    </ScrollFadeBlock>
-  );
-}
-
 function VibeSignal() {
-  const { displayedText, isTyping } = useTypewriter(ABOUT_CONTENT.vibe.emojis, 100, 2000);
-
+  const { displayedText } = useTypewriter(ABOUT_CONTENT.vibe.emojis, 100, 2000);
   return (
-    <ScrollFadeBlock className="py-3 lg:mt-4">
-      <div className="mb-3 flex items-center justify-between gap-4 font-mono text-[10px] uppercase text-[#d4cdc4]/40">
-        <span className="inline-flex items-center gap-2 text-[12px] font-bold">
-          <FaSignal className={`h-3 w-3 ${isTyping ? "animate-pulse text-[#e6c3a8]" : "text-[#d4cdc4]/25"}`} aria-hidden />
-          {ABOUT_CONTENT.vibe.label}
-        </span>
-        <span>{ABOUT_CONTENT.vibe.emojis.length} states</span>
-      </div>
-      <div className="font-mono text-3xl font-semibold leading-none text-[#d4cdc4] sm:text-4xl lg:text-[2rem]">
-        {displayedText}
-        <span className="ml-1 inline-block h-[1em] w-0.75 translate-y-1 bg-[#e6c3a8] align-baseline" />
-      </div>
-      <div className="mt-3 flex flex-wrap gap-x-2 gap-y-1.5 font-mono text-[10px] text-[#d4cdc4]/30">
-        {ABOUT_CONTENT.vibe.emojis.map((emoji) => (
-          <span key={emoji} className={displayedText === emoji ? "text-[#e6c3a8]" : undefined}>
-            {emoji}
-          </span>
-        ))}
-      </div>
-    </ScrollFadeBlock>
+    <div aria-hidden="true" className="mt-5 h-9 font-mono text-2xl text-[#e6c3a8]">
+      {displayedText}<span className="ml-1 text-[#d4cdc4]/50">|</span>
+    </div>
   );
 }
 
 function RailNamePlate() {
   return (
-    <ScrollFadeBlock className="py-3 sm:border-b sm:border-[#d4cdc4]/20">
-      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#d4cdc4]/36">
-        {ABOUT_CONTENT.rail.eyebrow}
-      </p>
-      <p className="mt-2 max-w-[9ch] font-display text-4xl uppercase leading-[0.9] text-[#d4cdc4] sm:text-5xl lg:text-[3.35rem]">
+    <div className="py-2 lg:pt-6">
+      <p className="font-display text-4xl uppercase leading-none text-[#f4eee3] sm:text-5xl">
         {ABOUT_CONTENT.rail.name}
       </p>
-    </ScrollFadeBlock>
+      <p className="mt-3 text-sm text-[#d4cdc4]/65">{ABOUT_CONTENT.location.region}</p>
+      <dl className="mt-6 grid grid-cols-2 gap-x-5 gap-y-4">
+          {ABOUT_CONTENT.personalStats.map((stat) => (
+            <div key={stat.label}>
+              <dt className="text-xs text-[#d4cdc4]/65">{stat.label}</dt>
+              <dd className={`mt-1.5 text-sm ${stat.isHighlighted ? "text-[#e6c3a8]" : "text-[#f4eee3]"}`}>{stat.value}</dd>
+            </div>
+          ))}
+          <div className="col-span-2">
+            <dt className="text-xs text-[#d4cdc4]/65">{ABOUT_CONTENT.location.localTimeLabel}</dt>
+            <dd className="mt-1.5 min-h-5"><LocalTimeClient className="text-sm tabular-nums text-[#f4eee3]" /></dd>
+          </div>
+        </dl>
+      <VibeSignal />
+    </div>
   );
 }
 
@@ -201,13 +127,15 @@ function FadeInView({
   id,
   children,
   className = "",
+  revealOnce = false,
 }: {
   id: string;
   children: React.ReactNode;
   className?: string;
+  revealOnce?: boolean;
 }) {
   const ref = React.useRef<HTMLElement | null>(null);
-  const isInView = useInView(ref, { amount: 0.1, margin: "-8% 0px -16% 0px" });
+  const isInView = useInView(ref, { once: revealOnce, amount: 0.1, margin: "-8% 0px -16% 0px" });
   const prefersReducedMotion = useReducedMotion();
 
   return (
@@ -218,8 +146,8 @@ function FadeInView({
       animate={isInView ? "show" : "hidden"}
       variants={{
         hidden: {
-          opacity: prefersReducedMotion ? 1 : 0.18,
-          y: prefersReducedMotion ? 0 : 34,
+          opacity: prefersReducedMotion || revealOnce ? 1 : 0.18,
+          y: prefersReducedMotion || revealOnce ? 0 : 34,
         },
         show: {
           opacity: 1,
@@ -227,248 +155,89 @@ function FadeInView({
           transition: { duration: 0.72, ease: viewEase },
         },
       }}
-      className={`scroll-mt-28 py-12 lg:min-h-[78vh] lg:py-14 ${className}`}
+      className={`scroll-mt-28 py-12 lg:py-14 ${className}`}
     >
       {children}
     </motion.article>
   );
 }
 
-function ViewTitle({
-  title,
-  meta,
-}: {
-  title: string;
-  meta: string;
-}) {
-  return (
-    <div className="relative pb-7">
-      <div className="mb-4 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/46">
-        <span className="h-2 w-2 rotate-45 bg-[#e6c3a8]" />
-        <span>{meta}</span>
-        <span className="h-px flex-1 bg-[#d4cdc4]/18" />
-      </div>
-      <h2 className="max-w-[11ch] font-display text-6xl uppercase leading-[0.88] text-[#f4eee3] sm:text-8xl md:text-9xl">
-        {title}
-      </h2>
-    </div>
-  );
+function useCardReveal() {
+  const reducedMotion = useReducedMotion();
+  const textReveal = {
+    hidden: { opacity: reducedMotion ? 1 : 0.15, filter: reducedMotion ? "blur(0px)" : "blur(8px)", y: reducedMotion ? 0 : 12 },
+    show: { opacity: 1, filter: "blur(0px)", y: 0, transition: { duration: reducedMotion ? 0 : 0.85, ease: viewEase } },
+  };
+  const cardReveal = {
+    hidden: { opacity: reducedMotion ? 1 : 0.15, filter: reducedMotion ? "blur(0px)" : "blur(12px)", y: reducedMotion ? 0 : 20 },
+    show: {
+      opacity: 1, filter: "blur(0px)", y: 0,
+      transition: { duration: reducedMotion ? 0 : 0.85, ease: viewEase, delayChildren: reducedMotion ? 0 : 0.12, staggerChildren: reducedMotion ? 0 : 0.08 },
+    },
+  };
+  return { textReveal, cardReveal };
 }
 
-function FloatingPanel({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={`relative bg-[#0d0b08]/24 p-5 shadow-[0_22px_90px_rgba(0,0,0,0.14)] sm:p-6 ${className}`}>
-      <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,rgba(230,195,168,0.52),rgba(212,205,196,0.12)_45%,transparent)]" />
-      <span className="pointer-events-none absolute left-0 top-0 h-2 w-2 border-l border-t border-[#e6c3a8]/70" />
-      <span className="pointer-events-none absolute bottom-0 right-0 h-2 w-2 border-b border-r border-[#d4cdc4]/24" />
-      {children}
-    </div>
-  );
-}
-
-function ProfileSheetRow({
-  children,
-  icon,
-  label,
-  className = "",
-}: {
-  children: React.ReactNode;
-  icon: IconType;
-  label: string;
-  className?: string;
-}) {
-  return (
-    <section className={`grid gap-6 border-t border-[#d4cdc4]/14 py-8 md:grid-cols-[142px_minmax(0,1fr)] md:py-9 xl:grid-cols-[164px_minmax(0,1fr)] ${className}`}>
-      <SectionLabel icon={icon}>{label}</SectionLabel>
-      <div className="min-w-0">{children}</div>
-    </section>
-  );
-}
-
-function ProfileSummaryPanel() {
-  return (
-    <ProfileSheetRow icon={FaUser} label={ABOUT_CONTENT.summary.sectionLabel} className="border-t-0 pt-0">
-      <div className="space-y-7">
-        <p className="max-w-3xl text-lg leading-8 text-[#d4cdc4]/82 sm:text-xl">
-          {ABOUT_CONTENT.summary.lead}
-          <span className="text-[#d4cdc4]/58"> {ABOUT_CONTENT.summary.detail}</span>
-        </p>
-
-        <dl className="grid grid-cols-2 gap-3 sm:max-w-136 sm:gap-4">
-          {ABOUT_CONTENT.profileStats.map((stat) => (
-            <div key={stat.label} className="relative min-w-0 border border-[#d4cdc4]/14 bg-[#0d0b08]/18 p-4 sm:p-5">
-              <span className="pointer-events-none absolute left-0 top-0 h-1.5 w-1.5 bg-[#e6c3a8]/70" />
-              <span className="pointer-events-none absolute bottom-0 right-0 h-1.5 w-1.5 bg-[#d4cdc4]/24" />
-              <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/42">
-                {stat.label}
-              </dt>
-              <dd className="mt-2 font-display text-5xl leading-none text-[#e6c3a8] sm:text-6xl">
-                {stat.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    </ProfileSheetRow>
-  );
-}
-
-function CoreStackPanel() {
-  return (
-    <ProfileSheetRow icon={FaCode} label={ABOUT_CONTENT.sections.coreStack}>
-      <div className="grid grid-cols-2 gap-x-8 gap-y-4 xl:grid-cols-4">
-        {CORE_STACK_ITEMS.map((item, index) => (
-          <span
-            key={item.name}
-            className="inline-flex min-w-0 items-center gap-2 font-mono text-xs font-semibold uppercase text-[#d4cdc4]"
-          >
-            <span className="text-[#e6c3a8]">{String(index + 1).padStart(2, "0")}</span>
-            <span className="shrink-0 text-[#d4cdc4]" aria-hidden>{item.icon}</span>
-            <span className="truncate">{item.name}</span>
-          </span>
-        ))}
-      </div>
-    </ProfileSheetRow>
-  );
-}
-
-function PersonalStatsPanel() {
-  return (
-    <ProfileSheetRow icon={FaChartBar} label={ABOUT_CONTENT.sections.stats}>
-      <div className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-4">
-        {ABOUT_CONTENT.personalStats.map((stat) => (
-          <div key={stat.label} className="min-w-0">
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/40">
-              {stat.label}
-            </p>
-            <p className="flex items-center gap-2 font-mono text-base font-semibold text-[#d4cdc4]">
-              {stat.isHighlighted ? <span className="h-2 w-2 rounded-full bg-[#e6c3a8]" /> : null}
-              <span className="whitespace-nowrap">{stat.value}</span>
-            </p>
-          </div>
-        ))}
-      </div>
-    </ProfileSheetRow>
-  );
-}
-
-function ExperiencePanel() {
-  return (
-    <ProfileSheetRow icon={FaBriefcase} label={ABOUT_CONTENT.sections.experience} className="py-10 md:py-11">
-      <div className="relative pl-9 sm:pl-12">
-        <span
-          className="absolute bottom-8 left-1.5 top-2 w-px bg-[linear-gradient(180deg,rgba(230,195,168,0.86),rgba(212,205,196,0.22)_52%,rgba(212,205,196,0.04))]"
-          aria-hidden
-        />
-        {ABOUT_CONTENT.experience.map((item, index) => (
-          <article
-            key={`${item.company}-${item.role}`}
-            className="relative pb-10 last:pb-0"
-          >
-            <span
-              className={`absolute -left-9.5 top-1 h-3.25 w-3.25 border border-[#0d0b08] sm:-left-12.5 ${
-                index === 0 ? "bg-[#e6c3a8] shadow-[0_0_0_5px_rgba(230,195,168,0.12)]" : "bg-[#d4cdc4]/48"
-              }`}
-              aria-hidden
-            />
-            <span
-              className="absolute -left-7.75 top-1.75 hidden h-px w-7 bg-[#d4cdc4]/20 sm:-left-10.75 sm:block"
-              aria-hidden
-            />
-
-            <div className="grid gap-5 border-t border-[#d4cdc4]/10 pt-5 first:border-t-0 first:pt-0 lg:grid-cols-[minmax(210px,0.62fr)_minmax(0,1fr)] lg:gap-8">
-              <div className="min-w-0">
-                <div className="mb-3 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
-                  <h3 className="font-mono text-base font-semibold leading-snug text-[#d4cdc4]">
-                    {item.role}
-                  </h3>
-                  <span className={index === 0 ? "font-mono text-[10px] uppercase text-[#e6c3a8]" : "font-mono text-[10px] uppercase text-[#d4cdc4]/40"}>
-                    {item.badge}
-                  </span>
-                </div>
-                <p className="font-mono text-xs text-[#d4cdc4]/58">
-                  {item.company}
-                </p>
-                <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-[#d4cdc4]/34">
-                  {item.duration}
-                </p>
-              </div>
-
-              <div className="min-w-0 space-y-4">
-                <div className="flex flex-wrap gap-2">
-                  {item.focus.map((focus) => (
-                    <span
-                      key={focus}
-                      className="border border-[#d4cdc4]/12 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[#d4cdc4]/58"
-                    >
-                      {focus}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex items-center gap-3 font-mono text-[10px] uppercase text-[#d4cdc4]/40">
-                  <span>{item.status}</span>
-                  {index === 0 ? (
-                    <span className="relative h-1 w-24 overflow-hidden bg-[#d4cdc4]/10">
-                      <span
-                        className="absolute inset-y-0 w-1/2 bg-[#e6c3a8]/75"
-                        style={{ animation: "loading 1.5s ease-in-out infinite" }}
-                      />
-                    </span>
-                  ) : (
-                    <span className="h-1 w-8 bg-[#e6c3a8]/60" />
-                  )}
-                </div>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </ProfileSheetRow>
-  );
-}
-
-function LocationPanel() {
-  return (
-    <ProfileSheetRow icon={FaMapMarkerAlt} label={ABOUT_CONTENT.sections.location} className="pb-0">
-      <div className="grid gap-6 sm:grid-cols-2">
-        <div>
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/40">
-            {ABOUT_CONTENT.location.regionLabel}
-          </p>
-          <p className="font-mono text-sm font-semibold text-[#d4cdc4]">{ABOUT_CONTENT.location.region}</p>
-        </div>
-        <div>
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/40">
-            {ABOUT_CONTENT.location.localTimeLabel}
-          </p>
-          <LocalTimeClient className="font-mono text-sm font-semibold text-[#d4cdc4]" />
-        </div>
-      </div>
-    </ProfileSheetRow>
-  );
-}
+const ABOUT_CARD_CLASS_NAME = "max-w-3xl rounded-xl bg-[#121210]/85 px-6 py-8 sm:p-10 xl:p-12";
 
 function SoftwareEngineerView() {
+  const { textReveal, cardReveal } = useCardReveal();
   return (
-    <FadeInView id="about-software-engineer" className="pt-6 lg:min-h-[92vh]">
-      <ViewTitle title={ABOUT_CONTENT.views.profile.title} meta={ABOUT_CONTENT.views.profile.meta} />
+    <FadeInView id="about-software-engineer" className="pt-0" revealOnce>
+      <motion.div variants={cardReveal} className={ABOUT_CARD_CLASS_NAME}>
+        <motion.h2 variants={textReveal} className="font-display text-5xl uppercase leading-none text-[#f4eee3] sm:text-6xl xl:text-7xl">
+          {ABOUT_CONTENT.views.profile.title}
+        </motion.h2>
+        <motion.p variants={textReveal} className="mt-6 max-w-2xl text-xl leading-relaxed tracking-[-0.015em] text-[#d4cdc4] sm:text-2xl">
+          {ABOUT_CONTENT.summary.lead}
+        </motion.p>
+        <motion.dl variants={textReveal} className="mt-7 grid max-w-sm grid-cols-2 gap-6">
+          {ABOUT_CONTENT.profileStats.map((stat, index) => (
+            <div key={stat.label} className="flex flex-col">
+              <dt className="mt-1 text-xs text-[#d4cdc4]/65">{index === 0 ? "Years coding" : "Years professional"}</dt>
+              <dd className="order-first font-display text-5xl leading-none text-[#e6c3a8] sm:text-6xl">{stat.value}</dd>
+            </div>
+          ))}
+        </motion.dl>
 
-      <div className="relative max-w-304">
-        <span className="pointer-events-none absolute bottom-0 left-0 top-1 hidden w-px bg-[linear-gradient(180deg,rgba(230,195,168,0.48),rgba(212,205,196,0.12)_35%,transparent)] md:block" />
-        <div className="md:pl-6 xl:pl-8">
-          <ProfileSummaryPanel />
-          <ExperiencePanel />
-          <CoreStackPanel />
-          <PersonalStatsPanel />
-          <LocationPanel />
-        </div>
-      </div>
+        <motion.div variants={textReveal} className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+          <span className="text-[#d4cdc4]/65">{ABOUT_CONTENT.sections.coreStack}</span>
+          <ul className="flex flex-wrap gap-x-4 gap-y-2 text-[#f4eee3]" aria-label={ABOUT_CONTENT.sections.coreStack}>
+            {ABOUT_CONTENT.coreStackNames.map((name) => {
+              const tech = TECH_STACK_ITEMS.find((item) => item.name === name);
+              return (
+                <li key={name} role="img" aria-label={name} title={name} className="flex h-9 w-9 items-center justify-center [&_svg]:size-7">
+                  <span aria-hidden="true">{tech?.icon}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </motion.div>
+
+        <motion.section variants={textReveal} aria-labelledby="about-experience-title" className="mt-8 sm:mt-10">
+          <h3 id="about-experience-title" className="mb-5 text-sm font-medium text-[#d4cdc4]/65">Experience</h3>
+          <div className="space-y-6">
+            {ABOUT_CONTENT.experience.map((item, index) => (
+              <article key={item.company} className="flex items-baseline justify-between gap-5">
+                <span className="shrink-0 font-mono text-xs tabular-nums text-[#e6c3a8]">
+                  {String(ABOUT_CONTENT.experience.length - index).padStart(2, "0")}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-base font-medium leading-snug text-[#f4eee3]">{item.role}</h4>
+                  <p className="mt-1 text-sm text-[#d4cdc4]/65">
+                    {item.company}<span className="px-2 text-[#d4cdc4]/40" aria-hidden="true">·</span>
+                    <span className={item.status === "ONGOING" ? "text-[#e6c3a8]" : undefined}>{item.status.toLowerCase()}</span>
+                  </p>
+                  <p className="mt-2 text-xs leading-5 text-[#d4cdc4]/65">{item.focus.join(" · ")}</p>
+                </div>
+                <p className="shrink-0 text-xs tabular-nums text-[#d4cdc4]/65">{item.duration}</p>
+              </article>
+            ))}
+          </div>
+        </motion.section>
+
+
+      </motion.div>
     </FadeInView>
   );
 }
@@ -503,15 +272,15 @@ function ProjectVisual({ project, displayTitle, index }: { project: Project; dis
   const hasImage = project.image !== "/placeholder-project.jpg";
 
   return (
-    <div className="relative min-h-40 overflow-hidden border border-[#d4cdc4]/10 bg-[#11100d] sm:min-h-44">
+    <div className="relative aspect-video overflow-hidden rounded-xl bg-[#1b1b18] sm:aspect-auto sm:min-h-44">
       {hasImage ? (
         <Image
           src={project.image}
           alt={`${displayTitle} preview`}
           fill
-          priority={index < 2}
-          sizes="(min-width: 1024px) 220px, 100vw"
-          className="object-cover grayscale-12 saturate-[0.9] contrast-[1.02] transition duration-500 group-hover/project:scale-[1.025] group-hover/project:grayscale-0"
+          priority={false}
+          sizes="(min-width: 640px) 196px, calc(100vw - 96px)"
+          className={`${project.image === "/ingolstadt-project-dark.png" ? "object-contain bg-[#0d0b08]" : "object-cover"} grayscale-12 saturate-[0.9] contrast-[1.02] transition duration-500 group-hover/project:scale-[1.025] group-hover/project:grayscale-0`}
         />
       ) : (
         <ProjectPlaceholder index={index} />
@@ -533,39 +302,30 @@ function ProjectListCard({
   const displayTitle = formatProjectTitle(project.title);
 
   return (
-    <article className="group/project grid transform-gpu gap-5 border-t border-[#d4cdc4]/12 py-6 transition-[border-color,translate] duration-200 ease-out first:border-t-0 first:pt-0 hover:translate-x-1.5 hover:border-[#d4cdc4]/22 motion-reduce:transition-none motion-reduce:hover:translate-x-0 sm:grid-cols-[196px_minmax(0,1fr)] sm:gap-6">
+    <article className="group/project grid gap-5 sm:grid-cols-[176px_minmax(0,1fr)] sm:gap-6">
       <ProjectVisual project={project} displayTitle={displayTitle} index={index} />
 
       <div className="flex min-w-0 flex-col">
-        <div className="mb-3 flex items-center justify-between gap-4 font-mono text-[10px] uppercase text-[#d4cdc4]/42">
-          <span>[{String(index + 1).padStart(2, "0")}]</span>
+        <div className="mb-2 flex items-center justify-between gap-4 text-xs text-[#d4cdc4]/65">
+          <span className="font-mono text-[#e6c3a8]">{String(index + 1).padStart(2, "0")}</span>
           <span>{project.year}</span>
         </div>
 
-        <h4 className="font-display text-3xl leading-none text-[#d4cdc4] transition-colors duration-300 group-hover/project:text-[#f4eee3] sm:text-4xl">
+        <h3 className="text-xl font-medium leading-snug text-[#f4eee3]">
           {displayTitle}
-        </h4>
+        </h3>
 
-        <p className="mt-3 overflow-hidden text-sm leading-6 text-[#d4cdc4]/62 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">
-          {project.description}
+        <p className="mt-3 overflow-hidden text-sm leading-6 text-[#d4cdc4]/70 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">
+          {project.previewDescription ?? project.description}
         </p>
 
-        <div className="mt-5 flex flex-wrap gap-x-3 gap-y-2">
-          {project.techStack.slice(0, 4).map((tech) => (
-            <span
-              key={tech}
-              className="border-l border-[#d4cdc4]/14 pl-3 font-mono text-[10px] uppercase text-[#d4cdc4]/54 first:border-l-0 first:pl-0"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
+        <ProjectToolIcons tools={project.techStack.slice(0, 4)} />
 
-        <div className="mt-6 flex flex-wrap items-center gap-4">
+        <div className="mt-4 flex flex-wrap items-center gap-5">
           <button
             type="button"
             onClick={() => onOpen(project.id)}
-            className="inline-flex h-8 items-center gap-2 border-b border-[#d4cdc4]/24 font-mono text-[10px] uppercase text-[#f4eee3] transition hover:border-[#f4eee3]"
+            className="inline-flex min-h-11 items-center gap-2 text-sm text-[#e6c3a8] underline-offset-4 transition-colors hover:text-[#f4eee3] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e6c3a8]"
           >
             Read
             <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
@@ -575,7 +335,7 @@ function ProjectListCard({
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-8 items-center gap-2 border-b border-transparent font-mono text-[10px] uppercase text-[#d4cdc4]/62 transition hover:border-[#d4cdc4]/24 hover:text-[#f4eee3]"
+              className="inline-flex min-h-11 items-center gap-2 text-sm text-[#d4cdc4]/70 underline-offset-4 transition-colors hover:text-[#f4eee3] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e6c3a8]"
             >
               <ExternalLink className="h-3.5 w-3.5" aria-hidden />
               Live
@@ -586,7 +346,7 @@ function ProjectListCard({
               href={project.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-8 items-center gap-2 border-b border-transparent font-mono text-[10px] uppercase text-[#d4cdc4]/62 transition hover:border-[#d4cdc4]/24 hover:text-[#f4eee3]"
+              className="inline-flex min-h-11 items-center gap-2 text-sm text-[#d4cdc4]/70 underline-offset-4 transition-colors hover:text-[#f4eee3] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e6c3a8]"
             >
               <Github className="h-3.5 w-3.5" aria-hidden />
               Source
@@ -599,82 +359,41 @@ function ProjectListCard({
 }
 
 function RecentProjectsView({ onOpenProject }: { onOpenProject: (projectId: string) => void }) {
+  const { textReveal, cardReveal } = useCardReveal();
+
   return (
-    <FadeInView id="about-projects">
-      <ViewTitle title={ABOUT_CONTENT.views.projects.title} meta={`view 02 / ${PROJECTS.length} records`} />
-
-      <FloatingPanel className="max-w-6xl px-5 py-8 sm:px-8 sm:py-10 xl:ml-6">
-        <div className="mb-6 flex flex-col gap-4 border-b border-[#d4cdc4]/12 pb-5 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <SectionLabel icon={FaBriefcase}>{ABOUT_CONTENT.views.projects.sectionLabel}</SectionLabel>
-            <p className="mt-3 max-w-2xl font-mono text-[12px] leading-6 text-[#d4cdc4]/56">
-              {ABOUT_CONTENT.views.projects.description}
-            </p>
-          </div>
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#d4cdc4]/42">
-            archive: {PROJECTS.length.toString().padStart(2, "0")}
-          </span>
-        </div>
-
-        <div className="space-y-4">
+    <FadeInView id="about-projects" revealOnce>
+      <motion.div variants={cardReveal} className={ABOUT_CARD_CLASS_NAME}>
+        <motion.h2 variants={textReveal} className="font-display text-5xl uppercase leading-none text-[#f4eee3] sm:text-6xl xl:text-7xl">
+          {ABOUT_CONTENT.views.projects.title}
+        </motion.h2>
+        <motion.p variants={textReveal} className="mt-6 max-w-2xl text-base leading-relaxed text-[#d4cdc4]/70 sm:text-lg">
+          {ABOUT_CONTENT.views.projects.description}
+        </motion.p>
+        <div className="mt-9 space-y-10 sm:mt-10 sm:space-y-12">
           {PROJECTS.map((project, index) => (
-            <ProjectListCard
-              key={project.id}
-              project={project}
-              index={index}
-              onOpen={onOpenProject}
-            />
+            <motion.div key={project.id} variants={textReveal}>
+              <ProjectListCard project={project} index={index} onOpen={onOpenProject} />
+            </motion.div>
           ))}
         </div>
-      </FloatingPanel>
+      </motion.div>
     </FadeInView>
   );
 }
 
-function CostBars({ filled }: { filled: number }) {
-  return (
-    <div className="flex shrink-0 gap-0.5">
-      {[1, 2, 3, 4, 5].map((bar) => (
-        <span key={bar} className={`h-2 w-1 bg-current ${filled >= bar ? "opacity-100" : "opacity-20"}`} />
-      ))}
-    </div>
-  );
-}
-
 function AboutTechChip({ tech }: { tech: TechItem }) {
-  const filledBars = Math.ceil(tech.cost / 3);
-
   return (
     <div
       tabIndex={0}
-      className="about-tech-card group relative min-h-35.5 cursor-default overflow-hidden border border-[#A69F8D]/30 bg-[#0d0b08]/24 p-4 text-[#A69F8D] transition-colors duration-200 hover:border-[#A69F8D]/80 hover:bg-[#A69F8D] hover:text-[#0d0b08] focus-visible:border-[#A69F8D] focus-visible:bg-[#A69F8D] focus-visible:text-[#0d0b08] focus-visible:outline-none"
+      className="about-tech-card group flex min-w-0 items-start gap-3 rounded-xl px-2 py-3 text-[#d4cdc4] transition-colors duration-200 hover:bg-[#e6c3a8]/8 focus-visible:bg-[#e6c3a8]/8 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e6c3a8]"
     >
-      <div className="absolute left-0 top-0 h-1 w-1 bg-[#A69F8D] transition-colors group-hover:bg-[#0d0b08] group-focus-visible:bg-[#0d0b08]" />
-      <div className="absolute right-0 top-0 h-1 w-1 bg-[#A69F8D] transition-colors group-hover:bg-[#0d0b08] group-focus-visible:bg-[#0d0b08]" />
-      <div className="absolute bottom-0 left-0 h-1 w-1 bg-[#A69F8D] transition-colors group-hover:bg-[#0d0b08] group-focus-visible:bg-[#0d0b08]" />
-      <div className="absolute bottom-0 right-0 h-1 w-1 bg-[#A69F8D] transition-colors group-hover:bg-[#0d0b08] group-focus-visible:bg-[#0d0b08]" />
-
-      <div className="absolute right-3 top-3 font-mono text-xs opacity-60">[{tech.cost}]</div>
-
-      <div className="relative z-10 flex h-full flex-col justify-end">
-        <div className="mb-2 flex items-center gap-2.5">
-          <div className="shrink-0 opacity-80 transition-colors group-hover:opacity-100">
-            {tech.icon}
-          </div>
-          <span className="font-mono text-base font-bold uppercase tracking-tight group-hover:glitch-jitter group-focus-visible:glitch-jitter">
-            {tech.name}
-          </span>
-        </div>
-
-        <div className="mb-2 h-px w-full bg-current opacity-20" />
-
-        <div className="flex items-end justify-between">
-          <span className="mr-2 truncate font-mono text-[10px] uppercase tracking-widest opacity-80">
-            {tech.description}
-          </span>
-          <CostBars filled={filledBars} />
-        </div>
+      <span aria-hidden="true" className="mt-0.5 shrink-0 text-[#e6c3a8] [&_svg]:size-5">{tech.icon}</span>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium leading-6 text-[#f4eee3]">{tech.name}</p>
+        <p className="mt-0.5 text-xs leading-5 text-[#d4cdc4]/65">{tech.description}</p>
       </div>
+      <span className="mt-1 shrink-0 font-mono text-[10px] tabular-nums text-[#d4cdc4]/65" aria-label={`${tech.cost} memory`}>{tech.cost}</span>
     </div>
   );
 }
@@ -683,50 +402,39 @@ function AboutTechCategory({ category }: { category: TechCategoryDef }) {
   const categoryMemory = category.items.reduce((acc, item) => acc + item.cost, 0);
 
   return (
-    <div>
-      <div className="mb-4 flex items-center gap-4 font-mono">
-        <div className="h-1.5 w-1.5 shrink-0 rotate-45 bg-[#A69F8D]" />
-        <h4 className="whitespace-nowrap font-display text-3xl font-bold italic leading-none text-[#A69F8D] sm:text-4xl">
-          {category.label}
-        </h4>
-        <div className="h-px flex-1 bg-[#A69F8D]/15" />
-        <span className="hidden text-[10px] uppercase tracking-widest text-[#A69F8D]/35 sm:block">
-          {category.tag}
-        </span>
-        <span className="font-mono text-[10px] tracking-wider text-[#A69F8D]/50">
-          {categoryMemory} mem
-        </span>
+    <section aria-labelledby={`tech-category-${category.key}`}>
+      <div className="mb-3 flex items-baseline justify-between gap-4">
+        <h3 id={`tech-category-${category.key}`} className="text-base font-medium capitalize text-[#f4eee3]">{category.label === "CMS" ? category.label : category.label.toLowerCase()}</h3>
+        <span className="font-mono text-[10px] tabular-nums text-[#d4cdc4]/65">{categoryMemory} mem</span>
       </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {category.items.map((tech) => (
-          <AboutTechChip key={tech.name} tech={tech} />
-        ))}
+      <div className="-mx-2 grid grid-cols-1 gap-x-6 gap-y-1 sm:grid-cols-2">
+        {category.items.map((tech) => <AboutTechChip key={tech.name} tech={tech} />)}
       </div>
-    </div>
+    </section>
   );
 }
 
 function AboutTechStackView() {
+  const { textReveal, cardReveal } = useCardReveal();
+
   return (
-    <FadeInView id="about-tech-stack" className="pb-2">
-      <ViewTitle title={ABOUT_CONTENT.views.techStack.title} meta={`view 03 / ${TECH_STACK_ITEMS.length} installed chips`} />
-
-      <div className="relative max-w-6xl xl:ml-auto">
-        <div className="mb-9 grid gap-5 border-t border-[#A69F8D]/26 pt-5 sm:grid-cols-[minmax(150px,0.34fr)_minmax(0,1fr)] sm:items-end">
-          <SectionLabel icon={FaCode}>Installed chips</SectionLabel>
-          <div className="flex flex-col gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#A69F8D]/58 sm:items-end sm:text-right">
-            <p>memory: {TECH_STACK_TOTAL_MEMORY} / 256</p>
-            <p>{TECH_STACK_CATEGORIES.length} categories / cursor enabled in view</p>
-          </div>
-        </div>
-
-        <div className="space-y-11">
+    <FadeInView id="about-tech-stack" className="pb-2" revealOnce>
+      <motion.div variants={cardReveal} className={ABOUT_CARD_CLASS_NAME}>
+        <motion.h2 variants={textReveal} className="font-display text-5xl uppercase leading-none text-[#f4eee3] sm:text-6xl xl:text-7xl">
+          {ABOUT_CONTENT.views.techStack.title}
+        </motion.h2>
+        <motion.div variants={textReveal} className="mt-6 flex flex-wrap justify-between gap-x-6 gap-y-2 text-xs text-[#d4cdc4]/65">
+          <p>{TECH_STACK_CATEGORIES.length} categories · {TECH_STACK_ITEMS.length} tools</p>
+          <p className="tabular-nums">Memory: {TECH_STACK_TOTAL_MEMORY} / 256</p>
+        </motion.div>
+        <div className="mt-9 space-y-8 sm:mt-10 sm:space-y-9">
           {TECH_STACK_CATEGORIES.map((category) => (
-            <AboutTechCategory key={category.key} category={category} />
+            <motion.div key={category.key} variants={textReveal}>
+              <AboutTechCategory category={category} />
+            </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
     </FadeInView>
   );
 }
@@ -1064,22 +772,17 @@ function ModernAboutLayout() {
           <div
             ref={railRef}
             style={railStyle}
-            className="grid gap-4 sm:grid-cols-[minmax(170px,230px)_minmax(0,1fr)] sm:items-end lg:block"
+            className="grid grid-cols-[minmax(120px,0.9fr)_minmax(0,1fr)] items-center gap-5 sm:grid-cols-[minmax(170px,230px)_minmax(0,1fr)] lg:block"
           >
-            <div className="sm:col-span-2 lg:mb-4">
-              <StickyIntroLabel />
-            </div>
             <div className="lg:mb-5">
               <PortraitStamp />
             </div>
             <RailNamePlate />
-            <VibeSignal />
           </div>
         </aside>
 
-        <div className="relative lg:pl-12 xl:pl-16 xl:pr-2">
-          <ScrollFadeBlock className="pointer-events-none absolute left-0 top-0 hidden h-full w-px bg-[#d4cdc4]/50 lg:block" />
-          <div className="space-y-16 lg:space-y-28">
+        <div className="relative min-w-0 xl:pr-2">
+          <div className="space-y-6 lg:space-y-8">
             <SoftwareEngineerView />
             <RecentProjectsView onOpenProject={handleOpenProject} />
             <AboutTechStackView />
@@ -1126,7 +829,7 @@ export default function AboutSection() {
         data-snap-section="work"
         data-navbar-variant="bright"
         aria-labelledby="about-software-engineer"
-        className="relative isolate w-full bg-[#0a0a0a] py-24 sm:py-32"
+        className="relative isolate w-full bg-[#0a0a0a] font-sans py-24 sm:py-32"
       >
         <SectionPortalBackdrop />
 

@@ -13,7 +13,7 @@ export default function LocalTimeClient({
 
   useEffect(() => {
     const updateTime = () => {
-      setTime(new Date().toLocaleString("de-DE", { timeZone: "Europe/Berlin" }));
+      setTime(new Date().toLocaleTimeString("de-DE", { timeZone: "Europe/Berlin", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }));
     };
 
     updateTime();
