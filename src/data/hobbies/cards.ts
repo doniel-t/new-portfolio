@@ -28,7 +28,7 @@ export const HOBBIES: HobbyCard[] = [
       { label: "Hours in Souls", value: "600+" },
       { label: "LoL Rank Peak", value: "Diamond" },
     ],
-    quote: '"I have too many video game songs in my playlist!"',
+    quote: '"Video game OST rocks! (づᴗ _ᴗ)づ"',
   },
   {
     title: "Cycling",
@@ -42,7 +42,7 @@ export const HOBBIES: HobbyCard[] = [
       { label: "Weekly Avg", value: "Too little T-T" },
       { label: "Favorite Time", value: "Around 20:00" },
     ],
-    quote: '"Life is movement"'
+    quote: '"Life is movement ദ്ദി ˉ͈̀꒳ˉ͈́ )✧"'
   },
   {
     title: "Digital Art",
@@ -57,7 +57,7 @@ export const HOBBIES: HobbyCard[] = [
       { label: "Tablet", value: "Huion Camvas Pro 19" },
       { label: "Favourite Artist", value: "Tatsuki Fujimoto" },
     ],
-    quote: '"The blank canvas scares me"'
+    quote: '"The blank canvas scares me (•᷄- •᷅ ;) "'
   },
   {
     title: "Dungeons & Dragons",
@@ -73,6 +73,6 @@ export const HOBBIES: HobbyCard[] = [
       { label: "Oneshots played", value: "4" },
       { label: "Favorite Class", value: "Bard" },
     ],
-    quote: '"Moth incident"',
+    quote: '"Moth incident ◉‿◉"',
   },
 ];
